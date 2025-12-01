@@ -1,0 +1,4 @@
+@import 'rcg.css';  /* <-- COMMENT THIS LINE OUT */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

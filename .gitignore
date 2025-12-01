@@ -1,0 +1,27 @@
+/.phpunit.cache
+/public/storage
+/storage/pail
+.env.backup
+.env.production
+.phpactor.json
+npm-debug.log
+yarn-error.log
+/auth.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+# Laravel-specific files to ignore
+/bootstrap/cache/
+/node_modules
+/public/hot # Development helper
+/storage/*.key
+/vendor
+.env
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+# Compiled Assets (Vite/Mix output)
+/public_html/build
+/public/build
