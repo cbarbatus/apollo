@@ -1,13 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container'>
 
-        <h1>Delete Element ID {{$id }}: Are you sure?</h1>
-        <br><br>
+    <div class='container'>
+        {{-- Use simple $id variable, which is now guaranteed to be available --}}
+        <h1>Delete Element ID {{ $id }}: Are you sure?</h1>
+        <br>
+        <br>
+
+        {{-- Use simple $id in form action --}}
         <form method="get" action="/elements/{{ $id }}/destroy" id="sure">
+            <button type="submit" class="btn btn-danger">Yes, Delete It</button>
         </form>
-            <button type="submit" form="sure" class="btn btn-danger">Confirm Delete</button>
+
+        <br>
+        {{-- Use simple $id in link href --}}
+        <a href="/elements/{{ $id }}/edit" class="btn btn-secondary">Cancel</a>
     </div>
-    <br>
+
 @endsection
+

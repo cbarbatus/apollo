@@ -8,7 +8,7 @@
         Member: $70 includes ADF membership renewal<br>
 <br>If you have access to Zelle, you can send your membership fee or donation by Zelle to finance@ravenscrygrove.org (to save us a few dollars in fees that Paypal charges) <br><br>
         To use Paypal instead, you can scan this Paypal QR code<br/><br/>
-<img alt="QR Code" border="0" <img src="/img/qrcode.png" border:0">
+<img alt="QR Code" src="/img/qrcode.png">
 <br/><br/>
 or use one of these buttons <br/><br/>
 

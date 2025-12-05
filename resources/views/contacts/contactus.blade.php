@@ -2,86 +2,47 @@
 
 @section('content')
     <div class='container'>
-        <h1>Contact Us</h1>
 
-        <form name="frmContact" id="frmContact" method="post"
-            action="/contacts/submit" enctype="multipart/form-data"
-            onsubmit="return validateContactForm()">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+        <h1 class="mb-4">Contact Us</h1>
 
-            <label for="name">Name</label>
-                <input type="text" name="name" id="name" size="40" required/>
-            <br>
-            <label for="email">Email</label>
-                <input type="email" name="email" id="email" size="60" required/>
-            <br>
-            <label for="message">Message</label>
-                <textarea name="message" id="content"
-                    cols="60" rows="6" required></textarea>
-            <br>
-            <div class="form-group" style="display: none;">
-                <label for="faxonly">Fax Only
-                    <input type="checkbox" name="faxonly" id="faxonly" />
-                </label>
-            </div>
-            <br>
-        </form>
-                <button type="submit" form='frmContact' class="btn btn-go" >Submit</button>
-        <br><br>
-                <div id="statusMessage">
-                        <?php
-                        if (! empty($message)) {
-                            ?>
-                            <p class='<?php echo $type; ?>Message'><?php echo $message; ?></p>
-                        <?php
-                        }
-                        ?>
+        <form name="frmContact" id="frmContact" method="post" action="/contacts/submit">
+            @csrf
+
+            <div class="row mb-3">
+                <label for="name" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-sm-10">
+                    {{-- NESTED COL: Limit the input width to 50% of the available space --}}
+                    <div class="col-md-6 p-0">
+                        <input type="text" name="name" id="name" class="form-control" required>
                     </div>
-        </div>
+                </div>
+            </div>
 
-    <script src="https://code.jquery.com/jquery-2.1.1.min.js"
-        type="text/javascript"></script>
-    <script type="text/javascript">
-        function validateContactForm() {
-            var valid = true;
+            <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    {{-- NESTED COL: Limit the input width to 50% of the available space --}}
+                    <div class="col-md-6 p-0">
+                        <input type="email" name="email" id="email" class="form-control" required>
+                    </div>
+                </div>
+            </div>
 
-            $(".info").html("");
-            $(".input-field").css('border', '#e0dfdf 1px solid');
-            var userName = $("#userName").val();
-            var userEmail = $("#userEmail").val();
-            var subject = $("#subject").val();
-            var content = $("#content").val();
+            <div class="row mb-3">
+                <label for="message" class="col-sm-2 col-form-label">Message</label>
+                <div class="col-sm-10">
+                    {{-- Textarea remains full-width (100% of the col-sm-10) --}}
+                    <textarea name="message" id="content" rows="6" class="form-control" required></textarea>
+                </div>
+            </div>
 
-            if (userName == "") {
-                $("#userName-info").html("Required.");
-                $("#userName").css('border', '#e66262 1px solid');
-                valid = false;
-            }
-            if (userEmail == "") {
-                $("#userEmail-info").html("Required.");
-                $("#userEmail").css('border', '#e66262 1px solid');
-                valid = false;
-            }
-            if (!userEmail.match(/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/))
-            {
-                $("#userEmail-info").html("Invalid Email Address.");
-                $("#userEmail").css('border', '#e66262 1px solid');
-                valid = false;
-            }
-
-            if (subject == "") {
-                $("#subject-info").html("Required.");
-                $("#subject").css('border', '#e66262 1px solid');
-                valid = false;
-            }
-            if (content == "") {
-                $("#userMessage-info").html("Required.");
-                $("#content").css('border', '#e66262 1px solid');
-                valid = false;
-            }
-            return valid;
-        }
-    </script>
+            <div class="row mb-3">
+                <div class="col-sm-10 offset-sm-2">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </form>
+        {{-- The old PHP and JavaScript blocks should remain removed --}}
 
     </div>
     <br>

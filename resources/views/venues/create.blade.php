@@ -19,8 +19,7 @@
             <input type="url" name="map_link" id="map_link" size="60">
             <br>
             <label for="directions">Driving directions:</label>
-            <textarea id="directions" name="directions" rows="4" cols="60">
-            </textarea>
+            <textarea id="directions" name="directions" rows="4" cols="60"></textarea>
             <br><br>
         </form>
         <button type="submit" form='create' class="btn btn-go">Submit</button>

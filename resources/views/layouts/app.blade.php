@@ -35,6 +35,13 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <style>
+        /* Define a CSS variable using the Laravel asset() helper */
+        :root {
+            --header-image-url: url("{{ asset('img/rcg_large_text.png') }}");
+            --header-image-tree-url: url("{{ asset('img/newtree2560.jpg') }}");
+        }
+    </style>
 </head>
 <body>
 
@@ -113,7 +120,6 @@
                                 <a  class="dropdown-item" href="/liturgy/find"> Liturgy </a>
                                 <a  class="dropdown-item" href="/grove/bylaws"> Bylaws </a>
                                 <a  class="dropdown-item" href="/grove/pay"> Pay Dues </a>
-                                <a  class="dropdown-item" href="/votes"> Vote </a>
                                 @endrole
 
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -164,6 +170,9 @@
         </div>
     </div>
 </div>
+<link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+<script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-</body>
+{{-- This must be in your main layout file, usually near the </body> tag --}}
+@stack('scripts')</body>
 </html>

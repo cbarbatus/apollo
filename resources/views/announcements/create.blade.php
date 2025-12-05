@@ -17,8 +17,7 @@
             </select>
             <br>
             <label for="summary">Summary:</label>
-            <textarea id="summary" name="summary" rows="15" cols="60">
-            </textarea>
+            <textarea id="summary" name="summary" rows="15" cols="60"></textarea>
             <br>
             <label for="when">When:</label>
             <input type="datetime-local" name="when" id="title" size="40" value="yyyy-mm-dd">
@@ -32,8 +31,7 @@
             <span class="note">If the venue is new, create it before a new announcement.</span>
             <br>
             <label for="notes">Notes:</label>
-            <textarea id="notes" name="notes" rows="15" cols="60">
-            </textarea>
+            <textarea id="notes" name="notes" rows="15" cols="60"></textarea>
             <br><br>
         </form>
         <button type="submit" form='create' class="btn btn-go">Submit</button>

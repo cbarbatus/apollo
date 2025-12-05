@@ -1,4 +1,115 @@
-@import 'rcg.css';  /* <-- COMMENT THIS LINE OUT */
+@import 'rcg.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* ---------------------------------------------------- */
+/* FIXES FOR FRONT-END LIST DISPLAY           */
+/* ---------------------------------------------------- */
+
+/* Targets UL tags within the main container (.container) for front-end display.
+   This overrides the global list-style: none reset. */
+.container ul {
+    list-style: disc !important;
+    padding-left: 20px !important; /* Ensure space for the marker */
+    margin: 5px 0 !important;      /* Consistent vertical spacing */
+}
+
+/* Targets list items for front-end proper spacing */
+.container li {
+    margin-bottom: 0.3rem !important;
+}
+
+/* ---------------------------------------------------- */
+/* FIXES FOR TRIX EDITOR DISPLAY             */
+/* ---------------------------------------------------- */
+
+/* Consolidated UL Fix for Trix: Restores dots and indentation.
+   Uses the stronger 40px padding for better visual clearance in the editor. */
+trix-editor .trix-content ul {
+    list-style: disc !important;
+    padding-left: 40px !important;
+    margin: 1em 0 !important;
+}
+
+/* Consolidated Header and Block Spacing Fix for Trix */
+/* Ensures H1, P, and DIV blocks have proper vertical separation. */
+trix-editor .trix-content h1,
+trix-editor .trix-content p,
+trix-editor .trix-content div {
+    /* Guarantees vertical separation for most block elements */
+    margin-top: 1em !important;
+    margin-bottom: 1em !important;
+}
+
+/* Specific H1 Margin Override for Trix: This is slightly more specific for headers. */
+trix-editor .trix-content h1 {
+    margin-top: 1.5em !important;
+    margin-bottom: 0.5em !important;
+}
+
+/* Fixes the visibility of the <hr> tag inside the Trix editor */
+trix-editor .trix-content hr {
+    height: 1px !important;
+    border: none !important;
+    background-color: #ccc !important;
+    margin: 1.5em 0 !important;
+}
+
+/* Custom line separator to replace the HR tag */
+.line-separator {
+    /* Critical: Ensures the line itself is visible */
+    border-top: 1px solid #ccc !important;
+
+    /* Ensures margin around the line */
+    margin: 1.5em 0 !important;
+
+    /* Forces the element to take up zero height (the line is the border) */
+    height: 0 !important;
+}
+
+/* Restores the visibility of the line-separator inside the Trix editor */
+trix-editor .trix-content .line-separator {
+    /* Critical: Ensures the top border is visible */
+    border-top: 1px solid #ccc !important;
+
+    /* Resets any border setting Trix might enforce */
+    border-style: solid !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-right: none !important;
+
+    /* Ensures proper vertical spacing */
+    margin: 1.5em 0 !important;
+
+    /* Ensures the element takes up no vertical space outside of the border */
+    height: 0 !important;
+}
+/* Optional: Stronger Front-End Targeting */
+.container .line-separator {
+    border-top: 1px solid #ccc !important;
+    margin: 1.5em 0 !important;
+    height: 0 !important;
+}
+
+/* Fixes link appearance (color and underline) on the front-end page */
+
+/* Target links in the main content area */
+.container a,
+.content-wrapper a {
+    /* Forces the link color to be blue */
+    color: #007bff !important;
+
+    /* Forces the link to be underlined */
+    text-decoration: underline !important;
+
+    /* Ensure the hover state is also styled (optional, but good practice) */
+    /* &:hover {
+        color: #0056b3 !important;
+    } */
+}
+
+/* If the front-end Trix content is wrapped in a dedicated div: */
+.trix-output a {
+    color: #007bff !important;
+    text-decoration: underline !important;
+}

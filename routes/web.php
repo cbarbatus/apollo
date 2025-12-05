@@ -19,12 +19,14 @@ Route::get('/', [WelcomeController::class, 'index']);
 Route::get('/dashboard', [WelcomeController::class, 'index'])->name('dashboard');
 Route::get('/home', [HomeController::class, 'index']);
 
+
 Route::get('/elements', [ElementController::class, 'index']);
-Route::post('/elements', [ElementController::class, 'store']);
+// Use a unique path for creation to stop the router from confusing it with the update request
+Route::post('/elements', [ElementController::class, 'store'])->name('elements.store');
 Route::get('/elements/{section_id}/create', [ElementController::class, 'create']);
+Route::put('/elements/{element}', [ElementController::class, 'update'])->name('elements.update');
 Route::get('/elements/{id}', [ElementController::class, 'show']);
-Route::put('/elements/{id}', [ElementController::class, 'update']);
-Route::get('/elements/{id}/edit', [ElementController::class, 'edit']);
+Route::get('/elements/{element}/edit', [ElementController::class, 'edit'])->name('elements.edit');
 Route::get('/elements/{id}/sure', [ElementController::class, 'sure']);
 Route::get('/elements/{id}/destroy', [ElementController::class, 'destroy']);
 
@@ -33,7 +35,7 @@ Route::post('/sections/store', [SectionController::class, 'store']);
 Route::get('/sections/create', [SectionController::class, 'create']);
 Route::get('/sections/{id}/show', [SectionController::class, 'show']);
 Route::put('/sections/{id}/update', [SectionController::class, 'update']);
-Route::get('/sections/{id}/edit', [SectionController::class, 'edit']);
+Route::get('/sections/{id}/edit', [SectionController::class, 'edit'])->name('sections.edit');;
 Route::get('/sections/{id}/sure', [SectionController::class, 'sure']);
 Route::get('/sections/{id}/destroy', [SectionController::class, 'destroy']);
 Route::get('/sections/{id}/on', [SectionController::class, 'on']);
@@ -98,8 +100,8 @@ Route::get('/grove/upload', [GroveController::class, 'upload']);
 Route::get('/grove/bylaws', [GroveController::class, 'bylaws']);
 Route::get('/grove/pay', [GroveController::class, 'pay']);
 Route::get('/grove/donate', [GroveController::class, 'donate']);
-Route::get('/schedule', [GroveController::class, 'schedule']);
-Route::put('/schedupdt/{id}', [GroveController::class, 'schedupdt']);
+Route::get('/schedule', [GroveController::class, 'schedule'])->name('schedule.show');;
+Route::put('/schedupdt/{id}', [GroveController::class, 'schedupdt'])->name('schedule.update');;
 Route::get('/grove/', [GroveController::class, 'index']);
 
 Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
@@ -171,6 +173,7 @@ Route::get('/announcements/{id}/uploadpic', [GroveController::class, 'uploadpic'
 
 Route::get('/roles', [RoleController::class, 'roles']);
 Route::get('/permissions', [RoleController::class, 'permissions']);
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -54,9 +54,12 @@
         </a>
         <br>
         <br>
-        <a href="https://www.facebook.com/ravenscrygrove/">
-            <img alt="Facebook" src="/img/facebook_button.gif">
-        </a>
+
+        <div class="d-flex justify-content-center my-4">
+            <a href="https://www.facebook.com/ravenscrygrove/">
+                <img src="/img/facebook_button.gif" alt="Follow Us on Facebook">
+            </a>
+        </div>
         <br><br>
     </div>
 

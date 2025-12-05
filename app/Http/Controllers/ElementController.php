@@ -47,6 +47,26 @@ class ElementController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+
+        // 1. CHECK IF THIS IS AN UPDATE REQUEST
+        if ($request->has('id')) {
+            // Find the existing model using the hidden ID field
+            $element = Element::findOrFail($request->input('id'));
+
+            // MANUALLY call your existing, correct update logic
+            // This executes your update function logic:
+            $element->title = (string) $request->input('title', $element->title);
+            $element->name = (string) $request->input('name', $element->name);
+            $element->sequence = (int) $request->input('sequence', $element->sequence);
+            $element->item = (string) $request->input('item', $element->item);
+
+            $element->save(); // This GUARANTEES an UPDATE query
+
+            $section_id = $element->section_id;
+
+            return redirect('/sections/'.$section_id.'/edit');
+        }
+
         $element = new Element;
 
         // Fixed type-mixing by using input() for safety and explicit casting for numeric columns
@@ -83,7 +103,6 @@ class ElementController extends Controller
     public function edit(Element $element): View
     {
         // Element::findOrFail($id) is now handled automatically by Laravel.
-
         return view('elements.edit', compact('element'));
 
     }
@@ -107,7 +126,8 @@ class ElementController extends Controller
         $element->save();
         $section_id = $element->section_id;
 
-        return redirect('/sections/'.$section_id.'/edit');
+        return redirect()->route('sections.edit', $section_id)
+            ->with('success', 'Element updated successfully!');
     }
 
     /**
@@ -115,24 +135,33 @@ class ElementController extends Controller
      *
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      */
-    public function sure(Element $element): View
+    public function sure(int $id): View
     {
-        // Passing the element object ensures type safety and property access in the view.
-        return view('elements.sure', compact('element'));
-    }
+        // Fetch the element manually to confirm it exists
+        $element = Element::findOrFail($id);
 
+        // Pass BOTH the simple ID and the Element object to the view for redundancy
+        return view('elements.sure', compact('element', 'id'));
+    }
     /**
      * Remove the specified resource from storage.
      *
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      */
-    public function destroy(Element $element): RedirectResponse
+    public function destroy(int $id): RedirectResponse
     {
-        // Element::findOrFail($id) is no longer needed.
+        // 2. Manually find the element (guarantees the object is loaded)
+        $element = Element::findOrFail($id);
 
-        $section_id = $element->section_id;
+        // 3. Store necessary variables BEFORE deletion.
+        $deleted_id = $element->id;
+        $section_id = $element->section_id; // This will definitely be 10 now.
+
+        // 4. Perform the deletion.
         $element->delete();
 
-        return redirect('/sections/'.$section_id.'/edit')->with('success', 'Element '.$element->id.' was deleted');
+        // 5. Use the stored section_id for the reliable named route redirect.
+        return redirect()->route('sections.edit', $section_id)
+            ->with('success', 'Element '.$deleted_id.' was deleted');
     }
 }

@@ -1,7 +1,9 @@
 @media screen and (min-width: 671px) {
 
-    body {background: url(/img/rcg_large_text.png) no-repeat,
-            url(/img/newtree2560.jpg) top center no-repeat;
+    body {
+        /* Use the CSS variables defined in Blade */
+        background: var(--header-image-url) no-repeat,
+        var(--header-image-tree-url) top center no-repeat;
         color:black;
         font-family: 'Cabin', sans-serif;
         font-style: normal;
@@ -168,21 +170,22 @@ h3, h2 {
     text-shadow: 2px 2px 4px #505050;
 }
 
-/* Restore bullet points and indentation for unordered lists */
-ul {
+/* Apply the restoration ONLY to lists inside the main content container */
+.main-content ul {
     list-style-type: disc;
-    padding-left: 20px ;
+    padding-left: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
-/* Ensure ordered lists (if used) also display correctly */
-ol {
-    list-style-type: decimal !important;
-    padding-left: 20px !important;
+
+/* Apply the rule to ordered lists in the content as well */
+.main-content ol {
+    list-style-type: decimal;
+    padding-left: 20px;
 }
 
-/* Ensure list items have proper spacing */
-li {
+/* Apply the list item spacing specifically to content lists */
+.main-content li {
     margin-bottom: 0.3rem;
 }
 

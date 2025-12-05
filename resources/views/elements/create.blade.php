@@ -18,9 +18,8 @@
             <input type="number" name="sequence" id="sequence" size="4">
             <br>
             <label for="item">Text:</label>
-            <textarea id="item" name="item" rows="4" cols="60" value="">
-            </textarea>
-        </form>
+            <textarea id="item" name="item" rows="4" cols="60" value=""></textarea>
+       </form>
         <button type="submit" form='create' class="btn btn-go">Submit</button>
 
     </div>
