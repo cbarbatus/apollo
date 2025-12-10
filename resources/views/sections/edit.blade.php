@@ -1,26 +1,34 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container'>
+    <div class='container my-5'>
         <h1>Edit Text Section {{ $section->id }}</h1>
-        <br>
+
         <form method="post" action="/sections/{{ $section->id }}/update" id="edit">
             @csrf
             @method('put')
-            <br>
-            <label for="title">Title:</label>
-            <input type="text" name="title" id="title" size="40" value="{{ $section->title }}">
-            <br>
-            <label for="name">Name:</label>
-            <input type="text" name="name" id="namee" size="20" value="{{ $section->name }}">
-            <br>
-            <label for="sequence">Sequence:</label>
-            <input type="number" name="sequence" id="seqence" size="4" value="{{ $section->sequence }}">
-            <br><br>
+
+            <div class="col-md-4 mb-3">
+                <label for="title">Title:</label>
+                <input type="text" name="title" id="title" size="40" value="{{ $section->title }}">
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" name="name" id="name" class="form-control" size="20" value="{{ $section->name }}">
+                </div>
+
+                <div class="col-md-1 mb-3">
+                    <label for="sequence" class="form-label">Sequence:</label>
+                    <input type="number" name="sequence" id="sequence" class="form-control" size="4" value="{{ $section->sequence }}">
+                </div>
+            </div>
+            <button type="submit" form='edit' class="btn btn-go">Submit</button>
         </form>
-        <button type="submit" form='edit' class="btn btn-go">Submit</button>
-        <br>
-<hr>
+
+        <hr class="my-5">
+
         <h3>Elements in Section {{ $section->id }}</h3>
 
         <br>

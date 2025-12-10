@@ -7,36 +7,42 @@
         <form method="get" action="/rituals/{{ $ritual['id'] }}/text" id="text">
         </form>
 
-        @if ( ($slideshow ?? '') != '')
-        <form method="get" action="/slideshows/{{ $slideshow['id'] }}/view" id="view">
-        </form>
-        @endif
-
-        @if ($lit_file != '')
-            <button type="submit" form='text' class="btn btn-go">Text</button>
-        @else No liturgy text
-        @endif
-
-        @if (($slideshow ?? '') != '')
-            <button type="submit" form='view' class="btn btn-go">Photos</button>
-        @else
-            No slideshow
-        @endif
-
-        <br><br>
-        @if ($announcement === null)
-            <h4> No announcement for this ritual </h4>
-        @else
-            <h4> Announcement Information: </h4><br>
-            @if ($announcement->picture_file == '')
-                <b>Picture:</b> none<
-            @else
-            Click on the image to open it full size in a new window.<br>
-                <a target="_blank" href="/img/{{ $announcement->picture_file }}">
-                <img src="/img/{{ $announcement->picture_file}}" alt="Ritual" style="max-height:120px">
+        <div class="my-4">
+            @if ($slideshow)
+                {{-- Assuming a route exists to view the slideshow by ID --}}
+                <a href="{{ url('/slideshows/' . $slideshow->id) }}" class="btn btn-info">
+                    View Associated Slideshow
                 </a>
-
+            @else
+                <span class="text-muted fst-italic">No slideshow associated with this ritual.</span>
             @endif
+        </div>
+
+        <div class="my-4">
+            @if ($lit_file != '')
+            <button type="submit" form='text' class="btn btn-info">View Liturgy Text</button>
+        @else <span class="text-muted fst-italic">No liturgy text associated with this rituale.</span>
+        @endif
+        </div>
+
+        <div class="my-5">
+            @if (!$announcement )
+                <span class="text-muted fst-italic">No announcement associated with this ritual.</span>
+            @else
+                <div class="my-5 fs-2 fw-bold">
+                    Announcement Information:
+                </div>
+
+            @if ($announcement->picture_file == '')
+                    <span class="text-muted fst-italic">No announcement picture associated with this ritual.</span>
+            @else
+                Click on the image to open it full size in a new window.<br>
+                    <a target="_blank" href="/img/{{ $announcement->picture_file }}">
+                    <img src="/img/{{ $announcement->picture_file}}" alt="Ritual" style="max-height:120px">
+                    </a>
+            @endif
+        </div>
+
             <br><br>
             <b>Summary:</b> {!! $announcement->summary !!}
             <br><br>

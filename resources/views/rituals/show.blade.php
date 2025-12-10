@@ -5,9 +5,9 @@
 
         <h1>Ritual Details</h1>
 
-        <br><b>Year: </b>{{ $ritual['year'] }}
-        <br><b>Name: </b>{{ $ritual['name'] }}
-        <br><b>Culture: </b>{{ $ritual['culture'] }}
+        <br><b>Year: </b>{{ $ritual->year }}
+        <br><b>Name: </b>{{ $ritual->name }}
+        <br><b>Culture: </b>{{ $ritual->culture }}
         <br><br>
 
         <form method="get" action="/rituals/{{ $ritual['id']}}/edit" id="edit">

@@ -3,7 +3,8 @@
 @section('content')
 
     <div class='container'>
-        {{-- Use simple $id variable, which is now guaranteed to be available --}}
+
+        {{-- Use simple $id, which is less likely to fail interpolation --}}
         <h1>Delete Element ID {{ $id }}: Are you sure?</h1>
         <br>
         <br>
@@ -19,4 +20,3 @@
     </div>
 
 @endsection
-

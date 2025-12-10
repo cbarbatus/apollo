@@ -9,6 +9,9 @@
 
         gtag('config', 'G-CTZCPCHVZ5');
     </script>
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=BAAhO9Kdh6sldcZSbvKxZKzHD8jOR2jCGn2M5_gjh1l4xpz6dPnaGxMzvUYAIqIerToxV5DsJLDVWvAwjQ&components=hosted-buttons&enable-funding=venmo&currency=USD">
+    </script>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

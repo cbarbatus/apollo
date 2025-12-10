@@ -2,34 +2,50 @@
 
 @section('content')
 
-    <div class='container'>
+    <div class='container my-5'>
         <h1>Dues for full grove year</h1>
-        <br>
-        Member: $70 includes ADF membership renewal<br>
-<br>If you have access to Zelle, you can send your membership fee or donation by Zelle to finance@ravenscrygrove.org (to save us a few dollars in fees that Paypal charges) <br><br>
-        To use Paypal instead, you can scan this Paypal QR code<br/><br/>
-<img alt="QR Code" src="/img/qrcode.png">
-<br/><br/>
-or use one of these buttons <br/><br/>
 
-        <br>
-        Use Paypal preset to $70: <br/><br/>
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick">
-            <input type="hidden" name="hosted_button_id" value="SQUEKWG9TF94Y">
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_paynowCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-            <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-        </form>
-        <br>
-        Or, you can use Paypal to make a payment/donation of any amount: <br><br>
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-            <input type="hidden" name="cmd" value="_s-xclick" />
-            <input type="hidden" name="hosted_button_id" value="76CYM7TT2DL7U" />
-            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-            <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1" />
-        </form>
+        <p class="mt-4">
+            Member: $70 including grove and ADF membership renewal
+        </p>
+
+        <div class="alert alert-info my-4">
+            <p>If you have access to **Zelle**, you can send your membership fee or donation by Zelle to **finance@ravenscrygrove.org** (to save us a few dollars in fees that Paypal charges).</p>
+        </div>
+
+        <h3 class="mt-5 mb-3">To use PayPal instead:</h3>
+
+        <p class="my-4">Use one of these buttons:</p>
+
+        {{-- Section for the preset $70 button (Option 1) --}}
+        <div class="card p-3 mb-4">
+            <p class="fw-bold">Option 1: Use PayPal preset to $72.10 (Membership Renewal plus PayPal fee):</p>
+            <div>
+                <style>.pp-XVEQTFTFVFWM4{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+                <form action="https://www.paypal.com/ncp/payment/XVEQTFTFVFWM4" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+                    <input class="pp-XVEQTFTFVFWM4" type="submit" value="Buy Now" />
+                    <img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" />
+                    <section style="font-size: 0.75rem;"> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
+                </form>
+            </div>
+        </div>
+
+        {{-- Section for the generic donation button (Option 2) --}}
+        <div class="card p-3">
+            <p class="fw-bold">Option 2: Use PayPal to make a payment/donation of any amount:</p>
+            <div>
+                <style>.pp-9LBHB5F4288G4{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+                <form action="https://www.paypal.com/ncp/payment/9LBHB5F4288G4" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+                    <input class="pp-9LBHB5F4288G4" type="submit" value="Buy Now" />
+                    <img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" />
+                    <section style="font-size: 0.75rem;"> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
+                </form>
+            </div>
+        </div>
+
+        <p>Or you can scan this PayPal QR code and put in your own amount:</p>
+        <img alt="PayPal QR Code" src="/img/qrcode.png" class="d-block mb-4" style="max-width: 200px;">
+
     </div>
-<br>
 
 @endsection
-

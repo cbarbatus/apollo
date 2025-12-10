@@ -14,22 +14,22 @@
             <label for="name">Name:</label>
             {{ $ritual->name }}
             <select name="name" id="name">
-            @foreach ($ritualNames as $item)
-                <option value="{{ $item }}" @selected($ritual->name == $item)>
-                    {{ $item }}
-                </option>
-            @endforeach
+                @foreach ($ritualNames as $item)
+                    <option value="{{ $item }}" @selected($ritual->name == $item)>
+                        {{ $item }}
+                    </option>
+                @endforeach
             </select>
             <br>
 
             <label for="culture">Culture:</label>
             {{ $ritual->culture }}
             <select name="culture" id="culture">
-            @foreach ($cultures as $item){
+                @foreach ($cultures as $item){
                 <option value="{{ $item }}" @selected($ritual->name == $item)>
                     {{ $item }}
                 </option>
-            @endforeach
+                @endforeach
             </select>
 
             <br><br>

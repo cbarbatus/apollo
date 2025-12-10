@@ -45,11 +45,9 @@ class RitualController extends Controller
      */
     public function year(string $year, bool $admin): View
     {
-        $rituals = DB::table('rituals')
-            ->select()
-            ->where('year', '=', $year)
+        $rituals = Ritual::query()
+            ->where('year', $year)
             ->get();
-
         return view('rituals.year', compact('rituals', 'year', 'admin'));
     }
 
@@ -65,50 +63,52 @@ class RitualController extends Controller
             return redirect('/rituals/0/list')->with('message', 'Invalid ritual parameters.');
         }
 
-        $id = Ritual::query()
-            ->where('year', $year)
-            ->where('name', $name)
-            ->value('id');
-
-        $ritual = Ritual::query()->find($id);
         /** @var \App\Models\Ritual|null $ritual */
+        $ritual = Ritual::query()
+            ->where('year', $year)
+            ->where( 'name', $name)
+            ->first();
 
-        if (is_null($ritual)) {
+        if (!$ritual) {
             return redirect('/rituals/0/list')->with('message', 'Ritual not defined');
         }
 
-        $announcement = Announcement::query()->where('year', '=', $year)
+                /** @var \App\Models\Announcement|null $announcement */
+        $announcement = Announcement::query()
+            ->where('year', '=', $year)
             ->where('name', '=', $name)
             ->first();
-        /** @var \App\Models\Announcement|null $announcement */
 
-        if ($admin) {
+
+/* dd("end of one", $ritual, $ritual->year); */
+        if ($admin)
+            return view('rituals.show', compact('ritual'));
+
+
             /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
-            $locations = Venue::all();
 
-            $elements = Element::query()->where('name', '=', 'names')->first();
-            /** @var \App\Models\Element|null $elements */
-            $ritualNames = ($elements !== null) ? explode(',', (string)$elements->item) : [];
+        $slideshow = \App\Models\Slideshow::where('year', $ritual->year)
+            ->where('name', $ritual->name)
+            ->first();
 
-            $elements = Element::query()->where('name', '=', 'cultures')->first();
-            /** @var \App\Models\Element|null $elements */
-            $cultures = ($elements !== null) ? explode(',', (string)$elements->item) : [];
+        $lit_file = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $ritual->year . "_" . $ritual->name . ".htm";
+        if (!file_exists($lit_file)) {
+            $lit_file = '';
+        }
+        $venue_title = '';
 
+        if ($announcement !== null) {
+            // Accessing $announcement->venue_name is now safe due to corrected PHPDoc
+            $venue = Venue::query()->where('name', '=', (string)$announcement->venue_name)->first();
+            /** @var \App\Models\Venue|null $venue */
 
-            return view('rituals.edit', compact('ritual', 'ritualNames',  'locations', 'cultures'));
-
+            if ($venue) {
+                // Accessing $venue->title is now safe due to corrected PHPDoc
+                $venue_title = (string)$venue->title;
+            }
         }
 
-        $sid = DB::table('slideshows')
-            ->select()
-            ->where([['year', '=', $ritual->year],
-                ['name', '=', $ritual->name]])
-            ->value('id');
-        $slideshow = Slideshow::find($sid);
-        /** @var \App\Models\Slideshow|null $slideshow */
-
-        // NOTE: $slideshow is available here but not passed to view. It seems this branch is only for non-admin users.
-        return view('rituals.display', compact('ritual', 'announcement'));
+        return view('rituals.display', compact('ritual', 'slideshow', 'announcement', 'venue_title', 'lit_file'));
     }
 
     /**
@@ -314,9 +314,8 @@ class RitualController extends Controller
      */
     public function show(int $id): View
     {
-        $ritual = Ritual::findOrFail($id);
-        /** @var \App\Models\Ritual $ritual */
-
+        $ritual = Ritual::where('id','=', $id)
+            ->first();
         return view('rituals.show', compact('ritual'));
     }
 
