@@ -20,7 +20,7 @@
                 {{-- Name Field --}}
                 <div class="col-md-2 mb-3">
                     <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" id="namee" class="form-control" value="{{ $element->name }}" required>
+                    <input type="text" name="name" id="name" class="form-control" value="{{ $element->name }}" required>
                 </div>
 
             {{-- Sequence Field --}}
@@ -51,7 +51,7 @@
                     @endif
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Submit</button
+                <button type="submit" class="btn btn-primary mt-3">Submit</button>
         </form>
      </div>
 

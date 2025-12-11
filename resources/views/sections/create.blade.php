@@ -21,7 +21,7 @@
 
                 <div class="col-md-1 mb-3">
                     <label for="sequence" class="form-label">Sequence:</label>
-                    <input type="number" name="sequence" id="seqence" class="form-control" maxlength="4" value=''>
+                    <input type="number" name="sequence" id="sequence" class="form-control" maxlength="4" value=''>
                 </div>
             </div>
             <button type="submit" form='create' class="btn btn-go">Submit</button>

@@ -19,20 +19,18 @@
 
         {{-- Section for the preset $70 button (Option 1) --}}
         <div class="card p-3 mb-4">
-            <p class="fw-bold">Option 1: Use PayPal preset to $72.10 (Membership Renewal plus PayPal fee):</p>
-            <div>
+            <div class="fw-bold"> Option 1: Use PayPal preset to $72.10 (Membership Renewal plus PayPal fee):</div>
                 <style>.pp-XVEQTFTFVFWM4{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
                 <form action="https://www.paypal.com/ncp/payment/XVEQTFTFVFWM4" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
                     <input class="pp-XVEQTFTFVFWM4" type="submit" value="Buy Now" />
                     <img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" />
                     <section style="font-size: 0.75rem;"> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
                 </form>
-            </div>
         </div>
 
         {{-- Section for the generic donation button (Option 2) --}}
         <div class="card p-3">
-            <p class="fw-bold">Option 2: Use PayPal to make a payment/donation of any amount:</p>
+            <div class="fw-bold">Option 2: Use PayPal to make a payment/donation of any amount:</div>
             <div>
                 <style>.pp-9LBHB5F4288G4{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
                 <form action="https://www.paypal.com/ncp/payment/9LBHB5F4288G4" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
