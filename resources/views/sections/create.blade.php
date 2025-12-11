@@ -9,8 +9,8 @@
             @csrf
 
             <div class="col-md-4 mb-3">
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" size="40" value="">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" name="title" id="title" class="form-control" size="40" value="">
             </div>
 
             <div class="row">

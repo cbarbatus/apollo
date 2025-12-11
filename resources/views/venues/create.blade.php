@@ -29,15 +29,16 @@
 
             <div class="row">
                 <div class="col-md-8 mb-3">
-                <label for="directions">Driving directions:</label>
+                <label for="directions" class="form-label">Driving directions:</label>
                     <input
-                        id="element-item"
+                        id="directions"
                         type="hidden"
-                        name="item"
+                        name="directions"
                         value=""
                     >
                     {{-- The 'col-md-8' limits the width of the Trix editor --}}
-                    <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
+                    <trix-editor input="directions" class="form-control" style="min-height: 200px;"></trix-editor>
+
                 </div>
             </div>
             <button type="submit" form='create' class="btn btn-go">Submit</button>
