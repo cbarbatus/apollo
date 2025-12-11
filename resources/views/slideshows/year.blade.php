@@ -11,7 +11,7 @@
                 @if ($admin)
                     <a  class="text-decoration-none text-dark ritual-link" href="/slideshows/{{ $slideshow->id }}/edit"> {{ $slideshow->name }} </a>
                 @else
-                    <a  class="text-decoration-none text-dark ritual-link" href="/slideshows/{{ $slideshow->id }}/view"> {{ $slideshow->name }} </a>
+                    <a  class="text-decoration-none text-dark ritual-link" href="/slideshows/{{ $slideshow->id }}"> {{ $slideshow->name }} </a>
                 @endif
             </li>
             @endforeach

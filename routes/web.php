@@ -72,7 +72,7 @@ Route::get('/rituals/{id}/destroy', [RitualController::class, 'destroy']);
 Route::get('/rituals/{year}/{admin}/year', [RitualController::class, 'year']);
 Route::get('/rituals/{id}/display', [RitualController::class, 'display']);
 Route::get('/rituals/{id}/text', [RitualController::class, 'text']);
-Route::get('/rituals/{id}/view', [RitualController::class, 'view']);
+Route::get('/rituals/{id}/view', [RitualController::class, 'show']);
 Route::get('/rituals/{id}/uploadlit', [GroveController::class, 'uploadlit']);
 
 Route::put('/books/{id}', [BookController::class, 'update']);

@@ -32,67 +32,19 @@ class SlideshowController extends Controller
     {
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Slideshow> $slideshows */
         $slideshows = Slideshow::all();
-
-        $years = DB::table('slideshows')
-            ->select('year')
-            ->distinct()
+        $activeYears = Slideshow::select('year')
             ->groupBy('year')
-            ->orderBy('year', 'desc')
-            ->get();
-        $activeYears = [];
-        foreach ($years as $year) {
-            /** @var object{year: string} $year */
-            $activeYears[] = $year->year;
-        }
+            ->orderByDesc('year')
+            ->pluck('year') // Pluck returns a flat array of just the 'year' values
+            ->toArray(); // If you need it as a basic PHP array
 
-        $names = DB::table('slideshows')
-            ->select('name')
+        $activeNames = Slideshow::select('name')
             ->distinct()
-            ->groupBy('name')
-            ->get();
-        $activeNames = [];
-        foreach ($names as $name) {
-            /** @var object{name: string} $name */
-            $activeNames[] = $name->name;
-        }
+            ->orderByDesc('name')
+            ->pluck('name') // Returns a Collection of names
+            ->toArray(); // If you need it as a basic PHP array;
 
         return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames', 'admin'));
-    }
-
-
-
-    /**
-     * Find one slideshow from year and name
-     */
-    // Inject Request for best practice
-    public function one(Request $request, bool $admin): RedirectResponse
-    {
-        $target = "";
-        // Use $request->input() instead of global request() helper
-        $year = $request->input('year');
-        $name = $request->input('name');
-
-        $slideshow = null;
-        if (is_string($year) && is_string($name)) {
-            $slideshow = Slideshow::query()
-                ->where('year', $year)
-                ->where('name', $name)
-                ->first();
-
-            if (is_null($slideshow)) {
-                return redirect('/slideshows/0/list')->with('message', 'Slideshow ' . $year . ' ' . $name . ' not available');
-            }
-        }
-        /** @var \App\Models\Slideshow|null $slideshow */
-        if (!is_null($slideshow)) {
-            $id = $slideshow->id;
-            if ($admin) {
-                $target = 'slideshows/' . $id . '/edit';
-            } else {
-                $target = 'slideshows/' . $id . '/view';
-            }
-        }
-        return redirect($target);
     }
 
 
@@ -102,14 +54,49 @@ class SlideshowController extends Controller
      */
     public function year(string $year, bool $admin): View
     {
-        $slideshows = DB::table('slideshows')
-            ->select()
+        $slideshows = Slideshow::query()
             ->where('year', '=', $year)
             ->orderBy('sequence')
             ->get();
 
         return view('slideshows.year', compact('slideshows', 'year', 'admin'));
     }
+
+
+    /**
+     * Find one slideshow from year and name
+     */
+    // Inject Request for best practice
+    public function one(Request $request, bool $admin): RedirectResponse
+    {
+        // Use $request->input() instead of global request() helper
+        $year = $request->input('year');
+        $name = $request->input('name');
+
+        $slideshow = null;
+        if (!is_string($year) || !is_string($name))
+            return redirect('/slideshows/0/list')->with('message', 'Slideshow ' . $year . ' ' . $name . ' not available');
+
+            /** @var \App\Models\Slideshow|null $slideshow */
+        $slideshow = Slideshow::where('year', $year)
+            ->where('name', $name)
+            ->first();
+
+        if (!$slideshow)
+            return redirect('/slideshows/0/list')->with('message', 'Slideshow not defined');
+
+        /** @var \App\Models\Slideshow|null $slideshow */
+        $target = "";  /* ensure target is a string */
+        $id = $slideshow->id;
+
+        if ($admin) $target = 'slideshows/' . $id . '/edit';
+        else $target = 'slideshows/' . $id;
+
+        return redirect($target);
+
+    }
+
+
 
     /**
      * Show the form for creating a new resource.
@@ -182,7 +169,7 @@ class SlideshowController extends Controller
     /**
      * View a slideshow.
      */
-    public function view(int $id): View
+    public function show(int $id): View
     {
         $slideshow = Slideshow::findOrFail($id);
         /** @var \App\Models\Slideshow $slideshow */

@@ -21,7 +21,7 @@
         <div class="my-4">
             @if ($lit_file != '')
             <button type="submit" form='text' class="btn btn-info">View Liturgy Text</button>
-        @else <span class="text-muted fst-italic">No liturgy text associated with this rituale.</span>
+        @else <span class="text-muted fst-italic">No liturgy text associated with this ritual.</span>
         @endif
         </div>
 

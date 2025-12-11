@@ -21,21 +21,12 @@ class RitualController extends Controller
      */
     public function list(bool $admin): View|RedirectResponse
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Ritual> $rituals */
         $rituals = Ritual::all();
-
-        $years = DB::table('rituals')
-            ->select('year')
+        $activeYears = Ritual::select('year')
             ->groupBy('year')
-            ->orderby('year', 'DESC')
-            ->get()->toArray();
-        $activeYears = [];
-        foreach ($years as $year) {
-            // $year is a generic object from DB::table('rituals')->get()
-            if (property_exists($year, 'year')) {
-                $activeYears[] = $year->year;
-            }
-        }
+            ->orderByDesc('year')
+            ->pluck('year') // Pluck returns a flat array of just the 'year' values
+            ->toArray(); // If you need it as a basic PHP array
 
         return view('rituals.index', compact('rituals', 'activeYears', 'admin'));
     }
@@ -51,6 +42,32 @@ class RitualController extends Controller
         return view('rituals.year', compact('rituals', 'year', 'admin'));
     }
 
+    private function getRitualDisplayData(Ritual $ritual): array
+    {
+        $slideshow = Slideshow::where('year', $ritual->year)
+            ->where('name', $ritual->name)
+            ->first();
+
+        $lit_file = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $ritual->year . "_" . $ritual->name . ".htm";
+        if (!file_exists($lit_file)) { // Use file_exists() not !$lit_file
+            $lit_file = '';
+        }
+
+        $announcement = Announcement::where('year', $ritual->year)
+            ->where('name', $ritual->name)
+            ->first();
+
+        $venue_title = '';
+        if ($announcement) {
+            $venue = Venue::query()->where('name', (string)$announcement->venue_name)->first();
+            if ($venue) {
+                $venue_title = (string)$venue->title;
+            }
+        }
+
+        // Return all ancillary data as an array
+        return compact('slideshow', 'announcement', 'venue_title', 'lit_file');
+    }
 
     public function one(Request $request)  : View|RedirectResponse
     {
@@ -64,8 +81,7 @@ class RitualController extends Controller
         }
 
         /** @var \App\Models\Ritual|null $ritual */
-        $ritual = Ritual::query()
-            ->where('year', $year)
+        $ritual = Ritual::where('year', $year)
             ->where( 'name', $name)
             ->first();
 
@@ -73,43 +89,10 @@ class RitualController extends Controller
             return redirect('/rituals/0/list')->with('message', 'Ritual not defined');
         }
 
-                /** @var \App\Models\Announcement|null $announcement */
-        $announcement = Announcement::query()
-            ->where('year', '=', $year)
-            ->where('name', '=', $name)
-            ->first();
-
-
-/* dd("end of one", $ritual, $ritual->year); */
-        if ($admin)
-            return view('rituals.show', compact('ritual'));
-
-
-            /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
-
-        $slideshow = \App\Models\Slideshow::where('year', $ritual->year)
-            ->where('name', $ritual->name)
-            ->first();
-
-        $lit_file = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $ritual->year . "_" . $ritual->name . ".htm";
-        if (!file_exists($lit_file)) {
-            $lit_file = '';
-        }
-        $venue_title = '';
-
-        if ($announcement !== null) {
-            // Accessing $announcement->venue_name is now safe due to corrected PHPDoc
-            $venue = Venue::query()->where('name', '=', (string)$announcement->venue_name)->first();
-            /** @var \App\Models\Venue|null $venue */
-
-            if ($venue) {
-                // Accessing $venue->title is now safe due to corrected PHPDoc
-                $venue_title = (string)$venue->title;
-            }
-        }
-
-        return view('rituals.display', compact('ritual', 'slideshow', 'announcement', 'venue_title', 'lit_file'));
+        $data = $this->getRitualDisplayData($ritual);
+        return view('rituals.display', compact('ritual', ...$data)); // Use spread operator for clean merge
     }
+
 
     /**
      * Display one ritual.
@@ -117,42 +100,11 @@ class RitualController extends Controller
     public function display (int $id): View
     {
         $ritual = Ritual::query()->findOrFail($id);
-        /** @var \App\Models\Ritual $ritual */
+        $data = $this->getRitualDisplayData($ritual);
+        $viewData = array_merge($data, compact('ritual'));
 
-        /**
-         * compute normalized or special liturgy exists
-         */
+        return view('rituals.display', $viewData);
 
-        $lit_file = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $ritual->year . "_" . $ritual->name . ".htm";
-        if (!file_exists($lit_file)) $lit_file = '';
-
-        $sid = DB::table('slideshows')
-            ->select()
-            ->where([['year', '=', $ritual->year],
-                ['name', '=', $ritual->name]])
-            ->value('id');
-        $slideshow = Slideshow::find($sid);
-        /** @var \App\Models\Slideshow|null $slideshow */
-
-        $announcement = Announcement::query()->where('year', '=', $ritual->year)
-            ->where('name', '=', $ritual->name)
-            ->first();
-        // FIX: Corrected PHPDoc syntax to resolve 'undefined property' errors on lines 113/114
-        /** @var \App\Models\Announcement|null $announcement */
-
-        $venue_title = '';
-        if ($announcement !== null) {
-            // Accessing $announcement->venue_name is now safe due to corrected PHPDoc
-            $venue = Venue::query()->where('name', '=', (string)$announcement->venue_name)->first();
-            /** @var \App\Models\Venue|null $venue */
-
-            if ($venue !== null) {
-                // Accessing $venue->title is now safe due to corrected PHPDoc
-                $venue_title = (string)$venue->title;
-            }
-        }
-
-        return view('rituals.display', compact('ritual', 'slideshow', 'announcement', 'venue_title', 'lit_file'));
     }
 
     public function text(int $id) :  View|RedirectResponse
@@ -161,22 +113,23 @@ class RitualController extends Controller
         /** @var \App\Models\Ritual $rite */
 
         $theFile = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $rite->year . "_" . $rite->name . ".htm";
-        $text = '';
+        $text = @file_get_contents($theFile);
 
-        $fp = @fopen($theFile, 'rb');
-        if ($fp) {
-            $text = fread($fp, (int)filesize($theFile));
-            fclose($fp);
-        } else {
-            $theFile = $theFile.'.htm';
-            $fp = @fopen($theFile, 'rb');
-            if ($fp) {
-                $text = fread($fp, (int)filesize($theFile));
-                fclose($fp);
-            } else {
-                return redirect('/rituals/0/list')->with('message', 'Ritual text missing');
-            }
+        if ($text === false) {
+            // Try the secondary name:
+            $theFile = $theFile . '.htm';
+            $text = @file_get_contents($theFile);
         }
+
+        if ($text === false) {
+            return redirect('/rituals/0/list')->with('message', 'Ritual text missing');
+        }
+// $text now contains the file content, proceed to encoding and parsing
+
+        if ($text === false) {
+            return redirect('/rituals/0/list')->with('message', 'Ritual text missing');
+        }
+// $text now contains the file content, proceed to encoding and parsing
 
         // Parse the HTML file into array of lines $contents
         $charset = strpos($text, 'charset=');
@@ -191,16 +144,22 @@ class RitualController extends Controller
             }
         }
 
-        if (substr($type, 0, 3) != 'utf') {
-            // Fragile encoding logic maintained, but applied safely
-            if ($charset !== false && isset($size)) {
-                $utftext = substr_replace($text, 'utf-8          ', $charset + 8, $size);
-                $utftext = utf8_encode($utftext);
-            } else {
-                $utftext = utf8_encode($text);
-            }
-        } else {
+// Use mb_convert_encoding() for reliable conversion.
+// We use the @ symbol for error suppression during file reading, so this should
+// handle the conversion to the required UTF-8 standard.
+
+// Check if content is already UTF-8 based on file header
+        if (str_starts_with($type, 'utf')) {
             $utftext = $text;
+        } else {
+            // Convert from the assumed legacy encoding (ISO-8859-1) to UTF-8
+            $utftext = mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
+
+            // The fragile logic for updating the charset declaration inside the HTML is maintained
+            // for compatibility, applied to the newly encoded text.
+            if ($charset !== false && isset($size)) {
+                $utftext = substr_replace($utftext, 'utf-8          ', $charset + 8, $size);
+            }
         }
 
         $contents = preg_split("/\r?\n|\r/", $utftext);
@@ -248,7 +207,7 @@ class RitualController extends Controller
         /** @var \App\Models\Element|null $elements */
 
         $ritualNames = [];
-        if ($elements !== null)
+        if ($elements)
             $ritualNames = explode(',', (string)$elements->item);
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues */
@@ -262,7 +221,7 @@ class RitualController extends Controller
         /** @var \App\Models\Element|null $elements */
 
         $cultures = [];
-        if ($elements !== null) {
+        if ($elements) {
             $cultures = explode(',', (string)$elements->item);
         }
 
@@ -297,7 +256,7 @@ class RitualController extends Controller
             ->first();
         /** @var \App\Models\Ritual|null $previous */
 
-        if ($previous !== null) {
+        if ($previous) {
             return back()->with('error', 'Ritual year and name already used! ');
         }
 
