@@ -23,7 +23,15 @@
             </div>
 
             @foreach($roles as $role)
-                <input type="checkbox" name="role[]" value={{ $role->name }} {{ $checks[$role->name] }}> {{ $role->name }} <br/>
+                <label class="d-block">
+                    <input
+                        type="checkbox"
+                        name="role[]"
+                        value="{{ $role->name }}"
+                        {{ $checks[$role->name] }}
+                    >
+                    {{ $role->name }}
+                </label>
             @endforeach
 
             <br><br>
