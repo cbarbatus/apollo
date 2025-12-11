@@ -5,22 +5,22 @@
     <div class='container my-5'>
         <h1>Contacts</h1>
 
-        <p class="mt-4">
+        <div class="mt-4">
         <form method="get" action="/contacts/replied/list" id="reply">
             <button type="submit" class="btn btn-go" >Show Replied</button>
         </form>
-        </p>
+        </div>
 
-        <p class="mt-4">
+        <div class="mt-4">
             <form method="get" action="/contacts/spam/list" id="reply">
             <button type="submit" class="btn btn-go" >Show Spam</button>
         </form>
-        </p>
-        <p class="mt-4">
+        </div>
+        <div class="mt-4">
         <form method="get" action="/contacts/all/list" id="reply">
             <button type="submit" class="btn btn-go" >Show All</button>
         </form>
-    </p>
+        </div>
     </div>
 
         <div class='container' >

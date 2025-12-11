@@ -9,7 +9,7 @@
 
             <div class="col-md-4 mb-3">
                 <label for="year" class="form-label">Year:</label>
-                <input type="text" class="form-label" name="year" id="year" class="form-control" size="4" required>
+                <input type="text" class="form-label" name="year" id="year" size="4" required>
             </div>
 
             <div class="row">
