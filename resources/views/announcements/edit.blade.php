@@ -44,7 +44,7 @@
             <label for="when">When:</label>
             <input type="datetime-local" name="when" id="when" value="{{ $announcement->when }}">
             <br>
-            <label for="venue">Venue:</label>
+            <label for="venue_name">Venue:</label>
             <select name="venue_name" id="venue_name">
                 @foreach($locations as $location)
                     <option value="{{$location->name}}"
@@ -59,7 +59,8 @@
             {{ html_entity_decode($announcement->notes) }}
             </textarea>
             <br>
-
+                </div>
+                <button type="submit" form='edit' class="btn btn-go">Submit</button>
         </form>
         <button type="submit" form='edit' class="btn btn-go">Submit</button>
 

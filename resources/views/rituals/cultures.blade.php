@@ -15,12 +15,12 @@
             </div>
 
             <div class="col-md-4 mb-3">
-                <label for="item">Text:</label>
-            <textarea id="item" name="item" rows="2" cols="60"
-                      value="{{ $element->item }}">{{ html_entity_decode($element->item) }}
-            </textarea>
-            <br><br>
-        </form>
+                <label for="item" class="form-label">Text:</label>
+                    <textarea id="item" name="item" class="form-control" rows="2" cols="60"
+                              value="{{ $element->item }}">{{ html_entity_decode($element->item) }}
+                    </textarea>
+            </div>
+            </form>
         <button type="submit" form='edit' class="btn btn-warning">Submit</button>
         <br>
     </div>
