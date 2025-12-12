@@ -9,35 +9,33 @@
             @method('put')
 
             <div class="col-md-4 mb-3">
-                <label for="name">Name:</label>
-                <input type="text" name="name" id="name" value="{{ $venue->name }}">
+                <label for="name" class="form-label">Name:</label>
+                <input type="text" name="name" id="name" class="form-control" value="{{ $venue->name }}">
             </div>
 
             <div class="col-md-4 mb-3">
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" size="40" value="{{ $venue->title }}">
+                <label for="title" class="form-label">Title:</label>
+                <input type="text" name="title" id="title" class="form-control" size="40" value="{{ $venue->title }}">
             </div>
 
             <div class="col-md-4 mb-3">
-                <label for="address">Address:</label>
-                <input type="text" name="address" id="address" size="60" value="{{ $venue->address }}">
+                <label for="address" class="form-label">Address:</label>
+                <input type="text" name="address" id="address" class="form-control" size="60" value="{{ $venue->address }}">
             </div>
 
             <div class="col-md-4 mb-3">
-                <label for="map_link">Map URL:</label>
-                <input type="url" name="map_link" id="map_link" size="60" value="{{ $venue->map_link }}">
+                <label for="map_link" class="form-label">Map URL:</label>
+                <input type="url" name="map_link" id="map_link" class="form-control" size="60" value="{{ $venue->map_link }}">
             </div>
 
             <div class="row">
                 <div class="col-md-8 mb-3">
                     <label for="directions">Driving directions:</label>
                     <input
-                        id="element-item"
                         type="hidden"
                         name="item"
                         value="{{ html_entity_decode($venue->directions ?? '') }}"
-                    >
-                    {{-- The 'col-md-8' limits the width of the Trix editor --}}
+                        >
                     <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
                 </div>
             </div>

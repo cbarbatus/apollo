@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container'>
+    <div class='container py-4'>
         <h1>Edit a Ritual</h1>
         <br><br>
         <form method="post" action="/rituals/{{ $ritual->id }}" id="edit">

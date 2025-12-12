@@ -46,7 +46,7 @@
                             type="hidden"
                             name="item"
                             value="{{ html_entity_decode($element->item ?? '') }}"
-                        >
+                            >
                         <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
                     @endif
                     </div>

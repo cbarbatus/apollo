@@ -2,35 +2,45 @@
 
 @section('content')
 
-    <div class='container'>
+    <div class='container my-5'>
         <h1>Edit an Announcement</h1>
-        <br><br>
+
         <form method='post' action="/announcements/{{ $announcement->id }}/update" id="edit">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
+            @csrf
             @method('put')
-            <br>
 
-            <label for="year">Year:</label>
-            <input type="text" name="year" id="year" size="4" value="{{ $announcement->year }}">
-            <label for="name">Name:</label>
-            <select name="name" id="name">
-                @foreach($rituals as $ritual_name)
-                    <option value="{{$ritual_name}}"
-                    <?php if($ritual_name==$announcement->name) echo 'selected'; ?>>
-                        {{$ritual_name}}
-                    </option>
-                @endforeach
-            </select>
-            <br>
+            <div class="col-md-4 mb-3">
+                <label for="year" class="form-label">Year:</label>
+                <input type="text" name="year" id="year" class="form-control" size="4" value="{{ $announcement->year }}">
+            </div>
 
-            <label for="picture_file">Picture File:</label>
-            <input type="text" name="picture_file" id="picture_file" size="60" value="{{ $announcement->picture_file }}">
-            <br>
-            <label for="summary">Summary:</label>
-            <textarea id="notes" name="summary" rows="15" cols="60" value="{{ $announcement->summary }}">
-            {{ html_entity_decode($announcement->summary) }}
-            </textarea>
-            <br>
+            <div class="col-md-4 mb-3">
+                <label for="name" class="form-label">Name:</label>
+                <select name="name" class="form-label" id="name">
+                    @foreach($rituals as $ritual_name)
+                        <option value="{{$ritual_name}}"
+                        <?php if($ritual_name==$announcement->name) echo 'selected'; ?>>
+                            {{$ritual_name}}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label for="picture_file" class="form-label">Picture File:</label>
+                <input type="text" name="picture_file" id="picture_file" class="form-label" size="60" value="{{ $announcement->picture_file }}">
+            </div>
+
+            <div class="row">
+                <label for="summary">Summary:</label>
+                <div class="col-md-8 mb-3">
+                <input
+                    type="hidden"
+                    name="summary"
+                    value="{{ html_entity_decode($venue->summary ?? '') }}"
+                    >
+            <trix-editor input="summary" class="form-control" style="min-height: 200px;"></trix-editor>
+
             <label for="when">When:</label>
             <input type="datetime-local" name="when" id="when" value="{{ $announcement->when }}">
             <br>

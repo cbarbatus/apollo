@@ -29,13 +29,17 @@
 
         <hr class="my-5">
 
-        <h3>Elements in Section {{ $section->id }}</h3>
+        <div class='container my-5 fw-bold'>
+            Elements in Section {{ $section->id }}
+        </div>
 
-        <br>
-        <form method="get" action="/elements/{{ $section->id }}/create" id="create">
-        </form>
-        <button type="submit" form='create' class="btn btn-warning">New Element</button>
-        <br><br>
+
+        <div class="col-md-2 mb-3">
+            <form method="get" action="/elements/{{ $section->id }}/create" id="create">
+                <button type="submit" form='create' class="btn btn-warning">New Element</button>
+            </form>
+        </div>
+
 
 
         <table class="table table-striped">
@@ -74,5 +78,4 @@
         </table>
 
     </div>
-    <br>
 @endsection
