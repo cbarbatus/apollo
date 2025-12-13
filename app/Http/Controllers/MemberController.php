@@ -123,7 +123,7 @@ class MemberController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+
      */
     public function savejoin(Request $request): RedirectResponse
     {
@@ -159,15 +159,20 @@ class MemberController extends Controller
             $member->joined = ($item === null) ? '' : $item;
             $item = request('adf');
             $member->adf = ($item === null) ? '' : $item;
+            $item = request('adf_join');
+            $member->adf_join = ($item === null) ? '' : $item;
+            $item = request('adf_renew');
+            $member->adf_renew = ($item === null) ? '' : $item;
 
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            // FIX: Removed the redundant if ($user) check, as we are already inside if (Auth::check()).
-            $user->update(['name' => $first_name . ' ' . $last_name]);
-            $user->assignRole('pending');
-            $user_id = $user->getKey();
-            $user->update(['user_id' => $user_id]);
+            $newUser = new user;
+            $newUser->name = $first_name.' '.$last_name;
+            $newUser->email = $email;
+            $temporaryPassword = Str::random(12); // Generates a secure 12-character random string
+            $newUser->password = Hash::make($temporaryPassword);
+            $newUser->save();
+            $newUser->assignRole('pending');
 
+            $member->user_id = $newUser->id;
             $member->save();
         }
 

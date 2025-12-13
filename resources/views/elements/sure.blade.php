@@ -3,11 +3,8 @@
 @section('content')
 
     <div class='container'>
-
-        {{-- Use simple $id, which is less likely to fail interpolation --}}
         <h1>Delete Element ID {{ $id }}: Are you sure?</h1>
-        <br>
-        <br>
+
 
         {{-- Use simple $id in form action --}}
         <form method="get" action="/elements/{{ $id }}/destroy" id="sure">

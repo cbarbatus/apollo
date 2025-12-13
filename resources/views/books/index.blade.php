@@ -5,6 +5,13 @@
 
         <h1 class="mb-5">Suggested Reading List for those Interested in Druidry</h1>
 
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         @if ($changeok)
             <a href="/books/create" class="btn btn-warning btn-lg mb-5">New Book</a>
         @endif
@@ -30,13 +37,12 @@
                         @if ($changeok)
                             <div class="d-flex align-items-center gap-3 mt-4">
 
-                                <a href="/books/{{ $book['id']}}/edit" class="btn btn-sm btn-warning">Edit</a>
+                                <a href="/books/{{ $book->id }}/edit" class="btn btn-sm btn-warning">Edit</a>
 
-                                <form method="post" action="/books/{{ $book['id']}}" id="delete-{{$book->id}}" onsubmit="return confirm('Are you sure you want to delete the book: {{ addslashes($book->title) }}?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                <form method="get" action="/books/{{ $book->id }}/sure" id="sure">
+                                    <button type="submit" form="sure" class="btn btn-danger">Delete</button>
                                 </form>
+
                             </div>
                         @endif
                     </div>

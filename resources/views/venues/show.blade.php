@@ -2,7 +2,7 @@
 
 @section('content')
     <div class='container'>
-
+dd('In venue.show');
         <h1>Venue Details</h1>
 
         <br><b>Name: </b>{{ $venue['name']}}

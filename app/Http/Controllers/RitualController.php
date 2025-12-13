@@ -90,8 +90,9 @@ class RitualController extends Controller
         }
 
         $data = $this->getRitualDisplayData($ritual);
-        return view('rituals.display', compact('ritual', ...$data)); // Use spread operator for clean merge
-    }
+        $viewData = array_merge($data, compact('ritual'));
+
+        return view('rituals.display', $viewData);    }
 
 
     /**

@@ -81,7 +81,7 @@ Route::post('/books', [BookController::class, 'store']);
 Route::get('/books/{id}/edit', [BookController::class, 'edit']);
 Route::get('/books/create', [BookController::class, 'create']);
 Route::get('/books/{id}/sure', [BookController::class, 'sure']);
-Route::delete('/books/{id}', [BookController::class, 'destroy']);
+Route::delete('/books/{id}/destroy', [BookController::class, 'destroy']);
 
 Route::get('/contact', [ContactController::class, 'contactus']);
 Route::get('/contacts/thanks', [ContactController::class, 'thanks']);
@@ -111,7 +111,7 @@ Route::get('/venues', [VenueController::class, 'index']);
 
 Route::post('/venues', [VenueController::class, 'store']);
 Route::get('/venues/create', [VenueController::class, 'create']);
-Route::get('/venues/{id}', [VenueController::class, 'show']);
+/* Route::get('/venues/{id}', [VenueController::class, 'show']); */
 Route::put('/venues/{id}', [VenueController::class, 'update']);
 Route::get('/venues/{id}/edit', [VenueController::class, 'edit']);
 Route::get('/venues/{id}/sure', [VenueController::class, 'sure']);

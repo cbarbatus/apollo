@@ -31,13 +31,13 @@ class StoreBookRequest extends FormRequest
             // Title is required and must be a string, max 255 chars
             'title' => ['required', 'string', 'max:255'],
             // Author is optional but if present, must be a string
-            'author' => ['nullable', 'string', 'max:255'],
+            'author' => ['required', 'string', 'max:255'],
             // Link should be a valid URL, max 255 chars
-            'link' => ['nullable', 'url', 'max:255'],
+            'link' => ['required', 'url', 'max:255'],
             // Pix (image path) is a string
-            'pix' => ['nullable', 'string', 'max:255'],
+            'pix' => ['required', 'string', 'max:255'],
             // Remarks is a nullable string (for longer text)
-            'remarks' => ['nullable', 'string'],
+            'remarks' => ['required', 'string'],
             // Sequence is required and must be an integer
             'sequence' => ['required', 'integer'],
         ];
