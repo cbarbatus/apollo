@@ -175,7 +175,7 @@ class SectionController extends Controller
         $section = Section::findOrFail($id);
         $section->delete();
 
-        return redirect('/sections')->with('success', 'section was deleted');
+        return redirect('/sections')->with('success', 'section '.$section->id.' was deleted');
     }
 
 

@@ -5,12 +5,13 @@
     <div class='container'>
         <h1>Front Page Sections</h1>
 
-        <br>
-        <form method="get" action="/sections/create" id="create">
-        </form>
-        <button type="submit" form='create' class="btn btn-warning">New Section</button>
-        <br><br>
+        <x-alert-success />
 
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <a href="{{ url('/sections/create') }}" class="btn btn-warning">New Section</a>
+            </div>
+        </div>
 
         <table class="table table-striped">
             <thead>
@@ -47,5 +48,4 @@
             </tbody>
         </table>
     </div>
-<br>
 @endsection

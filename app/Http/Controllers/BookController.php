@@ -119,6 +119,6 @@ class BookController extends Controller
         $book = \App\Models\Book::query()->findOrFail($id);
         $book->delete();
 
-        return redirect('/books')->with('success', 'Book was deleted');
+        return redirect('/books')->with('success', 'Book '.$book->id.' was deleted');
     }
 }

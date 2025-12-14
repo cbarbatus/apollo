@@ -164,12 +164,61 @@
                     @yield('content')
                 </div>
             </main>
+
+                <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title confirmation-title" id="confirmDeleteModalLabel">
+                                    Confirm Deletion
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body confirmation-body">
+                                Are you absolutely sure you want to delete this item? This action cannot be undone.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" id="modal-confirm-delete">Yes, Delete It</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 </div>
 <link rel="stylesheet" type="text/css" href="https://unpkg.com/trix@2.0.8/dist/trix.css">
+
+
+
 <script type="text/javascript" src="https://unpkg.com/trix@2.0.8/dist/trix.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 {{-- This must be in your main layout file, usually near the </body> tag --}}
-@stack('scripts')</body>
+
+@stack('scripts')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('confirmDeleteModal');
+        const deleteButton = document.getElementById('modal-confirm-delete');
+        let formToSubmit = null;
+
+        modal.addEventListener('show.bs.modal', function (event) {
+            // Button that triggered the modal
+            const button = event.relatedTarget;
+
+            // Find the parent form of the button that was clicked
+            formToSubmit = button.closest('.delete-form');
+        });
+
+        deleteButton.addEventListener('click', function () {
+            if (formToSubmit) {
+                formToSubmit.submit();
+            }
+        });
+    });
+</script>
+
+
+</body>
 </html>

@@ -3,7 +3,7 @@
 @section('content')
     <div class='container my-5'>
 
-        <h1>Delete User: Are you sure?</h1>
+        <h1>Delete User {{ $id }}: Are you sure?</h1>
 
         <div class="col-md-4 mb-3">
             <form method="get" action="/users/{{ $id }}/destroy" id="sure">

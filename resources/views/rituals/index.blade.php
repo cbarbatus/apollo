@@ -6,7 +6,8 @@
 
         <h1>Raven's Cry Grove, ADF Rituals</h1>
 
-        <br><br>
+        <x-alert-success />
+
         @if ($admin)
         <form method="get" action="/rituals/create" id="create">
         </form>

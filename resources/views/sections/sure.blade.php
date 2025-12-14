@@ -4,7 +4,7 @@
 
     <div class='container my-5'>
 
-        <h1>Delete Section ID {{$id }}: Are you sure?</h1>
+        <h1>Delete Section {{$id}}: Are you sure?</h1>
 
 
         <div class="col-md-4 mb-3">
@@ -13,7 +13,7 @@
             </form>
         </div>
         <div class="col-md-4 mb-3">
-            <a href="/sections/{{ $id }}/edit" class="btn btn-secondary">Cancel</a>
+            <a href="/sections" class="btn btn-secondary">Cancel</a>
         </div>
 
 @endsection

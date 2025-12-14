@@ -345,7 +345,7 @@ class RitualController extends Controller
 
         $ritual->delete();
 
-        return redirect('/rituals/1/list')->with('success', 'Ritual was deleted');
+        return redirect('/rituals/1/list')->with('success', 'Ritual '.$ritual->id.' was deleted');
     }
 
 

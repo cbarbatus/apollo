@@ -31,12 +31,19 @@
             <div class="row">
                 <div class="col-md-8 mb-3">
                     <label for="directions">Driving directions:</label>
+
                     <input
                         type="hidden"
-                        name="item"
-                        value="{{ html_entity_decode($venue->directions ?? '') }}"
-                        >
-                    <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
+                        name="directions"
+                        id="trix-directions-input"
+                        value="{{ $venue->directions }}"
+                    >
+
+                    <trix-editor
+                        input="trix-directions-input"
+                        class="form-control"
+                        style="min-height: 200px;"
+                    ></trix-editor>
                 </div>
             </div>
             <button type="submit" form='edit' class="btn btn-go">Submit</button>

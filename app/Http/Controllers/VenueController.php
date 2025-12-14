@@ -112,24 +112,20 @@ class VenueController extends Controller
         return redirect('/venues');
     }
 
-    /**
-     * Before destroy, ask sure.
-     */
+    /*
+
     public function sure(int $id): View
     {
         return view('/venues.sure', ['id' => $id]);
     }
-
+*/
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(Venue $venue)
     {
-        $venue = Venue::findOrFail($id);
-        /** @var \App\Models\Venue $venue */
-
         $venue->delete();
 
-        return redirect('/venues')->with('success', 'Venue was deleted');
+        return redirect()->route('venues.index')->with('success', 'Venue was successfully deleted.');
     }
 }
