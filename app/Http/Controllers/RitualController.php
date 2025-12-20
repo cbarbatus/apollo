@@ -16,31 +16,98 @@ use Illuminate\Support\Facades\Auth;
 class RitualController extends Controller
 {
 
+    public function index(Request $request)
+    {
+        // 1. Basic Data Setup
+        $activeYears = Ritual::whereNotNull('year')->where('year', '<>', '')
+            ->distinct()->orderByDesc('year')->pluck('year');
+        $selectedYear = $request->query('year', $activeYears->first());
+        $selectedName = $request->query('name');
+        $activeNames = Ritual::where('year', $selectedYear)->orderBy('id', 'asc')->pluck('name');
+
+        // 2. THE TRANSPORTER (Admin/Selection Logic)
+        $ritual = null; // Initialize to prevent Undefined Variable error
+
+        if ($selectedName) {
+            $ritual = Ritual::where('year', $selectedYear)
+                ->where('name', $selectedName)
+                ->first();
+
+            // If a ritual is found and user is logged in, jump straight to Details
+            if ($ritual && \Auth::check()) {
+                return redirect()->route('rituals.show', $ritual->id);
+            }
+        }
+
+        // 3. Render the Index (Falls here if no name is picked OR if guest)
+        return view('rituals.index', compact(
+            'activeYears',
+            'selectedYear',
+            'activeNames',
+            'selectedName',
+            'ritual'
+        ));
+    }
+
     /**
      * Display a listing of the resource if not admin.
      */
-    public function list(bool $admin): View|RedirectResponse
+    public function list(bool $admin): View
     {
-        $rituals = Ritual::all();
-        $activeYears = Ritual::select('year')
-            ->groupBy('year')
+        // 1. Get distinct years directly from the Ritual model
+        $activeYears = Ritual::distinct()
             ->orderByDesc('year')
-            ->pluck('year') // Pluck returns a flat array of just the 'year' values
-            ->toArray(); // If you need it as a basic PHP array
+            ->pluck('year');
 
-        return view('rituals.index', compact('rituals', 'activeYears', 'admin'));
+        // 2. Fetch the Master List using the Element model
+        $nameElement = Element::where('section_id', 99)
+            ->where('name', 'RitualNames')
+            ->first();
+
+        // 3. Explode the comma-delimited string
+        $names = $nameElement
+            ? array_map('trim', explode(',', $nameElement->item))
+            : ['Samhain', 'Yule', 'Imbolc'];
+
+        return view('rituals.index', compact('activeYears', 'names', 'admin'));
     }
+
+    public function search(Request $request)
+    {
+        $year = $request->input('year');
+        $name = $request->input('name');
+        $admin = $request->input('admin', 0);
+
+        // 1. Start the query builder on the Ritual model
+        $query = Ritual::query();
+
+        // 2. Apply filters only if they are present
+        if ($year) {
+            $query->where('year', $year);
+        }
+
+        if ($name) {
+            $query->where('name', $name);
+        }
+
+        // 3. Get the results
+        $rituals = $query->orderByDesc('year')->get();
+
+        // 4. Handle the "One" logic naturally
+        // If they picked a specific year and name, and we found exactly one,
+        // we can redirect straight to that ritual view.
+        if ($rituals->count() === 1 && $year && $name) {
+            return redirect()->route('rituals.show', [$rituals->first()->id, 'admin' => $admin]);
+        }
+
+        // 5. Otherwise, show the filtered list
+        return view('rituals.index_results', compact('rituals', 'admin', 'year', 'name'));
+    }
+
 
     /**
      * Display a listing of one year if not admin.
      */
-    public function year(string $year, bool $admin): View
-    {
-        $rituals = Ritual::query()
-            ->where('year', $year)
-            ->get();
-        return view('rituals.year', compact('rituals', 'year', 'admin'));
-    }
 
     private function getRitualDisplayData(Ritual $ritual): array
     {
@@ -69,30 +136,6 @@ class RitualController extends Controller
         return compact('slideshow', 'announcement', 'venue_title', 'lit_file');
     }
 
-    public function one(Request $request)  : View|RedirectResponse
-    {
-        // FIX: Use $request->input() and sanitize
-        $year = $request->input('year');
-        $name = $request->input('name');
-        $admin = $request->input('admin', false);
-
-        if (!is_string($year) || !is_string($name)) {
-            return redirect('/rituals/0/list')->with('message', 'Invalid ritual parameters.');
-        }
-
-        /** @var \App\Models\Ritual|null $ritual */
-        $ritual = Ritual::where('year', $year)
-            ->where( 'name', $name)
-            ->first();
-
-        if (!$ritual) {
-            return redirect('/rituals/0/list')->with('message', 'Ritual not defined');
-        }
-
-        $data = $this->getRitualDisplayData($ritual);
-        $viewData = array_merge($data, compact('ritual'));
-
-        return view('rituals.display', $viewData);    }
 
 
     /**
@@ -234,39 +277,29 @@ class RitualController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $ritual = new Ritual;
-        /** @var \App\Models\Ritual $ritual */
+        // 1. THE LOCK: Validates uniqueness and stops execution if it fails
+        $request->validate([
+            'year' => 'required|integer',
+            'name' => [
+                'required',
+                'string',
+                \Illuminate\Validation\Rule::unique('rituals')->where(function ($query) use ($request) {
+                    return $query->where('year', $request->year);
+                }),
+            ],
+        ], [
+            'name.unique' => 'Ritual year and name already used!'
+        ]);
 
-        // FIX: Refactored input handling to use dedicated variables and ternary operators
-        // This resolves the function.alreadyNarrowedType error caused by reusing $item.
-
-        $year = $request->input('year');
-        $ritual->year = is_string($year) ? $year : '';
-
-        $name = $request->input('name');
-        $ritual->name = is_string($name) ? $name : '';
-
-        $ritual->liturgy_base = $ritual->year.'_'.$ritual->name;
-
-        $culture = $request->input('culture');
-        $ritual->culture = is_string($culture) ? $culture : '';
-
-        /* check that ritual year and name are not duplicated */
-        $previous = Ritual::where('year', '=', $ritual->year)
-            ->where('name', '=', $ritual->name)
-            ->first();
-        /** @var \App\Models\Ritual|null $previous */
-
-        if ($previous) {
-            return back()->with('error', 'Ritual year and name already used! ');
-        }
-
-        /* check that announcement exists */
-
+        // 2. THE CREATION: Only happens if validation passes
+        $ritual = new Ritual($request->all());
         $ritual->save();
 
-        return redirect('/rituals/1/list');
-
+        // 3. THE APOLLO REDIRECT: No more stranded 404s
+        return redirect()->route('rituals.index', [
+            'year' => $ritual->year,
+            'name' => $ritual->name
+        ])->with('success', "Liturgy for {$ritual->name} {$ritual->year} created successfully!");
     }
 
     /**
@@ -304,27 +337,30 @@ class RitualController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, int $id)
     {
         $ritual = Ritual::findOrFail($id);
-        /** @var \App\Models\Ritual $ritual */
 
-        // FIX: Use $request->input() and sanitize
-        $item = $request->input('year');
-        if (!is_string($item)) $item = '';
-        $ritual->year = $item;
+        $request->validate([
+            'year' => 'required|integer',
+            'name' => [
+                'required',
+                'string',
+                \Illuminate\Validation\Rule::unique('rituals')
+                    ->where(fn ($query) => $query->where('year', $request->year))
+                    ->ignore($ritual->id), // The "Jealous Rule" fix
+            ],
+        ], [
+            'name.unique' => 'This ritual name and year combination is already in use.'
+        ]);
 
-        $item = $request->input('name');
-        if (!is_string($item)) $item = '';
-        $ritual->name = $item;
+        // Mass assignment using your specific $fillable fields
+        $ritual->update($request->all());
 
-        $item = $request->input('culture');
-        if (!is_string($item)) $item = '';
-        $ritual->culture = $item;
-
-        $ritual->save();
-
-        return redirect('/rituals/'.$ritual->id);
+        return redirect()->route('rituals.index', [
+            'year' => $ritual->year,
+            'name' => $ritual->name
+        ])->with('success', 'Ritual updated successfully.');
     }
 
     /**
@@ -355,7 +391,7 @@ class RitualController extends Controller
      */
     public function editNames(): View
     {
-        $element = Element::query()->where('name', '=', 'names')->first();
+        $element = Element::query()->where('name', '=', 'RitualNames')->first();
         /** @var \App\Models\Element|null $element */
 
         return view('rituals.parameters', compact('element'));
@@ -367,7 +403,7 @@ class RitualController extends Controller
      */
     public function editCultures(): View
     {
-        $element = Element::query()->where('name', '=', 'cultures')->first();
+        $element = Element::query()->where('name', '=', 'RitualCultures')->first();
         /** @var \App\Models\Element|null $element */
 
         return view('rituals.parameters', compact('element'));
@@ -394,4 +430,18 @@ class RitualController extends Controller
 
         return redirect('/');
     }
+
+    private function getSection99Names()
+    {
+        // Fetch the Master List from Section 99 via the Element model
+        $nameElement = \App\Models\Element::where('section_id', 99)
+            ->where('name', 'RitualNames')
+            ->first();
+
+        // Explode and clean the comma-delimited string
+        return $nameElement
+            ? array_map('trim', explode(',', $nameElement->item))
+            : ['Samhain', 'Yule', 'Imbolc', 'Beltaine']; // High Day fallback
+    }
+
 }

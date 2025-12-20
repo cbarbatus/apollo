@@ -1,53 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
+    <div class="container">
+        <h2>Add New Element to Section {{ $section_id }}</h2>
 
-    <div class='container my-5'>
-        <h1>Create a Text Element</h1>
-
-        <form method="post" action="/elements" id="create">
+        <form method="POST" action="{{ url('elements/store') }}">
             @csrf
+            <input type="hidden" name="section_id" value="{{ $section_id }}">
 
-            <input type="hidden" name="section_id" id="section_id" value="{{ $section_id }}">
-
-            {{-- Title Field --}}
-            <div class="col-md-4 mb-3">
-                <label for="title" class="form-label">Title:</label>
-                <input type="text" name="title" id="title" class="form-control" maxlength="40" required>
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" name="title" class="form-control" placeholder="e.g. MISSION:">
+                </div>
+                <div class="col-md-5">
+                    <label for="name" class="form-label">Internal Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. mission">
+                </div>
+                <div class="col-md-2">
+                    <label for="sequence" class="form-label">Sequence</label>
+                    <input type="number" name="sequence" value="{{ $next_seq }}" class="form-control">
+                </div>
             </div>
 
             <div class="row">
-                {{-- Name Field (Shortened to 2 columns on medium screens and up) --}}
-                <div class="col-md-2 mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" id="name" class="form-control" maxlength="20" required>
-                </div>
-
-                {{-- Sequence Field (Shortened to 1 columns on medium screens and up) --}}
-                <div class="col-md-1 mb-3">
-                    <label for="sequence" class="form-label">Sequence:</label>
-                    <input type="number" name="sequence" id="sequence" class="form-control" value="0">
-                    {{-- The 'form-control' class is retained, but the 'col-md-2' limits its width --}}
+                <div class="col-md-12 mb-3">
+                    <label for="trix-item-input">Element Content:</label>
+                    <input type="hidden" name="item" id="trix-item-input">
+                    <trix-editor input="trix-item-input" class="form-control" style="min-height: 300px; background-color: white;"></trix-editor>
                 </div>
             </div>
 
-            {{-- Text/Item Field with Trix (Width limited to 8 columns) --}}
-            <div class="row">
-                <div class="col-md-8 mb-3">
-                    <label for="element-item" class="form-label">Text (Content):</label>
-
-                    <input
-                        id="element-item"
-                        type="hidden"
-                        name="item"
-                        value=""
-                    >
-                    {{-- The 'col-md-8' limits the width of the Trix editor --}}
-                    <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            <button type="submit" class="btn btn-success">Create Element</button>
+            <a href="{{ url('sections/' . $section_id . '/edit') }}" class="btn btn-outline-secondary">Cancel</a>
         </form>
     </div>
-
 @endsection

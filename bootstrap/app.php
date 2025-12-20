@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+// 1. EXCLUDE THE TEST ROUTE FROM CSRF
+        $middleware->validateCsrfTokens(except: [
+            'abc/*',
+        ]);
+
         // 2. ADD SPATIE MIDDLEWARE ALIASES HERE
         $middleware->alias([
             'role'       => \Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -24,5 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+
+            // ADD THIS BLOCK
+            $exceptions->stopIgnoring(Illuminate\Auth\Access\AuthorizationException::class);
+            $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e) {
+                // DUMP THE STACK TRACE TO SEE WHERE THE ABORT(403) CAME FROM
+                dd($e->getTraceAsString());
+            });
     })->create();

@@ -25,75 +25,94 @@ class SlideshowController extends Controller
 
     }
 
-    /**
-     * Display a listing of the resource.
-     */
-    public function list(bool $admin): View|RedirectResponse
+
+    public function index(Request $request)
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Slideshow> $slideshows */
-        $slideshows = Slideshow::all();
-        $activeYears = Slideshow::select('year')
-            ->groupBy('year')
-            ->orderByDesc('year')
-            ->pluck('year') // Pluck returns a flat array of just the 'year' values
-            ->toArray(); // If you need it as a basic PHP array
-
-        $activeNames = Slideshow::select('name')
-            ->distinct()
-            ->orderByDesc('name')
-            ->pluck('name') // Returns a Collection of names
-            ->toArray(); // If you need it as a basic PHP array;
-
-        return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames', 'admin'));
-    }
-
-
-
-    /**
-     * Display a listing of one year if not admin.
-     */
-    public function year(string $year, bool $admin): View
-    {
-        $slideshows = Slideshow::query()
-            ->where('year', '=', $year)
-            ->orderBy('sequence')
-            ->get();
-
-        return view('slideshows.year', compact('slideshows', 'year', 'admin'));
-    }
-
-
-    /**
-     * Find one slideshow from year and name
-     */
-    // Inject Request for best practice
-    public function one(Request $request, bool $admin): RedirectResponse
-    {
-        // Use $request->input() instead of global request() helper
         $year = $request->input('year');
         $name = $request->input('name');
 
-        $slideshow = null;
-        if (!is_string($year) || !is_string($name))
-            return redirect('/slideshows/0/list')->with('message', 'Slideshow ' . $year . ' ' . $name . ' not available');
+        $query = \App\Models\Slideshow::query();
+        if ($year) {
+            $query->where('year', $year);
+        }
+        if ($name) {
+            $query->where('name', 'LIKE', "%{$name}%");
+        }
 
-            /** @var \App\Models\Slideshow|null $slideshow */
-        $slideshow = Slideshow::where('year', $year)
-            ->where('name', $name)
-            ->first();
+        $slideshows = ($year || $name) ? $query->get() : collect();
 
-        if (!$slideshow)
-            return redirect('/slideshows/0/list')->with('message', 'Slideshow not defined');
 
-        /** @var \App\Models\Slideshow|null $slideshow */
-        $target = "";  /* ensure target is a string */
-        $id = $slideshow->id;
+// --- THE TRANSPORTER SECTION ---
+        if ($name && $slideshows->isNotEmpty()) {
+            $id = $slideshows->first()->id;
 
-        if ($admin) $target = 'slideshows/' . $id . '/edit';
-        else $target = 'slideshows/' . $id;
+            if (\Auth::check()) {
+                $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
+                $activeNames = $this->getSection99Names();
 
-        return redirect($target);
+                return view('slideshows.index', [
+                    'slideshows' => $slideshows,
+                    'activeYears' => $activeYears,
+                    'activeNames' => $activeNames,
+                    'choiceId' => $id,
+                    'selectedName' => $name,
+                    'selectedYear' => $year
+                ]);
+            }
+            return redirect()->route('slideshows.show', $id);
+        }
 
+// --- THE HONEST ARCHIVE FAILURE SECTION ---
+        if ($name && $slideshows->isEmpty()) {
+            $slideshows = \App\Models\Slideshow::where('year', $year)->get();
+
+            $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
+            $activeNames = $this->getSection99Names();
+
+            // Use session()->flash to ensure the Blade @if(session('error')) catches it
+            session()->flash('error', "A slideshow for $name $year is not available in the archive.");
+
+            return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames'));
+        }
+
+// --- THE DEFAULT VIEW (SPIGOT) ---
+        $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
+        $activeNames = $this->getSection99Names();
+
+        return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames'));
+
+    }
+
+        /**
+     * Display a listing of the resource.
+     */
+    public function search(Request $request)
+    {
+        $year = $request->input('year');
+        $name = $request->input('name');
+        $admin = $request->input('admin', 0);
+
+        $query = Slideshow::query();
+
+        if ($year) { $query->where('year', $year); }
+        if ($name) { $query->where('name', $name); }
+
+        $slideshows = $query->orderBy('sequence')->get();
+
+        // If exactly one match exists (the "One" logic), go there directly
+        if ($slideshows->count() === 1 && $year && $name) {
+            return $admin
+                ? redirect()->route('slideshows.edit', $slideshows->first()->id)
+                : redirect()->route('slideshows.show', $slideshows->first()->id);
+        }
+
+        // Otherwise, show whatever we found (even if 0) on a results page
+        return view('slideshows.index', [
+            'slideshows' => $slideshows,
+            'admin' => $admin,
+            'activeYears' => Slideshow::distinct()->pluck('year'), // For the sidebar/form
+            'names' => $this->getSection99Names() // Helper to get clean names
+        ]);
     }
 
 
@@ -120,8 +139,24 @@ class SlideshowController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
-    {
+
+        public function store(Request $request)
+        {
+        $request->validate([
+            'year' => 'required|integer',
+            'google_id' => 'required',
+            'name' => [
+                'required',
+                'string',
+                // This rule says: "Look in slideshows table where name = X AND year = Y"
+                \Illuminate\Validation\Rule::unique('slideshows')->where(function ($query) use ($request) {
+                    return $query->where('year', $request->year);
+                }),
+            ],
+        ], [
+            'name.unique' => "Stop! A slideshow for {$request->name} {$request->year} already exists."
+        ]);
+
         $slideshow = new Slideshow;
         /** @var \App\Models\Slideshow $slideshow */
 
@@ -152,7 +187,8 @@ class SlideshowController extends Controller
 
         $slideshow->save();
 
-        return redirect('/slideshows/1/list');
+        return redirect()->route('slideshows.index')
+            ->with('success', "Slideshow '{$slideshow->name}' created successfully!");
     }
 
     /**
@@ -212,20 +248,36 @@ class SlideshowController extends Controller
 
         $slideshow->save();
 
-        return redirect('/slideshows/1/list');
+        return redirect()->route('slideshows.index', ['year' => $slideshow->year, 'name' => $slideshow->name])
+            ->with('success', "Slideshow updated successfully.");
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(int $id): RedirectResponse
     {
-        // Renamed $venue to $slideshow for clarity and type safety
         $slideshow = Slideshow::findOrFail($id);
-        /** @var \App\Models\Slideshow $slideshow */
-
         $slideshow->delete();
 
-        return redirect('/slideshows')->with('success', 'Slideshow was deleted');
+        // Apollo-standard named route
+        return redirect()->route('slideshows.index')->with('success', 'Slideshow was deleted successfully.');
     }
+
+
+    private function getSection99Names()
+    {
+        // Fetch the Master List from Section 99 via the Element model
+        $nameElement = \App\Models\Element::where('section_id', 99)
+            ->where('name', 'RitualNames')
+            ->first();
+
+        // Explode and clean the comma-delimited string
+        return $nameElement
+            ? array_map('trim', explode(',', $nameElement->item))
+            : ['Samhain', 'Yule', 'Imbolc', 'Beltaine']; // High Day fallback
+    }
+
+
 }

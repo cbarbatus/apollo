@@ -15,7 +15,9 @@
     </div>
 
     <br><br>
-    <a href="/slideshows/{{$slideshow->year}}/0/year" class="btn btn-go">More Slideshows</a>
+    <a href="{{ route('slideshows.index', ['year' => $slideshow->year]) }}" class="btn btn-primary">
+        <i class="bi bi-arrow-left"></i> More Slideshows
+    </a>
 
 
 @endsection

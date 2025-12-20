@@ -29,7 +29,8 @@
 
         <form method="get" action="/rituals/1/list" id="list">
         </form>
-        <button type="submit" form="list" class="btn btn-go">List</button>
+
+        <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-success">List</a>
     </div>
     <br>
 @endsection

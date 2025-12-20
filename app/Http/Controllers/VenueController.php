@@ -99,7 +99,8 @@ class VenueController extends Controller
     {
         $venue = Venue::query()->findOrFail($id);
         /** @var \App\Models\Venue $venue */
-
+dd("in venue update");
+        $venue->update($request->validated());
         // Switched from request('key') helper to $request->input('key') and explicitly cast to (string)
         $venue->name = (string) $request->input('name', $venue->name);
         $venue->title = (string) $request->input('title', $venue->title);

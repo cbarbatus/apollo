@@ -1,59 +1,64 @@
 @extends('layouts.app')
 
 @section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Whoops! Something went wrong:</strong>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <div class='container my-5'>
-        <h1 class="mb-4">Edit Text Element {{ $element->id }}</h1>
+    <div class="container">
+        <h1>Edit Element: {{ $element->id }}</h1>
 
-        <form method="post" action="{{ route('elements.update', $element->id) }}" id="edit">
+        <form method="POST" action="{{ url('elements/' . $element->id . '/update') }}">
             @csrf
-            @method('put') {{-- Essential: This tells Laravel to use the PUT route --}}
+            <input type="hidden" name="section_id" value="{{ $element->section_id }}">
 
-            <input type="hidden" name="id" value="{{ $element->id }}">
-            {{-- Title Field --}}
-            <div class="col-md-4 mb-3">
-                <label for="title" class="form-label">Title:</label>
-                <input type="text" name="title" id="title" class="form-control" value="{{ $element->title }}" required>
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" name="title" class="form-control" value="{{ $element->title }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="name" class="form-label">Internal Name</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ $element->name }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="sequence" class="form-label">Sequence</label>
+                    <input type="number" id="sequence" name="sequence" class="form-control" value="{{ $element->sequence }}">
+                </div>
             </div>
 
             <div class="row">
-                {{-- Name Field --}}
-                <div class="col-md-2 mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" id="name" class="form-control" value="{{ $element->name }}" required>
-                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="trix-item-input">Element Content:</label>
 
-            {{-- Sequence Field --}}
-                <div class="col-md-1 mb-3">
-                    <label for="sequence" class="form-label">Sequence:</label>
-                    <input type="number" name="sequence" id="sequence" class="form-control" value="0">
-                    {{-- w-25 limits the width for a small input field --}}
+                    <input
+                        type="hidden"
+                        name="item"
+                        id="trix-item-input"
+                        value="{{ $element->item }}"
+                    >
+                    @if($element->section_id == 99)
+                        <textarea name="item" class="form-control" rows="10">{{ strip_tags($element->item) }}</textarea>
+                        <small class="text-muted">Note: Section 99 must remain plain text for ritual dropdowns.</small>
+                    @else
+                        <trix-editor input="item"></trix-editor>
+                        <input id="trix-item-input" type="hidden" name="item" value="{{ $element->item }}">
+                    @endif
                 </div>
             </div>
-
-
-            {{-- Text Field (Trix Editor Implementation) --}}
-                <div class="row">
-                    <div class="col-md-8 mb-3">
-                        <label for="item" class="form-label">Text:</label>
-                    @if ($element->name === 'donate')
-                        {{-- CASE 1: Donate Section (Forces plain <textarea> for complex HTML) --}}
-                        <textarea id="item" name="item" rows="15" cols="80" class="form-control">{{ $element->item }}</textarea>
-                    @else
-                        {{-- CASE 2: All Other Sections (Uses Trix editor) --}}
-                        <input
-                            id="element-item"
-                            type="hidden"
-                            name="item"
-                            value="{{ html_entity_decode($element->item ?? '') }}"
-                            >
-                        <trix-editor input="element-item" class="form-control" style="min-height: 200px;"></trix-editor>
-                    @endif
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{{ url('sections/' . $element->section_id . '/edit') }}" class="btn btn-outline-secondary">
+                    Cancel
+                </a>
+            </div>
         </form>
-     </div>
-
-
+    </div>
 @endsection

@@ -2,6 +2,18 @@
 
 @section('content')
 
+    @if (session('status'))
+        <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c3e6cb;">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if (session('message'))
+        <div style="background-color: #cce5ff; color: #004085; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #b8daff;">
+            {{ session('message') }}
+        </div>
+    @endif
+
     <div class='container'>
         <h1>Front Page Sections</h1>
 
@@ -34,13 +46,6 @@
                             @csrf
                             @method('GET')
                             <button type="submit" class="btn btn-warning" >Edit</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form method="get" action="/sections/{{ $section['id']}}/sure" id="sure">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-danger" >Delete</button>
                         </form>
                     </td>
                 </tr>

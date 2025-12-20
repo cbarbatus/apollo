@@ -27,7 +27,7 @@ class Section extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'slug', 'sequence'];
+    protected $fillable = ['name', 'title', 'sequence', 'item', 'sequence'];
 
     public function elements(): HasMany
     {

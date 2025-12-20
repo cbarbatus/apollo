@@ -26,7 +26,7 @@ class Element extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_id', 'name', 'slug', 'title', 'item'];
+    protected $fillable = ['section_id', 'name', 'slug', 'title', 'item', 'sequence'];
 
     public function section(): BelongsTo
     {

@@ -177,3 +177,25 @@ h3, h2 {
     padding: 20px;
 }
 
+/* Ensure the button has a fixed size based on bold text */
+
+/* target the specific year buttons */
+.btn-ritual-year {
+    display: inline-block;
+    min-width: 60px; /* Gives the numbers a bit of breathing room */
+    text-align: center;
+}
+
+.btn-ritual-year:hover {
+    font-weight: bold;
+}
+
+/* Target the hover state specifically for Firefox stability */
+.btn-ritual-year:hover {
+    font-weight: bold !important;
+    /* Tighten the letters slightly to keep the total width the same as 'normal' weight */
+    letter-spacing: -0.02em !important;
+    /* Force Firefox to respect the box sizing */
+    display: inline-block !important;
+}
+}

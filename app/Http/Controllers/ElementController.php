@@ -7,6 +7,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 // Use Illuminate\Contracts\View\View for consistent static analysis of view returns
 use Illuminate\Contracts\View\View;
+use App\Models\Section;
+use App\Http\Requests\ElementRequest;
 
 class ElementController extends Controller
 {
@@ -16,11 +18,16 @@ class ElementController extends Controller
      * PHPDoc Fix: Using 'mixed' or 'void' since the function calls exit().
      * @return mixed
      */
-    public function index()
+// The signature is now correct: GET /sections/{section}/elements
+    public function index(Section $section): View
     {
-        var_dump('stopped at element.index');
-        exit();
+        // Retrieve elements that belong ONLY to this specific section
+        $elements = $section->elements()->orderBy('sequence')->get();
+
+        // Pass both the section and its elements to the view
+        return view('elements.index', compact('section', 'elements'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -29,65 +36,41 @@ class ElementController extends Controller
      * Added method return type hint for greater safety.
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View
      */
-    public function create(int $section_id): \Illuminate\Http\RedirectResponse|\Illuminate\Contracts\View\View
-    {
-        // FIX for Line 35: Explicitly call guard() to satisfy strict static analysis.
-        $user = auth()->guard()->user();
-        if ($user === null) {
-            return redirect('/')->with('warning', 'Login is needed.');
-        }
-        return view('elements.create', compact('section_id'));
 
+    public function create(Request $request)
+    {
+        $section_id = $request->query('section_id');
+
+        // Get the current highest sequence for this section and add 100
+        $last_seq = Element::where('section_id', $section_id)->max('sequence');
+        $next_seq = $last_seq ? $last_seq + 100 : 100;
+
+        return view('elements.create', compact('section_id', 'next_seq'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * Type Safety Fix: Use request()->input() and explicitly cast numeric fields to (int).
-     */
-    public function store(Request $request): RedirectResponse
+
+    public function store(Request $request)
     {
+        // 1. Validation - Removed 'item' since it's not in the DB
+        $request->validate([
+            'section_id' => 'required|integer|exists:sections,id',
+            'name'       => 'required|string',
+            'title'      => 'required|string',
+            'sequence'   => 'required|integer',
+            'item'       => 'required|string',
+        ]);
 
-        // 1. CHECK IF THIS IS AN UPDATE REQUEST
-        if ($request->has('id')) {
-            // Find the existing model using the hidden ID field
-            $element = Element::findOrFail($request->input('id'));
+        // 2. Create via Model
+        // This automatically handles created_at and updated_at.
+        // It also ignores any extra data (like 'item') not in your $fillable list.
 
-            // MANUALLY call your existing, correct update logic
-            // This executes your update function logic:
-            $element->title = (string) $request->input('title', $element->title);
-            $element->name = (string) $request->input('name', $element->name);
-            $element->sequence = (int) $request->input('sequence', $element->sequence);
-            $element->item = (string) $request->input('item', $element->item);
+        Element::create($request->all());
 
-            $element->save(); // This GUARANTEES an UPDATE query
-
-            $section_id = $element->section_id;
-
-            return redirect('/sections/'.$section_id.'/edit');
-        }
-
-        $element = new Element;
-
-        // Fixed type-mixing by using input() for safety and explicit casting for numeric columns
-        $element->section_id = (int) $request->input('section_id', 0);
-        $element->name = (string) $request->input('name', '');
-        $element->title = (string) $request->input('title', '');
-        $element->sequence = (int) $request->input('sequence', 0); // Assuming sequence is an integer
-        $element->item = (string) $request->input('item', '');
-
-        $element->save();
-
-        return redirect('/sections/'.$element->section_id.'/edit');
-
+        // 3. Redirect home
+        return redirect('sections/' . $request->section_id . '/edit')
+            ->with('status', 'Element created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * PHPDoc Fix: Using 'mixed' or 'void' since the function calls exit().
-     * @return mixed
-     */
     public function show(int $id)
     {
         var_dump('stopped at element.show', $id);
@@ -100,11 +83,12 @@ class ElementController extends Controller
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      * This resolves all undefined property errors in this method.
      */
-    public function edit(Element $element): View
+    public function edit($id)
     {
-        // Element::findOrFail($id) is now handled automatically by Laravel.
+        // 1. Find the element or fail with a clean 404
+        $element = Element::findOrFail($id);
+        // 2. Return the view
         return view('elements.edit', compact('element'));
-
     }
 
     /**
@@ -113,55 +97,53 @@ class ElementController extends Controller
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      * Type Safety Fix: Used input() and explicit casting.
      */
-    public function update(Request $request, Element $element): RedirectResponse
+    public function updatePost(Request $request, $id)
     {
-        // Element::find($id) is no longer needed.
+        // 1. Validation - Ensure the field names match your form inputs
+        $request->validate([
+            'name'     => 'required|string',
+            'title'    => 'required|string',
+            'sequence' => 'required|integer',
+            'item'     => 'nullable|string', // This is for the Trix content
+        ]);
 
-        // Fixed type-mixing by using input() and explicit casting
-        $element->title = (string) $request->input('title', $element->title);
-        $element->name = (string) $request->input('name', $element->name);
-        $element->sequence = (int) $request->input('sequence', $element->sequence); // Assuming sequence is an integer
-        $element->item = (string) $request->input('item', $element->item);
+        // 2. Prepare the data for the item column
+        $data = $request->only(['name', 'title', 'sequence', 'item']);
+        $data['updated_at'] = now(); // Keep strict mode happy
 
-        $element->save();
-        $section_id = $element->section_id;
+        // 3. Update the specific element
+        \DB::table('elements')
+            ->where('id', $id)
+            ->update($data);
 
-        return redirect()->route('sections.edit', $section_id)
-            ->with('success', 'Element updated successfully!');
-    }
+        // 4. Find the section_id so we can redirect back to the Section Edit page
+        $element = \DB::table('elements')->where('id', $id)->first();
 
-    /**
-     * Before destroy, ask sure.
-     *
-     * Route Model Binding Fix: Changed parameter from int $id to Element $element.
-     */
-    public function sure(int $id): View
-    {
-        // Fetch the element manually to confirm it exists
-        $element = Element::findOrFail($id);
-
-        // Pass BOTH the simple ID and the Element object to the view for redundancy
-        return view('elements.sure', compact('element', 'id'));
+        // 5. Return to the Section Edit page with a success message
+        return redirect('sections/' . $element->section_id . '/edit')
+            ->with('status', 'Element "' . $element->name . '" updated successfully!');
     }
     /**
      * Remove the specified resource from storage.
      *
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy($id)
     {
-        // 2. Manually find the element (guarantees the object is loaded)
-        $element = Element::findOrFail($id);
+        // 1. Find the element so we can get its section_id
+        $element = \DB::table('elements')->where('id', $id)->first();
 
-        // 3. Store necessary variables BEFORE deletion.
-        $deleted_id = $element->id;
-        $section_id = $element->section_id; // This will definitely be 10 now.
+        if (!$element) {
+            return redirect()->back()->with('error', 'Element not found.');
+        }
 
-        // 4. Perform the deletion.
-        $element->delete();
+        $section_id = $element->section_id;
 
-        // 5. Use the stored section_id for the reliable named route redirect.
-        return redirect()->route('sections.edit', $section_id)
-            ->with('success', 'Element '.$deleted_id.' was deleted');
+        // 2. Perform the deletion
+        \DB::table('elements')->where('id', $id)->delete();
+
+        // 3. Redirect back to the parent Section Edit page
+        return redirect('sections/' . $section_id . '/edit')
+            ->with('status', 'Element deleted successfully.');
     }
 }

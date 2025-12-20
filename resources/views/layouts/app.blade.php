@@ -56,9 +56,9 @@
             <div class="navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav list-unstyled">
                     <li class="nav-item">
-                        <a class="px-2 text-white" href="{{ url('/slideshows/0/list') }}">Photos</a></li>
+                        <a class="px-2 text-white" href="{{ url('/slideshows') }}">Photos</a></li>
                     <li class="nav-item">
-                        <a class="px-2 text-white" href="{{ url('/rituals/0/list') }}">Past Rituals</a></li>
+                        <a class="px-2 text-white" href="{{ url('/rituals') }}">Past Rituals</a></li>
                     <li class="nav-item">
                         <a class="px-2 text-white" href="{{ url('/books') }}">Books</a></li>                </ul>
 
@@ -200,25 +200,31 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('confirmDeleteModal');
-        const deleteButton = document.getElementById('modal-confirm-delete');
-        let formToSubmit = null;
+        const confirmBtn = document.getElementById('modal-confirm-delete');
+        let actionUrl = '';
 
-        modal.addEventListener('show.bs.modal', function (event) {
-            // Button that triggered the modal
-            const button = event.relatedTarget;
+        if (modal && confirmBtn) {
+            modal.addEventListener('show.bs.modal', function (event) {
+                // 'event.relatedTarget' is the "Delete" button you actually clicked
+                const button = event.relatedTarget;
+                actionUrl = button.getAttribute('data-action');
+            });
 
-            // Find the parent form of the button that was clicked
-            formToSubmit = button.closest('.delete-form');
-        });
-
-        deleteButton.addEventListener('click', function () {
-            if (formToSubmit) {
-                formToSubmit.submit();
-            }
-        });
+            confirmBtn.addEventListener('click', function () {
+                if (actionUrl) {
+                    const form = document.getElementById('global-delete-form');
+                    form.action = actionUrl;
+                    form.submit();
+                }
+            });
+        }
     });
 </script>
 
+<form id="global-delete-form" method="POST" style="display: none;">
+    @csrf
+    @method('DELETE')
+</form>
 
 </body>
 </html>

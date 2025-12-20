@@ -131,37 +131,23 @@ class AnnouncementController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, Announcement $announcement): RedirectResponse
     {
-        $announcement = Announcement::find($id);
-        /** @var \App\Models\Announcement|null $announcement */
+        // NO MANUAL FIND IS NEEDED! $announcement is already the correct model instance.
+        // $announcement = Announcement::find($id); <-- DELETE THIS LINE
 
-        if (!$announcement) {
-            return redirect('/announcements')->with('error', 'Announcement not found.');
-        }
-
-        // Switched to $request->input() for type safety and consistency
-        $item = $request->input('name');
-        $announcement->name = (string) ($item ?? $announcement->name);
-
-        $item = $request->input('when');
-        $announcement->when = (string) ($item ?? $announcement->when);
-
-        // Using 'venue_name' property
-        $item = $request->input('venue_name');
-        $announcement->venue_name = (string) ($item ?? $announcement->venue_name);
-
-        $item = $request->input('notes');
-        $announcement->notes = (string) ($item ?? $announcement->notes);
-
-        // Handle year, summary, picture_file updates
+        // Your update logic (simplified):
+        $announcement->name = (string) ($request->input('name') ?? $announcement->name);
+        $announcement->when = (string) ($request->input('when') ?? $announcement->when);
+        $announcement->venue_name = (string) ($request->input('venue_name') ?? $announcement->venue_name);
+        $announcement->notes = (string) ($request->input('notes') ?? $announcement->notes);
         $announcement->year = (string) ($request->input('year') ?? $announcement->year);
         $announcement->summary = (string) ($request->input('summary') ?? $announcement->summary);
         $announcement->picture_file = (string) ($request->input('picture_file') ?? $announcement->picture_file);
 
         $announcement->save();
-
-        return redirect('/announcements')->with('success', 'Announcement '.$announcement->id.' was updated');
+        // 🟢 CRITICAL CHANGE: Use the Named Route for reliability 🟢
+        return redirect()->route('announcements.index')->with('success', 'Announcement '.$announcement->id.' was updated');
     }
 
     /**

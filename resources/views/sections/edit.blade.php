@@ -2,80 +2,89 @@
 
 @section('content')
     <div class='container my-5'>
-        <h1>Edit Text Section {{ $section->id }}</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Edit Section: {{ $section->id }}</h1>
 
-        <form method="post" action="/sections/{{ $section->id }}/update" id="edit">
+        </div>
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if (session('status'))
+            <div class="alert alert-success">{{ session('status') }}</div>
+        @endif
+
+        <form method="POST" action="{{ url('sections/' . $section->id . '/update') }}">
             @csrf
-            @method('put')
 
-            <div class="col-md-4 mb-3">
-                <label for="title">Title:</label>
-                <input type="text" name="title" id="title" size="40" value="{{ $section->title }}">
-            </div>
-
-            <div class="row">
-                <div class="col-md-2 mb-3">
-                    <label for="name" class="form-label">Name:</label>
-                    <input type="text" name="name" id="name" class="form-control" size="20" value="{{ $section->name }}">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" name="title" class="form-control" value="{{ $section->title }}">
                 </div>
-
-                <div class="col-md-1 mb-3">
-                    <label for="sequence" class="form-label">Sequence:</label>
-                    <input type="number" name="sequence" id="sequence" class="form-control" size="4" value="{{ $section->sequence }}">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" id="name" name="name" class="form-control" value="{{ $section->name }}">
                 </div>
             </div>
-            <button type="submit" form='edit' class="btn btn-go">Submit</button>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label for="sequence" class="form-label">Sequence</label>
+                    <input type="number" id="sequence" name="sequence" class="form-control" value="{{ $section->sequence }}">
+                </div>
+                <div class="col-md-9 d-flex align-items-end justify-content-end">
+                    <button type="submit" class="btn btn-primary">Save Section Changes</button>
+                </div>
+            </div>
+
         </form>
+
+        <x-delete-button
+            :action="url('sections/' . $section->id)"
+            resource="Section"
+        />
 
         <hr class="my-5">
 
-        <div class='container my-5 fw-bold'>
-            Elements in Section {{ $section->id }}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3>Section Elements</h3>
+            <a href="{{ url('elements/create?section_id=' . $section->id) }}" class="btn btn-success btn-sm">
+                + Add New Element
+            </a>
         </div>
 
-
-        <div class="col-md-2 mb-3">
-            <form method="get" action="/elements/{{ $section->id }}/create" id="create">
-                <button type="submit" form='create' class="btn btn-warning">New Element</button>
-            </form>
-        </div>
-
-
-
-        <table class="table table-striped">
-            <thead>
-            <tr style="font-weight:bold">
-                <td>ID</td>
-                <td>Name</td>
-                <td>Title</td>
-                <td>Sequence</td>
-                <td colspan="2">Action</td>
+        <table class="table table-striped border">
+            <thead class="table-light">
+            <tr>
+                <th style="width: 80px;">Seq</th>
+                <th>Name</th>
+                <th>Content Preview</th>
+                <th class="text-end">Actions</th>
             </tr>
             </thead>
             <tbody>
             @foreach($elements as $element)
                 <tr>
-                    <td>{{$element->id}}</td>
-                    <td>{{$element->name}}</td>
-                    <td>{{$element->title}}</td>
-                    <td>{{$element->sequence}}</td>
-                    <td><form method="get" action="/elements/{{ $element['id']}}/edit" id="edit">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-warning" >Edit</button>
-                        </form>
+                    <td>{{ $element->sequence }}</td>
+                    <td><strong>{{ $element->name }}</strong></td>
+                    <td class="text-muted small">
+                        {{ Str::limit(str_replace('&nbsp;', ' ', strip_tags($element->item)), 50) }}
                     </td>
-                    <td>
-                        <form method="get" action="/elements/{{ $element['id']}}/sure" id="sure">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-danger" >Delete</button>
-                        </form>
+                    <td class="text-end">
+                        <a href="{{ url('elements/' . $element->id . '/edit') }}" class="btn btn-sm btn-outline-primary">Edit</a>
+
+                        <x-delete-button
+                            :action="url('elements/' . $element->id)"
+                            resource="Element"
+                        />
                     </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
-
     </div>
 @endsection

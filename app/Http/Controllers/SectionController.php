@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 // Explicitly import the User model for PHPDoc casting
 use App\Models\User;
+use App\Http\Requests\SectionRequest;
+use Illuminate\Support\Facades\DB;
 
 class SectionController extends Controller
 {
@@ -37,25 +39,18 @@ class SectionController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View|RedirectResponse
+    public function edit($id): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            // Cast $user to the expected type
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
+        if (Auth::check() && Auth::user()->hasRole(['admin', 'SeniorDruid'])) {
 
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
+            // Manually fetch the section using the ID from the URL
+            $section = Section::findOrFail($id);
 
-                // Explicitly cast to Section model for better analysis
-                $section = Section::query()->findOrFail($id);
-                /** @var \App\Models\Section $section */
+            $elements = Element::where('section_id', $section->id)
+                ->orderBy('sequence')
+                ->get();
 
-                // FIX: Added 'int' key type to resolve the PHPStan error on this line.
-                $elements = Element::query()->where('section_id', '=', $id)->orderBy('sequence')->get();
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Element> $elements */
-
-                return view('sections.edit', compact('section', 'elements'));
-            }
+            return view('sections.edit', compact('section', 'elements'));
         }
 
         return redirect('/');
@@ -84,58 +79,57 @@ class SectionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        $section = new Section;
-        /** @var \App\Models\Section $section */
+        // 1. Validation (This is usually why a page "sticks" - it fails and reloads)
+        $request->validate([
+            'name'     => 'required|string',
+            'title'    => 'required|string',
+            'sequence' => 'required|integer',
+        ]);
 
-        // Switched from request('key') helper to $request->input('key') for type safety
-        $section->title = (string) $request->input('title', '');
-        $section->name = (string) $request->input('name', '');
-        $section->sequence = (string) $request->input('sequence', '');
+        // 2. Create the Section
+        // Using the Model directly is cleaner than the old property-by-property way
+        $section = \App\Models\Section::create([
+            'name'     => $request->name,
+            'title'    => $request->title,
+            'sequence' => $request->sequence,
+          ]);
 
-        // Note: The 'slug' property, although in $fillable, is not set here. Laravel will default it to null/empty if not required.
-
-        $section->save();
-
-        return redirect('/sections');
-
+        // 3. Redirect to the Edit page of the NEW section
+        return redirect('sections/' . $section->id . '/edit')
+            ->with('status', 'Section "' . $section->name . '" created successfully!');
     }
 
     /**
      * Turn on the showit flag.
      */
-    public function on(Request $request, int $id): RedirectResponse
+    public function on(Request $request, Section $section): RedirectResponse
     {
-        $sections = Section::orderBy('sequence')->get();
+        $allSections = Section::orderBy('sequence')->get();
         // FIX: Added 'int' key type to resolve the PHPStan error on this line.
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections */
 
-        foreach ($sections as $section) {
+        foreach ($allSections as $s) {
             /** @var \App\Models\Section $section */
-            $section->showit = 0;
-            $section->save();
+            $s->showit = 0;
+            $s->save();
         }
 
         $thesection = Section::findOrFail($id);
         /** @var \App\Models\Section $thesection */ // Explicit cast for single model instance
 
-        $thesection->showit = 1;
-        $thesection->save();
+        $section->showit = 1;
+        $section->save();
 
-        /*
-        var_dump("stopped at section.on", $id, $thesection); exit();
-        */
         return redirect('/');
     }
 
     /**
      * Turn off the showit flag.
      */
-    public function off(Request $request, int $id): RedirectResponse
+    public function off(Request $request, Section $section): RedirectResponse
     {
-        $section = Section::findOrFail($id);
-        /** @var \App\Models\Section $section */ // Explicit cast for single model instance
 
         $section->showit = 0;
         $section->save();
@@ -144,39 +138,46 @@ class SectionController extends Controller
     }
 
 
-    public function update(Request $request, int $id): RedirectResponse
+    public function updatePost(Request $request, $id)
     {
-        $section = Section::query()->findOrFail($id);
-        /** @var \App\Models\Section $section */ // Explicit cast for single model instance
+        // 1. Validate only what belongs to the Section
+        $request->validate([
+            'name'     => 'required|string',
+            'title'    => 'required|string',
+            'sequence' => 'required|integer',
+        ]);
 
-        // Switched from request('key') helper to $request->input('key') for type safety
-        $section->title = (string) $request->input('title', $section->title);
-        $section->name = (string) $request->input('name', $section->name);
-        $section->sequence = (string) $request->input('sequence', $section->sequence);
+        // 2. Update the sections table (No 'item' here!)
+        \DB::table('sections')
+            ->where('id', $id)
+            ->update([
+                'name'       => $request->input('name'),
+                'title'      => $request->input('title'),
+                'sequence'   => $request->input('sequence'),
+                'updated_at' => now(),
+            ]);
 
-        $section->save();
-
-        return redirect('/sections');
+        // 3. THE APOLLO EXIT: Return to the list to break the "funky" loop
+        return redirect('/sections')
+            ->with('status', 'Section "' . $request->input('name') . '" updated successfully.');
     }
 
-    /**
-     * Before destroy, ask sure.
-     */
-    public function sure(int $id): View
-    {
-        return view('/sections.sure', ['id' => $id]);
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy($id)
     {
         $section = Section::findOrFail($id);
+
+        // Check if there are any elements linked to this section
+        if ($section->elements()->exists()) {
+            return back()->with('error', "Cannot delete '{$section->title}': You must delete or move its elements first.");
+        }
+
         $section->delete();
 
-        return redirect('/sections')->with('success', 'section '.$section->id.' was deleted');
+        return redirect('/sections')->with('status', 'Section deleted successfully.');
     }
-
 
 }
