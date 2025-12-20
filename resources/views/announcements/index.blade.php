@@ -5,16 +5,21 @@
     <div class='container'>
         <h1>Announcements</h1>
 
-        <br>
-        <form method="get" action="/announcements/create" id="create">
-        </form>
-        <button type="submit" form='create' class="btn btn-warning">New Announcement</button>
-        <br><br>
+        <x-alert-success />
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                {{-- Form action is a GET request, so it doesn't strictly need a <form> wrapper if just a link --}}
+                <a href="{{ url('/announcements/create') }}" class="btn btn-warning">New Announcement</a>
+            </div>
+        </div>
 
 
-        <table class="table table-striped">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+
             <thead>
-            <tr style="font-weight:bold">
+            <tr class="fw-bold">
                 <td>ID</td>
                 <td>Year</td>
                 <td>Name</td>
@@ -35,7 +40,7 @@
                     <td>{{substr($announcement['summary'], 0, 60)}}</td>
                     <td>{{$announcement->when}}</td>
                     <td>{{$announcement->venue_name}} </td>
-                    <td>{{substr(htmlentities($announcement['notes']), 0, 60)}} </td>
+                    <td>{{substr($announcement['notes'], 0, 60)}} </td>
                     <td><form method="get" action="/announcements/{{ $announcement['id']}}/edit" id="edit">
                             @csrf
                             @method('GET')

@@ -19,57 +19,45 @@ Route::get('/', [WelcomeController::class, 'index']);
 Route::get('/dashboard', [WelcomeController::class, 'index'])->name('dashboard');
 Route::get('/home', [HomeController::class, 'index']);
 
+// =========================================================================
+// SECTIONS (Apollo Version - Manual Explicit Routing)
+// =========================================================================
 
-Route::get('/elements', [ElementController::class, 'index']);
-// Use a unique path for creation to stop the router from confusing it with the update request
-Route::post('/elements', [ElementController::class, 'store'])->name('elements.store');
-Route::get('/elements/{section_id}/create', [ElementController::class, 'create']);
-Route::put('/elements/{element}', [ElementController::class, 'update'])->name('elements.update');
-Route::get('/elements/{id}', [ElementController::class, 'show']);
-Route::get('/elements/{element}/edit', [ElementController::class, 'edit'])->name('elements.edit');
-Route::get('/elements/{id}/sure', [ElementController::class, 'sure']);
-Route::get('/elements/{id}/destroy', [ElementController::class, 'destroy']);
+// 1. The Listing Page (The one that was throwing the 405 error)
+Route::get('sections', [SectionController::class, 'index'])->name('sections.index');
 
-Route::get('/sections', [SectionController::class, 'index']);
-Route::post('/sections/store', [SectionController::class, 'store']);
-Route::get('/sections/create', [SectionController::class, 'create']);
-Route::get('/sections/{id}/show', [SectionController::class, 'show']);
-Route::put('/sections/{id}/update', [SectionController::class, 'update']);
-Route::get('/sections/{id}/edit', [SectionController::class, 'edit'])->name('sections.edit');;
-Route::get('/sections/{id}/sure', [SectionController::class, 'sure']);
-Route::get('/sections/{id}/destroy', [SectionController::class, 'destroy']);
-Route::get('/sections/{id}/on', [SectionController::class, 'on']);
-Route::get('/sections/{id}/off', [SectionController::class, 'off']);
+// 2. The Creation Flow
+Route::get('sections/create', [SectionController::class, 'create'])->name('sections.create');
+Route::post('sections', [SectionController::class, 'store'])->name('sections.store');
 
-Route::get('/slideshows', [SlideshowController::class, 'index']);
-Route::get('/slideshows/{admin}/list', [SlideshowController::class, 'list']);
-Route::post('/slideshows', [SlideshowController::class, 'store']);
-Route::get('/slideshows/create', [SlideshowController::class, 'create']);
-Route::get('/slideshows/{admin}/one', [SlideshowController::class, 'one']);
-Route::get('/slideshows/one', [SlideshowController::class, 'one']);
-Route::get('/slideshows/{id}', [SlideshowController::class, 'show']);
-Route::put('/slideshows/{id}', [SlideshowController::class, 'update']);
-Route::get('/slideshows/{id}/edit', [SlideshowController::class, 'edit']);
-Route::get('/slideshows/{id}/sure', [SlideshowController::class, 'sure']);
-Route::get('/slideshows/{id}/destroy', [SlideshowController::class, 'destroy']);
-Route::get('/slideshows/{year}/{admin}/year', [SlideshowController::class, 'year']);
+// 3. The Editing Flow (Using your custom updatePost logic)
+Route::get('sections/{id}/edit', [SectionController::class, 'edit'])->name('sections.edit');
+Route::post('sections/{id}/update', [SectionController::class, 'updatePost'])->name('sections.update');
+
+// 4. The Deletion (For the Apollo-fied x-delete-button)
+Route::delete('sections/{id}', [SectionController::class, 'destroy'])->name('sections.destroy');
+
+// 5. Custom Binary Toggles
+Route::put('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
+Route::put('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
+
+// 4. ELEMENT ROUTES (Keep these separate)
+Route::get('elements/create', [ElementController::class, 'create'])->name('elements.store');;
+Route::post('elements/store', [ElementController::class, 'store']);
+Route::get('elements/{id}/edit', [ElementController::class, 'edit']);
+Route::post('elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');;
+Route::delete('elements/{id}', [ElementController::class, 'destroy'])->name('elements.destroy');;
+
+Route::resource('slideshows', SlideshowController::class);
 Route::get('/slideshows/{id}/view', [SlideshowController::class, 'view']);
 
-
-Route::get('/rituals', [RitualController::class, 'index']);
-Route::post('/rituals', [RitualController::class, 'store']);
-Route::get('/rituals/{admin}/list', [RitualController::class, 'list']);
-Route::get('/rituals/create', [RitualController::class, 'create']);
-Route::get('/rituals/one', [RitualController::class, 'one']);
 Route::get('/rituals/editNames', [RitualController::class, 'editNames']);
+Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
+Route::resource('rituals', RitualController::class);
+Route::get('/rituals/{admin}/list', [RitualController::class, 'list']);
 Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
 Route::put('/rituals/{id}/updateParameter', [RitualController::class, 'updateParameter']);
 Route::get('/rituals/{id}', [RitualController::class, 'show']);
-Route::put('/rituals/{id}', [RitualController::class, 'update']);
-Route::get('/rituals/{id}/edit', [RitualController::class, 'edit']);
-Route::get('/rituals/{id}/sure', [RitualController::class, 'sure']);
-Route::get('/rituals/{id}/destroy', [RitualController::class, 'destroy']);
-Route::get('/rituals/{year}/{admin}/year', [RitualController::class, 'year']);
 Route::get('/rituals/{id}/display', [RitualController::class, 'display']);
 Route::get('/rituals/{id}/text', [RitualController::class, 'text']);
 Route::get('/rituals/{id}/view', [RitualController::class, 'show']);
@@ -107,16 +95,8 @@ Route::get('/grove/', [GroveController::class, 'index']);
 Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
 Route::post('/liturgy/list', [LiturgyController::class, 'list']);
 Route::get('/liturgy/{id}/get', [LiturgyController::class, 'get']);
-Route::get('/venues', [VenueController::class, 'index']);
 
-Route::post('/venues', [VenueController::class, 'store']);
-Route::get('/venues/create', [VenueController::class, 'create']);
-/* Route::get('/venues/{id}', [VenueController::class, 'show']); */
-Route::put('/venues/{id}', [VenueController::class, 'update']);
-Route::get('/venues/{id}/edit', [VenueController::class, 'edit']);
-Route::get('/venues/{id}/sure', [VenueController::class, 'sure']);
-Route::get('/venues/{id}/destroy', [VenueController::class, 'destroy']);
-
+Route::resource('venues', VenueController::class);
 
 // Standard Views & Listing (Safe GET requests)
 Route::get('/members', [MemberController::class, 'index']); // List all members
@@ -160,16 +140,12 @@ Route::get('/roles/{name}/set', [RoleController::class, 'set']);
 Route::get('/roles/{name}/psure', [RoleController::class, 'psure']);
 Route::get('/roles/{name}/pdestroy', [RoleController::class, 'pdestroy']);
 
-Route::put('/announcements/{id}/update', [AnnouncementController::class, 'update']);
-Route::get('/announcements', [AnnouncementController::class, 'index']);
-Route::post('/announcements', [AnnouncementController::class, 'store']);
-Route::get('/announcements/create', [AnnouncementController::class, 'create']);
-Route::get('/announcements/{id}', [AnnouncementController::class, 'show']);
-Route::get('/announcements/{id}/edit', [AnnouncementController::class, 'edit']);
-Route::get('/announcements/{id}/sure', [AnnouncementController::class, 'sure']);
-Route::get('/announcements/{id}/destroy', [AnnouncementController::class, 'destroy']);
-Route::get('/announcements/{id}/activate', [AnnouncementController::class, 'activate']);
-Route::get('/announcements/{id}/uploadpic', [GroveController::class, 'uploadpic']);
+Route::resource('announcements', AnnouncementController::class);
+Route::delete('/announcements/{id}/destroy', [AnnouncementController::class, 'destroy']);
+Route::get('/announcements/{announcement}/activate', [AnnouncementController::class, 'activate'])
+    ->name('announcements.activate');
+Route::get('/announcements/{announcement}/uploadpic', [GroveController::class, 'uploadpic'])
+    ->name('announcements.uploadpic');
 
 Route::get('/roles', [RoleController::class, 'roles']);
 Route::get('/permissions', [RoleController::class, 'permissions']);
