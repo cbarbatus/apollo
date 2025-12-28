@@ -38,8 +38,8 @@ Route::post('sections/{id}/update', [SectionController::class, 'updatePost'])->n
 Route::delete('sections/{id}', [SectionController::class, 'destroy'])->name('sections.destroy');
 
 // 5. Custom Binary Toggles
-Route::put('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
-Route::put('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
+Route::get('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
+Route::get('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
 
 // 4. ELEMENT ROUTES (Keep these separate)
 Route::get('elements/create', [ElementController::class, 'create'])->name('elements.store');;

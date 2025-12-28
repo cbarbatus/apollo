@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
 
 class MemberController extends Controller
 {
@@ -234,7 +233,7 @@ class MemberController extends Controller
         ]);
 
         // 3. The Integrity Guardrail: Database Transaction
-        return \DB::transaction(function () use ($request, $validated) {
+        return DB::transaction(function () use ($request, $validated) {
 
             // Create User Parent
             $newUser = User::create([

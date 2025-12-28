@@ -106,25 +106,13 @@ class SectionController extends Controller
      */
     public function on(Request $request, Section $section): RedirectResponse
     {
-        $allSections = Section::orderBy('sequence')->get();
-        // FIX: Added 'int' key type to resolve the PHPStan error on this line.
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections */
-
-        foreach ($allSections as $s) {
-            /** @var \App\Models\Section $section */
-            $s->showit = 0;
-            $s->save();
-        }
-
-        $thesection = Section::findOrFail($id);
-        /** @var \App\Models\Section $thesection */ // Explicit cast for single model instance
-
+        // No need for a loop or findOrFail($id).
+        // Just update the specific section provided by the route.
         $section->showit = 1;
         $section->save();
 
         return redirect('/');
     }
-
     /**
      * Turn off the showit flag.
      */

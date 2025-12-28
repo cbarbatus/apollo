@@ -144,7 +144,7 @@ class ElementController extends Controller
     public function destroy($id)
     {
         // 1. Find the element so we can get its section_id
-        $element = \DB::table('elements')->where('id', $id)->first();
+        $element = DB::table('elements')->where('id', $id)->first();
 
         if (!$element) {
             return redirect()->back()->with('error', 'Element not found.');
@@ -153,7 +153,7 @@ class ElementController extends Controller
         $section_id = $element->section_id;
 
         // 2. Perform the deletion
-        \DB::table('elements')->where('id', $id)->delete();
+        DB::table('elements')->where('id', $id)->delete();
 
         // 3. Redirect back to the parent Section Edit page
         return redirect('sections/' . $section_id . '/edit')
