@@ -7,13 +7,11 @@ use App\Models\Element;
 use App\Models\Member;
 use App\Models\Ritual;
 use App\Models\User;
-use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\View\View; // Use Contracts\View\View for strict analysis
-use Session;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
