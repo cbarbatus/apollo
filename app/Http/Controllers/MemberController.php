@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
+
 
 class MemberController extends Controller
 {
@@ -23,43 +27,48 @@ class MemberController extends Controller
 
         // 2. Add specific, fine-grained permission checks inside the function bodies
         //    (like the $user->can('change members') check) for further security.
-    }    /**
+    }
+
+    /**
      * Display a listing of the resource.
      * must be a member
      *
      */
-    public function index(?bool $full = null) : View|RedirectResponse
+    public function index(Request $request): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user to resolve 'can()' and 'hasRole()' errors
-
-            $members = Member::whereIn('category', ['Elder', 'Member', 'Joiner'])
-                ->where('status', '=', 'current')
-                ->orderBy('first_name')->orderBy('last_name')
-                ->get();
-            $change_all = $user->can('change all');
-            $change_own = $user->can('change own');
-            $change_members =$user->can('change members');
-
-            return view('members.index', compact('members', 'change_all', 'change_own', 'change_members', 'user'));
+        if (!auth()->check()) {
+            return redirect('/');
         }
 
-        else return redirect('/');
-    }
+        $user = auth()->user();
+        /** @var \App\Models\User $user */
 
-    public function full() : View
-    {
-        $user = Auth::user();
-        /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-        $members = Member::get()->sortDesc();
+        // Check if the query string ?filter=all is present
+        $showAll = $request->query('filter') === 'all';
+
+        $query = Member::query();
+
+        // If we are NOT showing all, apply the filters
+        if (!$showAll) {
+            $query->whereIn('category', ['Elder', 'Member', 'Joiner'])
+                ->where('status', 'current');
+        }
+
+        $members = $query->orderBy('first_name')->orderBy('last_name')->get();
+
+        // Permissions logic
         $change_all = $user->can('change all');
         $change_own = $user->can('change own');
         $change_members = $user->can('change members');
 
-        return view('members.index', compact('members', 'change_all', 'change_own', 'change_members', 'user'));
+        return view('members.index', compact(
+            'members',
+            'change_all',
+            'change_own',
+            'change_members',
+            'user'
+        ))->with('full', $showAll); // Pass the state to the view
     }
-
 
     public function newmembers() : View|RedirectResponse
     {
@@ -72,6 +81,7 @@ class MemberController extends Controller
                     ->get();
                 return view('members.newmembers', compact('newmembers'));
             }
+            else dd('not authorized');
         }
 
         return redirect('/');
@@ -81,29 +91,29 @@ class MemberController extends Controller
 
     public function accept(int $id): RedirectResponse
     {
-        if (Auth::check()) {
-            $member = Member::query()->findOrFail($id);
-            /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member to resolve property access
-            $item = $member->first_name;
-            $member->first_name = substr($item, 1);  /* remove underscore */
-            $member->category = "Member";
-            $member->save();
+        $member = Member::findOrFail($id);
 
-            $user_id = $member->user_id;
-            $user = User::query()->findOrFail($user_id);
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            $item = $user->name;
-            $user->name = substr($item, 1);
-            $user->save();
-            $roles = ['member'];
-            $user->syncRoles($roles);
+        // Clean the Member Name
+        if (str_starts_with($member->first_name, '_')) {
+            $member->first_name = ltrim($member->first_name, '_');
+        }
+        $member->category = "Member";
+        $member->save();
 
-            return redirect('/members/newmembers');
+        // Safely handle the User
+        if ($member->user_id) {
+            $user = User::find($member->user_id);
+            if ($user) {
+                if (str_starts_with($user->name, '_')) {
+                    $user->name = ltrim($user->name, '_');
+                }
+                $user->save();
+                $user->syncRoles(['member']); // Upgrade from 'pending'
+            }
         }
 
-        return redirect('/');
-
-    }
+        return redirect('/members/newmembers')->with('success', 'Member accepted and moved to the roster successfully!');
+}
 
 
     /**
@@ -112,14 +122,9 @@ class MemberController extends Controller
      */
     public function join() : View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            if ($user->hasRole('joiner'))
+           if (Auth::user()?->hasRole('joiner'))
                 return view('members.join');
-
-        }
-        return redirect('/');
+            return redirect('/');
     }
 
     /**
@@ -127,58 +132,72 @@ class MemberController extends Controller
      */
     public function savejoin(Request $request): RedirectResponse
     {
-        if (Auth::check()) {
-            $member = new Member;
-            /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-            $item = request('first_name');
-            $first_name = ($member->first_name = ($item === null) ? '' : '_'.$item);
-            $item = request('last_name');
-            $last_name = ($member->last_name = ($item === null) ? '' : $item);
-            $item = request('rel_name');
-            $member->mid_name = '';
-            $member->rel_name = ($item === null) ? '' : $item;
-            $member->status = 'Current';
-            $item = request('category');
-            $member->category = $item;
-            $item = request('address');
-            $member->address = ($item === null) ? '' : $item;
-            $item = request('pri_phone');
-            $member->pri_phone = ($item === null) ? '' : $item;
-            $item = request('alt_phone');
-            $member->alt_phone = ($item === null) ? '' : $item;
-            $item = request('email');
-            $email = ($member->email = ($item === null) ? '' : $item);
+        if (!Auth::check()) return redirect('/');
 
-            $echeck = Member::where( 'email', '=', $email) -> first();
-            /** @var \App\Models\Member|null $echeck */ // FIX: Cast return type
-            /* var_dump($echeck);  exit(); */
-            if ($echeck) // FIX: Changed '!== NULL' to '$echeck' to resolve the 'always true' PHPStan warning (Line 155 in your environment).
-                return redirect('/')->with('warning', '  *** Not accepted - duplicate email.');
+        // 1. Validation (Modern way to handle those 'null' checks)
+        $validated = $request->validate([
+            'email' => 'required|email|unique:users,email|unique:members,email',
+            'first_name' => 'required|string',
+            'last_name' => 'required|string',
+        ]);
 
-            $item = request('joined');
-            $member->joined = ($item === null) ? '' : $item;
-            $item = request('adf');
-            $member->adf = ($item === null) ? '' : $item;
-            $item = request('adf_join');
-            $member->adf_join = ($item === null) ? '' : $item;
-            $item = request('adf_renew');
-            $member->adf_renew = ($item === null) ? '' : $item;
+        return DB::transaction(function () use ($request) { // <--- Added 'return' here
+            // 2. Create User first with 'pending' role
+            $newUser = User::create([
+                'name' => '_' . $request->first_name . ' ' . $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make(Str::random(12)),
+            ]);
 
-            $newUser = new user;
-            $newUser->name = $first_name.' '.$last_name;
-            $newUser->email = $email;
-            $temporaryPassword = Str::random(12); // Generates a secure 12-character random string
-            $newUser->password = Hash::make($temporaryPassword);
-            $newUser->save();
             $newUser->assignRole('pending');
 
+            // 3. Create Member
+            $member = new Member;
             $member->user_id = $newUser->id;
-            $member->save();
-        }
+            $member->first_name = '_' . $request->first_name;
+            $member->last_name = $request->last_name;
+            $member->email = $request->email;
+            $member->status = 'Current';
+            $member->category = $request->category ?? 'Joiner';
 
-        return redirect('/')->with('message', '  Join form accepted.');
+            // Use your existing 'scrubbing' for antique NOT NULL columns
+            $optional = [
+                'mid_name', 'rel_name', 'address', 'pri_phone', 'alt_phone',
+                'joined', 'adf', 'adf_join', 'adf_renew',
+                'city', 'state', 'zip', 'country', 'dob', 'emergency_contact' // Common culprits
+            ];
+            foreach ($optional as $field) {
+                // Check if column exists on the model to avoid a different error
+                if (Schema::hasColumn('members', $field)) {
+                    $member->$field = $request->input($field) ?? '';
+                }
+            }
+
+            $member->save();
+
+            return redirect('/')->with('success', 'Join form accepted.');
+        });
     }
 
+    public function deletejoin(Member $member): RedirectResponse
+    {
+        // Authorization check
+        if (!auth()->user()->hasRole(['admin', 'scribe'])) {
+            return redirect('/members')->with('error', 'Unauthorized.');
+        }
+
+        return DB::transaction(function () use ($member) {
+            // 1. Delete the User account (User 139)
+            if ($member->user_id) {
+                \App\Models\User::where('id', $member->user_id)->delete();
+            }
+
+            // 2. Delete the Member record entirely (Member 231)
+            $member->delete();
+
+            return redirect('/members')->with('success', 'Applicant ' . $member->first_name . ' has been fully removed.');
+        });
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -201,77 +220,65 @@ class MemberController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-
-        if (Auth::check()) {
-            $adminUser = Auth::user();
-            /** @var \App\Models\User $adminUser */ // FIX: Explicitly cast $adminUser
-
-            $member = new Member;
-            /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-            $item = request('first_name');
-            $first_name = ($member->first_name = ($item === null) ? '' : $item);
-            $item = request('last_name');
-            $last_name = ($member->last_name = ($item === null) ? '' : $item);
-            $item = request('mid_name');
-            $member->mid_name = ($item === null) ? '' : $item;
-            $item = request('rel_name');
-            $member->rel_name = ($item === null) ? '' : $item;
-            $item = request('status');
-            $member->status = ($item === null) ? '' : $item;
-            $item = request('category');
-            $member->category = ($item === null) ? '' : $item;
-            $item = request('address');
-            $member->address = ($item === null) ? '' : $item;
-            $item = request('pri_phone');
-            $member->pri_phone = ($item === null) ? '' : $item;
-            $item = request('alt_phone');
-            $member->alt_phone = ($item === null) ? '' : $item;
-            $item = request('email');
-            $email = ($member->email = ($item === null) ? '' : $item);
-
-            $echeck = Member::where( 'email', '=', $email) -> first();
-            /** @var \App\Models\Member|null $echeck */ // FIX: Cast return type
-            /* var_dump($echeck);  exit(); */
-            if ($echeck) // FIX: Changed '!== NULL' to '$echeck' to resolve the 'always true' PHPStan warning in the store method.
-                return redirect('/')->with('warning', '  *** Not accepted - duplicate email.');
-
-            $item = request('joined');
-            $member->joined = ($item === null) ? '' : $item;
-            $item = request('adf');
-            $member->adf = ($item === null) ? '' : $item;
-            $item = request('adf_join');
-            $member->adf_join = ($item === null) ? '' : $item;
-            $item = request('adf_renew');
-            $member->adf_renew = ($item === null) ? '' : $item;
-
-            // FIX: Use FQCN to resolve 'unknown class App\Http\Controllers\Str' error
-            $temp_raw_password = \Illuminate\Support\Str::random(16);
-
-            // --------------------------------------------------------------------------------
-            // Inlining the logic for user creation (resolves undefined function error)
-            // --------------------------------------------------------------------------------
-
-            // 1. Create the new User associated with the Member being created
-            $newUser = User::create([
-                'name' => $first_name . ' ' . $last_name,
-                'email' => $email,
-                'password' => Hash::make($temp_raw_password),
-                'email_verified_at' => now(),
-            ]);
-            /** @var \App\Models\User $newUser */ // FIX: Explicitly cast $newUser
-
-            // 2. Assign the default role to the new user (resolves assignRole error)
-            $newUser->assignRole('member');
-
-            // 3. Set the new Member's user_id to the newly created User's ID
-            $member->user_id = $newUser->getAuthIdentifier();
-
-            // --------------------------------------------------------------------------------
-
-            $member->save();
+        // 1. Authorization Check
+        if (!Auth::check()) {
+            return redirect('/')->with('error', 'Unauthorized.');
         }
 
-        return redirect('/members');
+        // 2. Clean Validation (Replaces all those manual null checks)
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email|unique:members,email',
+            'role'       => 'nullable|string'
+        ]);
+
+        // 3. The Integrity Guardrail: Database Transaction
+        return \DB::transaction(function () use ($request, $validated) {
+
+            // Create User Parent
+            $newUser = User::create([
+                'name' => $validated['first_name'] . ' ' . $validated['last_name'],
+                'email' => $validated['email'],
+                'password' => Hash::make(\Illuminate\Support\Str::random(16)),
+                'email_verified_at' => now(),
+            ]);
+
+            // Assign Role (Spatie) - Use the role from the form or default to 'member'
+            $roleName = $request->input('role', 'member');
+            $newUser->assignRole($roleName);
+
+            // Create Member Child
+            $member = new Member;
+            $member->user_id = $newUser->id;
+            $member->first_name = $validated['first_name'];
+            $member->last_name = $validated['last_name'];
+            $member->email = $validated['email'];
+
+            // Map the remaining optional fields cleanly
+            $optionalFields = [
+                'mid_name', 'rel_name', 'status', 'category', 'address',
+                'pri_phone', 'alt_phone', 'joined', 'adf', 'adf_join', 'adf_renew'
+            ];
+
+            foreach ($optionalFields as $field) {
+                $value = $request->input($field);
+
+                // Check if it's the specific 'date' type column
+                if ($field === 'joined') {
+                    // Because 'joined' is 'date' and 'NOT NULL'
+                    // MySQL often requires a dummy date if it's not nullable
+                    $member->$field = (empty($value)) ? '0001-01-01' : $value;
+                } else {
+                    // For all varchar fields set to NOT NULL
+                    // We must provide an empty string '' to avoid SQLSTATE[23000]
+                    $member->$field = (empty($value)) ? '' : $value;
+                }
+            }
+            $member->save();
+
+            return redirect('/members')->with('success', 'Member and User account created successfully.');
+        });
     }
 
     /**
@@ -298,109 +305,105 @@ class MemberController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, Member $member): RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            $member = Member::findOrFail($id);
-            /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-            $item = request('first_name');
-            $member->first_name = ($item === null) ? '' : $item;
-            $item = request('last_name');
-            $member->last_name = ($item === null) ? '' : $item;
-            $item = request('mid_name');
-            $member->mid_name = ($item === null) ? '' : $item;
-            $item = request('rel_name');
-            $member->rel_name = ($item === null) ? '' : $item;
-            $item = request('status');
-            $member->status = ($item === null) ? '' : $item;
-            $item = request('category');
-            $member->category = ($item === null) ? '' : $item;
-            $item = request('address');
-            $member->address = ($item === null) ? '' : $item;
-            $item = request('pri_phone');
-            $member->pri_phone = ($item === null) ? '' : $item;
-            $item = request('alt_phone');
-            $member->alt_phone = ($item === null) ? '' : $item;
-            $item = request('email');
-            $member->email = ($item === null) ? '' : $item;
+        // 1. Validation & Security Gate
+        // This ensures only the fields Susan is allowed to see are updated by her
+        $isManager = auth()->user()->canAny(['change all', 'change members', 'change_members']);
 
-            /* $echeck = Member::where( 'email', '=', $item) -> first();
-                        if ($echeck !== NULL)
-                            return redirect('/')->with('warning', '  *** Not accepted - duplicate email.');
-            */
+        $data = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'mid_name'   => 'nullable|string',
+            'rel_name'   => 'nullable|string',
+            'address'    => 'nullable|string',
+            'pri_phone'  => 'nullable|string',
+            'alt_phone'  => 'nullable|string',
+            'email' => [
+                'required',
+                'email',
+                // Validate against the 'members' table and ignore this specific member's ID
+                Rule::unique('members', 'email')->ignore($member->id),
 
-            $item = request('joined');
-            $member->joined = ($item === null) ? '' : $item;
-            $item = request('adf');
-            $member->adf = ($item === null) ? '' : $item;
-            $item = request('adf_join');
-            $member->adf_join = ($item === null) ? '' : $item;
-            $item = request('adf_renew');
-            $member->adf_renew = ($item === null) ? '' : $item;
-            $member->save();
+            ],
+        ]);
 
-            $user = User::find($member->user_id);
-            /** @var \App\Models\User|null $user */ // FIX: Explicitly cast $user
-            if ($user !== null) {
+        // 2. Add Management Fields ONLY if the user is a Manager
+        if ($isManager) {
+            $managementData = $request->validate([
+                'status'     => 'required|string',
+                'category'   => 'required|string',
+                'joined'     => 'nullable|date',
+                'adf'        => 'nullable|string',
+                'adf_join' => 'nullable', // or remove 'date' if you just want to permit the string
+                'adf_renew' => 'nullable',
+
+            ]);
+            $data = array_merge($data, $managementData);
+        }
+
+        // 3. Update Member (Handles all those null/item assignments at once)
+        // 3. Update Member (Handles all those null/item assignments at once)
+// Convert any null string fields to empty strings to satisfy antique NOT NULL constraints
+        $stringFields = ['mid_name', 'rel_name', 'address', 'pri_phone', 'alt_phone'];
+
+        foreach ($stringFields as $field) {
+            $data[$field] = $data[$field] ?? '';
+        }
+
+        $member->update($data);
+        $member->update($data);
+
+// 4. Sync User Record (Safe Version)
+        if ($member->user_id && $user = \App\Models\User::find($member->user_id)) {
+
+            $user->name = $member->first_name . ' ' . $member->last_name;
+
+            // Only update email if it's actually different from what's in the User record
+            // This prevents the "Email already taken" database crash
+            if ($user->email !== $member->email) {
                 $user->email = $member->email;
-                $user->name = $member->first_name.' '.$member->last_name;
-                $user->save();
-                $status = $member->status;
-                if ($status != 'Current') {
-                    $user->delete();
+            }
 
-                    return redirect('/members')->with('success', 'Member was updated, User was removed');
-                }
+            $user->save(); // Laravel now only touches the columns that changed
+
+            if ($member->status !== 'Current') {
+                $user->delete();
+                return redirect('/members')->with('success', 'Member updated, User removed.');
             }
         }
-
-        return redirect('/members')->with('success', 'Member was updated');
+        return redirect('/members')->with('success', 'Member updated successfully!');
     }
 
-    /**
-     * Before destroy, ask sure.
-     */
-    public function sure(int $id): view|RedirectResponse
-    {
-        // Removed incorrect PHPDoc tag @return \Illuminate\Http\Response (L327 error)
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            if ($user->hasRole(['admin', 'scribe'])) {
-                $member = Member::findOrFail($id);
-                /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-                $name = $member->first_name.' '.$member->last_name;
-
-                return view('/members.sure', ['id' => $id, 'name' => $name]);
-            }
-        }
-
-        return redirect('/');
-    }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(Member $member): RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            if ($user->hasRole(['admin', 'scribe'])) {
-                $member = Member::findOrFail($id);
-                /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-                $user = User::findOrFail($member->user_id);
-                /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
+
+        // Authorization check
+        if (!auth()->user()->hasRole(['admin', 'scribe'])) {
+            return redirect('/members')->with('error', 'Unauthorized.');
+        }
+        //// REVOKE ACCESS: Delete the User record, but leave the Member record alone.
+        if ($member->user_id) {
+            $user = \App\Models\User::find($member->user_id);
+            if ($user) {
                 $user->delete();
-                $member->delete();
             }
 
-            return redirect('/members')->with('success', 'Member was deleted');
+            // Unlink the member so they don't point to a ghost user
+            $member->update(['user_id' => null]);
+        }
+        else {
+
+            $member->delete();
+            return redirect('/members')->with('success', 'Member record ' . $member->id . ' deleted.');
         }
 
-        return redirect('/');
+        // Single clear announcement to stop the "stronger than needed" duplicates
+        return redirect('/members')->with('success', 'User login revoked. Member record preserved for history.');
     }
 
     /**

@@ -2,7 +2,9 @@
 
 @section('content')
     <div class="container py-4">
-        <h1 class="mb-3">New (Pending) Members</h1>
+        <div class="container">
+            {{-- Apollo Standard Alerts --}}
+            <h1>New (Pending) Members</h1>
 
         <div class="alert alert-info border-0 shadow-sm mb-4" role="alert">
             <p class="fw-bold mb-1">Reminder:</p>
@@ -55,17 +57,62 @@
                                 <td>{{$member->pri_phone}}</td>
                                 <td>{{$member->adf}}</td>
                                 <td>
-                                    <form method="post" action="/members/{{ $member['id'] }}/accept" id="accept-{{ $member['id'] }}" class="d-inline">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-success">Accept</button>
-                                    </form>
+                                    {{-- Update $newmember to $member --}}
+                                    <td class="text-nowrap">
+                                        {{-- Container to prevent stacking --}}
+                                        <div class="d-flex align-items-center gap-2">
 
-                                    {{-- OPTIONAL: Add a Reject/Delete button using the DELETE method --}}
-                                    {{-- <form method="post" action="/members/{{ $member['id'] }}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this pending member?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
-                                    </form> --}}
+                                            {{-- Accept Form --}}
+                                            <td class="text-nowrap">
+                                                <div class="d-flex align-items-center gap-2">
+
+                                                    {{-- 1. Standardized Accept Button --}}
+                                                    <form action="{{ route('members.accept', $member->id) }}" method="POST" class="m-0">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-sm btn-success px-3"
+                                                                style="height: 30px; border-radius: 8px;">
+                                                            Accept
+                                                        </button>
+                                                    </form>
+
+                                                    {{-- 2. Standardized Delete Button to match Accept --}}
+                                                    {{-- Standardized Delete Button with Apollo Modal Trigger --}}
+                                                    <button type="button"
+                                                            class="btn btn-sm btn-danger px-3"
+                                                            style="height: 30px; border-radius: 8px;"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteConfirm{{ $member->id }}">
+                                                        Delete Applicant
+                                                    </button>
+
+                                                    {{-- The Hidden Apollo Confirmation Modal --}}
+                                                    <div class="modal fade" id="deleteConfirm{{ $member->id }}" tabindex="-1" aria-hidden="true">
+                                                        {{-- Added 'modal-md' to give the text room to breathe --}}
+                                                        <div class="modal-dialog modal-dialog-centered modal-md">
+                                                            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px;">
+                                                                <div class="modal-body p-4 text-center">
+                                                                    <h5 class="fw-bold mb-3">Scrub Applicant?</h5>
+                                                                    <p class="text-muted mx-auto"
+                                                                       style="max-width: 350px; white-space: normal; word-wrap: break-word; line-height: 1.5; padding: 0 10px;">
+                                                                        Are you sure you want to permanently remove <strong>{{ $member->first_name }}</strong> from the Grove records?
+                                                                    </p>
+                                                                    <div class="d-flex justify-content-center gap-2 mt-4">
+                                                                        <button type="button" class="btn btn-sm btn-secondary px-4" data-bs-dismiss="modal" style="height: 35px; border-radius: 8px;">Cancel</button>
+
+                                                                        <form action="{{ route('members.deletejoin', $member->id) }}" method="POST" class="m-0">
+                                                                            @csrf
+                                                                            @method('DELETE')
+                                                                            <button type="submit" class="btn btn-sm btn-danger px-4" style="height: 35px; border-radius: 8px;">Confirm Delete</button>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </div>
+                                    </td>
                                 </td>
                             </tr>
                         @endif

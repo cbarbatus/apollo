@@ -97,22 +97,24 @@ class VenueController extends Controller
      */
     public function update(Request $request, int $id): RedirectResponse
     {
-        $venue = Venue::query()->findOrFail($id);
-        /** @var \App\Models\Venue $venue */
-dd("in venue update");
-        $venue->update($request->validated());
-        // Switched from request('key') helper to $request->input('key') and explicitly cast to (string)
-        $venue->name = (string) $request->input('name', $venue->name);
-        $venue->title = (string) $request->input('title', $venue->title);
-        $venue->address = (string) $request->input('address', $venue->address);
-        $venue->map_link = (string) $request->input('map_link', $venue->map_link);
-        $venue->directions = (string) $request->input('directions', $venue->directions);
+        $venue = Venue::findOrFail($id);
 
-        $venue->save();
+        // 1. Validate the data (this fixes the BadMethodCallException)
+        $validated = $request->validate([
+            'name'       => 'required|string',
+            'title'      => 'required|string',
+            'address'    => 'nullable|string',
+            'map_link'   => 'nullable|string', // Corrected to match DB
+            'directions' => 'nullable|string',
+        ]);
 
-        return redirect('/venues');
+        // 2. Update and Save in one go
+        // This is the Gold Standard: it validates, updates, and saves to DB
+        $venue->update($validated);
+        $venue->save(); // This forces the DB write
+        return redirect()->route('venues.index')
+            ->with('status', "Venue '{$venue->name}' updated successfully.");
     }
-
     /*
 
     public function sure(int $id): View

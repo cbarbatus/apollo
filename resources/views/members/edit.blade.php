@@ -2,6 +2,9 @@
 
 @section('content')
     <div class='container py-4'>
+
+        <x-alert-success />
+
         <h1 class="mb-4">Edit Member: {{ $member->first_name }} {{ $member->last_name }}</h1>
 
         <form method="post" action="/members/{{ $member->id }}" id="edit">
@@ -97,17 +100,21 @@
                     <label for="pri_phone" class="form-label">Primary Phone</label>
                     <input type="text" name="pri_phone" id="pri_phone" class="form-control" value="{{ old('pri_phone', $member->pri_phone) }}">
                 </div>
-                <div class="col-md-6">
-                    <label for="alt_phone" class="form-label">Alternate Phone</label>
-                    <input type="text" name="alt_phone" id="alt_phone" class="form-control" value="{{ old('alt_phone', $member->alt_phone) }}">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="alt_phone" class="form-label">Alternate Phone</label>
+                        <input type="text" name="alt_phone" id="alt_phone" class="form-control" value="{{ old('alt_phone', $member->alt_phone) }}">
+                    </div>
+                </div>
+
+                {{-- MOVE THE BUTTON INSIDE THE FORM HERE --}}
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                        Save Changes
+                    </button>
                 </div>
             </div>
-
-        </form>
-
-        <div class="d-flex justify-content-end">
-            <button type="submit" form='edit' class="btn btn-warning btn-lg">Save Changes</button>
-        </div>
+        </form> {{-- The form now correctly closes AFTER the button --}}
 
     </div>
     <br>

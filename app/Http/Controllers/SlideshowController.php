@@ -46,7 +46,7 @@ class SlideshowController extends Controller
         if ($name && $slideshows->isNotEmpty()) {
             $id = $slideshows->first()->id;
 
-            if (\Auth::check()) {
+            if (@auth()) {
                 $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
                 $activeNames = $this->getSection99Names();
 

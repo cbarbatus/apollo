@@ -27,15 +27,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class Venue extends Model
 {
-    // Added fillable properties for safety, inferred from the controller
     protected $fillable = [
         'name',
         'title',
         'address',
-        'map_link',
+        'map_link',    // Corrected from map_url
         'directions',
-        'driving',        // <-- RE-ADDED
-        'map',            // <-- RE-ADDED
     ];
 
     public function ritual(): BelongsTo

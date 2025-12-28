@@ -27,10 +27,15 @@
         <h1>Raven's Cry Grove, ADF Rituals</h1>
 
         @auth
-            <div class="my-4">
-                <a href="{{ route('rituals.create') }}" class="btn btn-warning fw-bold shadow-sm text-dark">
-                    New Ritual
-                </a>
+            {{-- Replace the "New Ritual" link with this Apollo version --}}
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <a href="{{ url('/rituals/create') }}"
+                       class="btn btn-primary shadow-sm px-4 fw-bold border-0 d-inline-flex align-items-center"
+                       style="height: 38px; border-radius: 8px;">
+                        <i class="bi bi-plus-lg me-2"></i>New Ritual
+                    </a>
+                </div>
             </div>
         @endauth
 
@@ -60,13 +65,19 @@
             <button type="submit" form="one-ritual" class="btn btn-success px-4 fw-bold">Select</button>
         </form>
 
-        @if(isset($ritual) && $ritual)
-            <div class="mt-4 p-4 border rounded bg-light">
-                <h4>Manage: {{ $ritual->name }} {{ $ritual->year }}</h4>
-                <div class="d-flex gap-2">
-                    <a href="{{ route('rituals.show', $ritual->id) }}" class="btn btn-info">View</a>
-                    <a href="{{ route('rituals.edit', $ritual->id) }}" class="btn btn-warning">Edit</a>
-                    {{-- Delete form goes here --}}
+        @if(auth()->check() && $ritual)
+            <div class="row">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card mb-4 bg-light shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted small uppercase">Manage Ritual</h5>
+                            <p class="h5 mb-3">{{ $ritual->name }} {{ $ritual->year }}</p>
+                            <div class="d-flex gap-2">
+                                <a href="/rituals/{{ $ritual->id }}/display" class="btn btn-info btn-sm text-white">Public View</a>
+                                <a href="{{ route('rituals.show', $ritual->id) }}" class="btn btn-primary btn-sm">Details</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         @endif
@@ -75,7 +86,6 @@
         <p class="mb-1">Choose a ritual year</p>
         <ul class="list-unstyled d-flex flex-wrap gap-1 mb-4">
             @foreach ($activeYears as $y)
-
                     <a href="{{ route('rituals.index', ['year' => $y]) }}"
                        class="btn btn-ritual-year {{ $y == $selectedYear ? 'btn-primary' : 'btn-outline-secondary' }}"
                        data-text="{{ $y }}"> {{-- This 'data-text' reserves the space --}}

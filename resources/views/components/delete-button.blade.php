@@ -6,7 +6,8 @@
     @csrf
     @method('DELETE')
 
-    <button type="button" class="btn btn-sm btn-danger confirm-delete-btn"
+    <button type="button"
+            class="btn btn-danger confirm-delete-btn px-4 fw-bold shadow-sm"
             data-bs-toggle="modal"
             data-bs-target="#confirmDeleteModal"
             data-action="{{ $action }}">

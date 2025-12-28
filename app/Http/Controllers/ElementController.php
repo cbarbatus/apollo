@@ -41,7 +41,7 @@ class ElementController extends Controller
     {
         $section_id = $request->query('section_id');
 
-        // Get the current highest sequence for this section and add 100
+        // Find the current max sequence for THIS section to suggest the next one
         $last_seq = Element::where('section_id', $section_id)->max('sequence');
         $next_seq = $last_seq ? $last_seq + 100 : 100;
 
@@ -99,30 +99,42 @@ class ElementController extends Controller
      */
     public function updatePost(Request $request, $id)
     {
-        // 1. Validation - Ensure the field names match your form inputs
-        $request->validate([
-            'name'     => 'required|string',
-            'title'    => 'required|string',
-            'sequence' => 'required|integer',
-            'item'     => 'nullable|string', // This is for the Trix content
+        $element = Element::findOrFail($id);
+
+        $validated = $request->validate([
+            'name'       => 'required|string',
+            'title'      => 'required|string',
+            'sequence'   => 'required|integer',
+            'item'       => 'nullable|string',
+            'section_id' => 'required|integer',
         ]);
 
-        // 2. Prepare the data for the item column
-        $data = $request->only(['name', 'title', 'sequence', 'item']);
-        $data['updated_at'] = now(); // Keep strict mode happy
+        $element->update($validated);
 
-        // 3. Update the specific element
-        \DB::table('elements')
-            ->where('id', $id)
-            ->update($data);
-
-        // 4. Find the section_id so we can redirect back to the Section Edit page
-        $element = \DB::table('elements')->where('id', $id)->first();
-
-        // 5. Return to the Section Edit page with a success message
         return redirect('sections/' . $element->section_id . '/edit')
-            ->with('status', 'Element "' . $element->name . '" updated successfully!');
+            ->with('status', "Element '{$element->name}' updated successfully!");
     }
+
+    public function editSchedule(): View
+    {
+        // Simplified Authorization - assuming your middleware handles the heavy lifting
+        $element = Element::where('name', 'Schedule')->firstOrFail();
+
+        return view('elements.schedule', compact('element'));
+    }
+
+    public function updateSchedule(Request $request, int $id): RedirectResponse
+    {
+        $element = Element::findOrFail($id);
+
+        // Clean input handling
+        $element->item = $request->input('item', '');
+        $element->save();
+
+        return redirect()->route('schedule.edit')
+            ->with('success', "Ritual Schedule updated successfully.");
+    }
+
     /**
      * Remove the specified resource from storage.
      *

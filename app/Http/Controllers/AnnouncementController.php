@@ -224,13 +224,45 @@ class AnnouncementController extends Controller
         // 4. Redirect to the homepage after activation
         return redirect('/');
     }
+
+
     /**
-     * Before destroy, ask sure.
+     * Show the Upload Form for a specific Announcement
      */
-    public function sure(int $id): View
+    public function uploadpic(int $id): View
     {
-        return view('/announcements.sure', ['id' => $id]);
+        $announcement = Announcement::findOrFail($id);
+
+        // Standard Phoenix Naming: 2024_Spring_Festival.jpg
+        $picname = $announcement->year . '_' . str_replace(' ', '_', $announcement->name) . '.jpg';
+
+        return view('announcements.uploadpic', compact('announcement', 'picname'));
     }
+
+    /**
+     * Process the Picture Upload
+     */
+    public function storepic(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,jpg|max:2048',
+            'id' => 'required|exists:announcements,id'
+        ]);
+
+        $announcement = Announcement::findOrFail($request->id);
+        $filename = $request->picname;
+
+        // Use base_path or public_path depending on your local vs server setup
+        // Since you use public_html/Img, we target that directly:
+        $request->file('file')->move(public_path('Img'), $filename);
+
+        $announcement->picture_file = $filename;
+        $announcement->save();
+
+        return redirect()->route('announcements.index')
+            ->with('success', "Picture for Announcement {$announcement->id} updated in /Img.");
+    }
+
 
     /**
      * Remove the specified resource from storage.
@@ -238,10 +270,12 @@ class AnnouncementController extends Controller
     public function destroy(int $id): RedirectResponse
     {
         $announcement = Announcement::findOrFail($id);
-        /** @var \App\Models\Announcement $announcement */
+        $idLabel = $announcement->id; // Grab the ID before it's gone
 
         $announcement->delete();
 
-        return redirect('/announcements/')->with('success', 'Announcement '.$announcement->id.' was deleted');
+        // Redirect to the index with the success message
+        return redirect()->route('announcements.index')
+            ->with('success', "Announcement {$idLabel} was deleted.");
     }
 }

@@ -45,7 +45,7 @@ Route::put('/sections/{section}/off', [SectionController::class, 'off'])->name('
 Route::get('elements/create', [ElementController::class, 'create'])->name('elements.store');;
 Route::post('elements/store', [ElementController::class, 'store']);
 Route::get('elements/{id}/edit', [ElementController::class, 'edit']);
-Route::post('elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');;
+Route::match(['post', 'put'], 'elements/{id}/update', [ElementController::class, 'updatePost']);
 Route::delete('elements/{id}', [ElementController::class, 'destroy'])->name('elements.destroy');;
 
 Route::resource('slideshows', SlideshowController::class);
@@ -57,11 +57,12 @@ Route::resource('rituals', RitualController::class);
 Route::get('/rituals/{admin}/list', [RitualController::class, 'list']);
 Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
 Route::put('/rituals/{id}/updateParameter', [RitualController::class, 'updateParameter']);
-Route::get('/rituals/{id}', [RitualController::class, 'show']);
 Route::get('/rituals/{id}/display', [RitualController::class, 'display']);
-Route::get('/rituals/{id}/text', [RitualController::class, 'text']);
-Route::get('/rituals/{id}/view', [RitualController::class, 'show']);
-Route::get('/rituals/{id}/uploadlit', [GroveController::class, 'uploadlit']);
+Route::get('/rituals/{id}/liturgy', [RitualController::class, 'liturgy'])->name('rituals.liturgy');
+Route::get('rituals/{id}/uploadlit', [RitualController::class, 'uploadlit'])
+    ->name('rituals.uploadlit');
+Route::post('rituals/storelit', [RitualController::class, 'storelit'])
+    ->name('rituals.storelit');
 
 Route::put('/books/{id}', [BookController::class, 'update']);
 Route::get('/books', [BookController::class, 'index']);
@@ -88,9 +89,9 @@ Route::get('/grove/upload', [GroveController::class, 'upload']);
 Route::get('/grove/bylaws', [GroveController::class, 'bylaws']);
 Route::get('/grove/pay', [GroveController::class, 'pay']);
 Route::get('/grove/donate', [GroveController::class, 'donate']);
-Route::get('/schedule', [GroveController::class, 'schedule'])->name('schedule.show');;
-Route::put('/schedupdt/{id}', [GroveController::class, 'schedupdt'])->name('schedule.update');;
-Route::get('/grove/', [GroveController::class, 'index']);
+// Standardized Apollo Routes
+Route::get('/schedule', [ElementController::class, 'editSchedule'])->name('schedule.edit');
+Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');Route::get('/grove/', [GroveController::class, 'index']);
 
 Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
 Route::post('/liturgy/list', [LiturgyController::class, 'list']);
@@ -109,23 +110,15 @@ Route::get('/members/join', [MemberController::class, 'join']); // Join form (SA
 // State-Changing Actions (POST, PUT, DELETE)
 Route::post('/members', [MemberController::class, 'store']); // Create new member (from /members/create)
 Route::post('/members/join', [MemberController::class, 'savejoin']); // Save new joiner (from /members/join)
-
-Route::put('/members/{id}', [MemberController::class, 'update']); // Update existing member (from /members/{id}/edit)
-// CRITICAL FIXES: Changing GET to secure verbs for state-changing actions
+Route::delete('/members/{member}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
+Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');// CRITICAL FIXES: Changing GET to secure verbs for state-changing actions
 Route::post('/members/restore', [MemberController::class, 'restore']); // Restore/undelete a member
-Route::delete('/members/{id}', [MemberController::class, 'destroy']); // Delete/destroy a member
-// Custom workflow route
-Route::post('/members/{id}/accept', [MemberController::class, 'accept']); // Accept new member
+Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');// Custom workflow route
+Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
 
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users/create', [UserController::class, 'create']);
+Route::resource('users', UserController::class);;;
 Route::put('/users/{id}/make', [UserController::class, 'make']);
 Route::put('/users/{id}/superuser', [UserController::class, 'superuser']);
-Route::put('/users/{id}/update', [UserController::class, 'update']);
-Route::get('/users/{id}/edit', [UserController::class, 'edit']);
-Route::put('/users/{id}', [UserController::class, 'update']);
-Route::get('/users/{id}/sure', [UserController::class, 'sure']);
-Route::get('/users/{id}/destroy', [UserController::class, 'destroy']);
 
 Route::get('/roles/create', [RoleController::class, 'create']);
 Route::post('/roles/store', [RoleController::class, 'store']);
@@ -144,9 +137,12 @@ Route::resource('announcements', AnnouncementController::class);
 Route::delete('/announcements/{id}/destroy', [AnnouncementController::class, 'destroy']);
 Route::get('/announcements/{announcement}/activate', [AnnouncementController::class, 'activate'])
     ->name('announcements.activate');
-Route::get('/announcements/{announcement}/uploadpic', [GroveController::class, 'uploadpic'])
+// Specific Picture Upload routes
+Route::get('announcements/{id}/uploadpic', [AnnouncementController::class, 'uploadpic'])
     ->name('announcements.uploadpic');
 
+Route::post('announcements/storepic', [AnnouncementController::class, 'storepic'])
+    ->name('announcements.storepic');
 Route::get('/roles', [RoleController::class, 'roles']);
 Route::get('/permissions', [RoleController::class, 'permissions']);
 

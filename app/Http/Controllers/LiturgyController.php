@@ -19,25 +19,26 @@ class LiturgyController extends Controller
     {
         if (Auth::check()) {
             $rawelements = Element::all();
-            $cultures=[];
-            $elements = $rawelements->where('name', '=', 'cultures')->first();
-            if ($elements) {
-                $item = $elements['item'];
-                if (is_string($item))
-                    $cultures = explode(',', $item);
-            }
-            $rituals=[];
-            $elements = $rawelements->where('name', '=', 'names')->first();
-            if ($elements) {
-                $item = $elements['item'];
-                if (is_string($item))
-                    $rituals = explode(',', $item);
+
+            // --- MATCH THE INTERNAL NAMES EXACTLY ---
+
+            // 1. Check for "Cultures" (Verify if this is also capitalized in the DB)
+            $cultures = [];
+            $cultureElement = $rawelements->where('name', 'RitualCultures')->first(); // Updated to match likely camelCase
+            if ($cultureElement && is_string($cultureElement->item)) {
+                $cultures = array_map('trim', explode(',', $cultureElement->item));
             }
 
-            return view('/liturgy.find', compact('rituals', 'cultures'));
-        } else {
-            return redirect('/');
+            // 2. Match "RitualNames" from your screenshot
+            $rituals = [];
+            $nameElement = $rawelements->where('name', 'RitualNames')->first(); // FIXED to match image_1e30e3.png
+            if ($nameElement && is_string($nameElement->item)) {
+                $rituals = array_map('trim', explode(',', $nameElement->item));
+            }
+
+            return view('liturgy.find', compact('rituals', 'cultures'));
         }
+        return redirect('/');
     }
 
     /**
@@ -90,8 +91,10 @@ class LiturgyController extends Controller
             if (is_string($name) && is_string($year) )
                 $fullName = $location . (string) $year . "_" . (string) $name . ".docx";
 
-            if (file_exists($fullName))
-                return response()->file($fullName);
+            if (file_exists($fullName)) {
+                // Adding the second parameter ensures the user sees a clean name like "2024_Imbolc.docx"
+                return response()->download($fullName, "{$year}_{$name}.docx");
+            }
             else
                 return redirect('/liturgy/find')->with('message', 'Ritual .docx missing');
         }

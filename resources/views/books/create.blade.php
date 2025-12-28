@@ -7,38 +7,64 @@
         <form method="post" action="/books" id="create">
             @csrf
 
-            <div class="col-md-4 mb-3">
-                <label for="title" class="form-label">Title:</label>
-                <input type="text" name="title" class="form-control" id="title"  size="40">
-            </div>
+            <div class="card shadow-sm border-0 rounded-3">
+                <div class="card-body p-4">
+                    <div class="row g-3">
+                        {{-- Title --}}
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold">Book Title</label>
+                            <input type="text" name="title" class="form-control shadow-sm" value="{{ old('title', $book->title ?? '') }}">
+                        </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="author" class="form-label">Author:</label>
-                <input type="text" name="author" class="form-control" id="author"  size="40">
-            </div>
+                        {{-- Sequence: Narrowed for numeric input --}}
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Sequence</label>
+                            <input type="number" name="seq" class="form-control shadow-sm text-center" style="max-width: 100px;" value="{{ old('seq', $book->seq ?? 0) }}">
+                        </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="link" class="form-label">goodreads Link:</label>
-                <input type="text" name="link" class="form-control" id="link" size="80">
-            </div>
+                        {{-- Author --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Author</label>
+                            <input type="text" name="author" class="form-control shadow-sm" value="{{ old('author', $book->author ?? '') }}">
+                        </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="pix" class="form-label">Cover picture link:</label>
-                <input type="text" name="pix" class="form-control" id="pix" size="120">
-            </div>
+                        {{-- Image URL (Pix) --}}
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Image URL (Pix)</label>
+                            <input type="text" name="pix" class="form-control shadow-sm" value="{{ old('pix', $book->pix ?? '') }}">
+                        </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="remarks" class="form-label">Remarks:</label>
-                <input type="text" name="remarks" class="form-control" id="remarks" size="60">
-            </div>
+                        {{-- Purchase Link --}}
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Purchase/Info Link</label>
+                            <input type="text" name="link" class="form-control shadow-sm" value="{{ old('link', $book->link ?? '') }}">
+                        </div>
 
-            <div class="col-md-4 mb-3">
-                <label for="sequence" class="form-label">Sequence:</label>
-                <input type="text" name="sequence" class="form-control" id="sequence" size="4">
-            </div>
+                        {{-- Remarks: Now using Trix --}}
+                        <div class="col-12 mb-3">
+                            <label for="remarks" class="form-label fw-bold">Remarks</label>
+                            <input id="remarks" type="hidden" name="remarks" value="{{ old('remarks', $book->remarks ?? '') }}">
+                            <trix-editor input="remarks" class="trix-content shadow-sm bg-white" style="min-height: 150px; border-radius: 8px;"></trix-editor>
+                        </div>
+                    </div>
 
-            <button type="submit" form='create' class="btn btn-go">Submit</button>
-        </form>
+                    {{-- Sequence: Narrowed for numeric input --}}
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Sequence</label>
+                        <input type="number" name="sequence"
+                               class="form-control shadow-sm text-center"
+                               style="max-width: 100px;"
+                               value="{{ old('sequence', $book->sequence ?? 0) }}">
+                    </div>
+
+                    <div class="mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary shadow-sm px-4 fw-bold" style="border-radius: 8px;">
+                            {{ isset($book) ? 'Update Book' : 'Create Book' }}
+                        </button>
+                        <a href="/books" class="btn btn-outline-secondary ms-2" style="border-radius: 8px;">Cancel</a>
+                    </div>
+                </div>
+            </div>   </form>
 
     </div>
     <br>

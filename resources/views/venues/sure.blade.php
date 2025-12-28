@@ -2,11 +2,17 @@
 
 @section('content')
     <div class='container'>
+        <h1>Delete Venue {{ $id }}: Are you sure?</h1>
 
-        <h1>Delete Venue: Are you sure?</h1>
-        <br><br>
-        <form method="get" action="/venues/{{ $id }}/destroy" id="sure">
+        <div class="col-md-4 mb-3">
+            <form method="post" action="/venues/{{ $id }}/destroy" id="sure">
+            @csrf
+            @method('DELETE')
+            <button type="submit" form="sure" class="btn btn-danger">Yes, Delete It</button>
         </form>
-            <button type="submit" form="sure" class="btn btn-danger">Confirm Delete</button>
+        </div>
 
+        <div class="col-md-4 mb-3">
+            <a href="/venues" class="btn btn-secondary">Cancel</a>
+        </div>
 @endsection

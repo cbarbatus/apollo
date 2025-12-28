@@ -54,11 +54,10 @@
                         </form>
                     </td>
                     <td>
-                        <form method="get" action="/announcements/{{ $announcement['id']}}/sure" id="sure">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-danger" >Delete</button>
-                        </form>
+                        <x-delete-button
+                            :action="route('announcements.destroy', $announcement->id)"
+                            resource="Announcement"
+                        />
                     </td>
                     <td>
                     <img src="/img/{{ $announcement->picture_file}}" alt="None" style="max-height:50px">
@@ -66,7 +65,7 @@
                     <td><form method="get" action="/announcements/{{ $announcement['id']}}/uploadpic" id="uppic">
                             @csrf
                             @method('GET')
-                            <button type="submit" class="btn btn-warning">Upload</button>
+                            <button type="submit" class="btn btn-primary px-4 fw-bold border-0 shadow-sm">Upload</button>
                         </form>
                     </td>
                 </tr>

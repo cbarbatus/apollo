@@ -1,36 +1,38 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container'>
+    <div class="container py-4">
+        <div class="mb-5">
+            <h1 class="display-4 fw-bold">Ritual Management</h1>
+            <p class="h3 text-muted">{{ $ritual->name }} | {{ $ritual->year }} — {{ $ritual->culture }}</p>
+        </div>
 
-        <h1>Ritual Details</h1>
+        <div class="card shadow-sm border-0" style="background-color: #e2f3f5; border-radius: 12px;">
+            <div class="card-body p-4">
+                <div class="d-flex flex-wrap align-items-center">
 
-        <br><b>Year: </b>{{ $ritual->year }}
-        <br><b>Name: </b>{{ $ritual->name }}
-        <br><b>Culture: </b>{{ $ritual->culture }}
-        <br><br>
+                    <div class="d-flex gap-2 align-items-center">
+                        <a href="/rituals/{{ $ritual->id }}/display" class="btn btn-info text-white px-4 fw-bold border-0 shadow-sm">
+                            Public View
+                        </a>
 
-        <form method="get" action="/rituals/{{ $ritual['id']}}/edit" id="edit">
-        </form>
-        <button type="submit" form='edit' class="btn btn-warning">Edit</button>
-        <br><br>
+                        @auth
+                            <a href="/rituals/{{ $ritual->id }}/uploadlit" class="btn btn-primary px-4 fw-bold border-0 shadow-sm">
+                                Upload
+                            </a>
 
-        <form method="get" action="/rituals/{{ $ritual['id']}}/uploadlit" id="uplit">
-        </form>
-        <button type="submit" form='uplit' class="btn btn-warning">Upload</button>
-        <br><br>
+                            <a href="{{ route('rituals.edit', $ritual->id) }}" class="btn btn-warning px-4 fw-bold border-0 shadow-sm">
+                                Edit Details
+                            </a>
 
-        <form method="get" action="/rituals/{{ $ritual['id'] }}/sure" id="sure">
-        </form>
-        <button type="submit" form="sure" class="btn btn-danger">Delete</button>
-
-        <br><br>
-
-
-        <form method="get" action="/rituals/1/list" id="list">
-        </form>
-
-        <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-success">List</a>
+                            <x-delete-button
+                                :action="route('rituals.destroy', $ritual->id)"
+                                resource="Ritual"
+                            />
+                        @endauth
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <br>
 @endsection

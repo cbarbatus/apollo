@@ -3,55 +3,36 @@
 @section('content')
     <h1>Rituals Liturgy</h1>
 
-    <br>
+    <div class="container">
 
-
-    <div class='container' >
-        @if ( !($rituals->count()) )
-            <div class="alert alert-warning" role="alert">
-                <strong>No Matching Rituals Found.</strong> Please modify your search criteria.
-            </div>
-        @else
-            <table class="table table-striped">
-                <thead>
-                <tr style="font-weight:bold">
-                    <td>ID</td>
-                    <td>Name</td>
-                    <td>Year</td>
-                    <td>Title</td>
-                    <td>Culture</td>
-                    <td colspan="2">Action</td>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Year</th>
+                    <th>Culture</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($rituals as $ritual)
                     <tr>
-                        <td>{{$ritual->id}} </td>
-                        <td>{{$ritual->name}} </td>
-                        <td>{{$ritual->year}}</td>
-                        <td>{{$ritual->title}}</td>
-                        <td>{{$ritual->culture}}</td>
-
+                        <td>{{ $ritual->id }}</td>
+                        <td>{{ $ritual->name }}</td>
+                        <td>{{ $ritual->year }}</td>
+                        <td>{{ $ritual->culture }}</td>
                         <td>
-                            @if($ritual->liturgy_base != '')
-                                <form method="get" action="/rituals/{{ $ritual['id']}}/text" id="show">
-                                    <button type="submit" class="btn btn-go" >Show</button>
-                                </form>
-                            @endif
-                        </td>
-                        <td>
-                            @if($ritual->liturgy_base != '')
-                                <form method="get" action="/liturgy/{{ $ritual['id']}}/get" id="spam">
-                                    <button type="submit" class="btn btn-go" >Get</button>
-                                </form>
-                            @endif
+                            <div class="d-flex gap-2">
+                                <a href="/rituals/{{ $ritual->id }}/liturgy" class="btn btn-sm btn-success">Show</a>
+                                <a href="/liturgy/{{ $ritual->id }}/get" class="btn btn-sm btn-success">Get</a>
+                            </div>
                         </td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
-        @endif
+        </div>
     </div>
-
-<br>
 @endsection

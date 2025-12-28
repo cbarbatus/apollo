@@ -3,41 +3,45 @@
 @section('content')
     <div class='container py-4'>
         <h1>Edit a Ritual</h1>
-        <br><br>
-        <form method="post" action="/rituals/{{ $ritual->id }}" id="edit">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-            @method('put')
-            <label for="year">Year:</label>
-            {{ $ritual->year }}
-            <br>
-
-            <label for="name">Name:</label>
-            {{ $ritual->name }}
-            <select name="name" id="name">
-                @foreach ($ritualNames as $item)
-                    <option value="{{ $item }}" @selected($ritual->name == $item)>
-                        {{ $item }}
-                    </option>
-                @endforeach
-            </select>
-            <br>
-
-            <label for="culture">Culture:</label>
-            {{ $ritual->culture }}
-            <select name="culture" id="culture">
-                @foreach ($cultures as $item){
-                <option value="{{ $item }}" @selected($ritual->name == $item)>
-                    {{ $item }}
-                </option>
-                @endforeach
-            </select>
-
-            <br><br>
-        </form>
-        <button type='submit' form='edit' class="btn btn-go">Submit</button>
         <br>
 
+        <form method="post" action="/rituals/{{ $ritual->id }}" id="edit">
+            @csrf
+            @method('put')
+
+            <div class="mb-3">
+                <label class="fw-bold">Year:</label>
+                <span class="ms-2">{{ $ritual->year }}</span>
+                <input type="hidden" name="year" value="{{ $ritual->year }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="name" class="fw-bold">Name:</label>
+                <select name="name" id="name" class="form-select w-auto d-inline-block ms-2">
+                    @foreach ($activeNames as $item)
+                        <option value="{{ $item }}" @selected($ritual->name == $item)>
+                            {{ $item }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="culture" class="fw-bold">Culture:</label>
+                <select name="culture" id="culture" class="form-select w-auto d-inline-block ms-2">
+                    @foreach ($cultures as $item)
+                        <option value="{{ $item }}" @selected($ritual->culture == $item)>
+                            {{ $item }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <br>
+        </form>
+
+        <button type='submit' form='edit' class="btn btn-primary">Submit Changes</button>
+        <a href="{{ route('rituals.show', $ritual->id) }}" class="btn btn-secondary ms-2">Cancel</a>
 
     </div>
-    <br>
 @endsection

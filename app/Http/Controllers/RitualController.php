@@ -12,38 +12,50 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class RitualController extends Controller
 {
 
     public function index(Request $request)
     {
-        // 1. Basic Data Setup
-        $activeYears = Ritual::whereNotNull('year')->where('year', '<>', '')
-            ->distinct()->orderByDesc('year')->pluck('year');
-        $selectedYear = $request->query('year', $activeYears->first());
-        $selectedName = $request->query('name');
-        $activeNames = Ritual::where('year', $selectedYear)->orderBy('id', 'asc')->pluck('name');
+        // 1. STICKY YEAR: Get year from request, or fallback to the most recent year in the DB
+        // This prevents the 'highest value' reset after a delete.
+        $selectedYear = $request->get('year', Ritual::max('year') ?? date('Y'));
+        $selectedName = $request->get('name');
 
-        // 2. THE TRANSPORTER (Admin/Selection Logic)
-        $ritual = null; // Initialize to prevent Undefined Variable error
+        // 2. MASTER YEAR LIST: For the primary year selector
+        $activeYears = Ritual::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
 
-        if ($selectedName) {
+        // 3. PRECISION NAME LIST: Only names that exist for the currently selected sticky year
+        // This fixes the 'blinking' by ensuring the dropdown matches the reality of that year.
+        $activeNames = Ritual::where('year', $selectedYear)
+            ->distinct()
+            ->orderBy('name')
+            ->pluck('name');
+
+        // 4. FIND THE SPECIFIC RITUAL (If selected)
+        $ritual = null;
+        if ($selectedYear && $selectedName) {
             $ritual = Ritual::where('year', $selectedYear)
                 ->where('name', $selectedName)
                 ->first();
-
-            // If a ritual is found and user is logged in, jump straight to Details
-            if ($ritual && \Auth::check()) {
-                return redirect()->route('rituals.show', $ritual->id);
-            }
         }
 
-        // 3. Render the Index (Falls here if no name is picked OR if guest)
+        // 5. THE FLOW LOGIC
+        if ($ritual) {
+            // GUESTS: Transport immediately to the clean public view
+            if (auth()->guest()) {
+                return redirect()->to("/rituals/{$ritual->id}/display");
+            }
+            // AUTHORIZED: Stay here to show the Ritual Management card
+        }
+
+        // 6. PASS TO APOLLO
         return view('rituals.index', compact(
             'activeYears',
-            'selectedYear',
             'activeNames',
+            'selectedYear',
             'selectedName',
             'ritual'
         ));
@@ -151,155 +163,70 @@ class RitualController extends Controller
 
     }
 
-    public function text(int $id) :  View|RedirectResponse
+    /**
+     * Modernized Liturgy Reader
+     * Replaces legacy 'text' method and manual line-parsing loops.
+     */
+    public function liturgy(int $id): View|RedirectResponse
     {
-        $rite = Ritual::query()->findOrFail($id);
-        /** @var \App\Models\Ritual $rite */
+        $ritual = Ritual::findOrFail($id);
 
-        $theFile = $_SERVER['DOCUMENT_ROOT'] . "/liturgy/" . $rite->year . "_" . $rite->name . ".htm";
-        $text = @file_get_contents($theFile);
+        // 1. Use the Phoenix 'liturgy_base' column for the filename
+        $fileName = "{$ritual->liturgy_base}.htm";
+        $filePath = public_path("liturgy/{$fileName}");
 
-        if ($text === false) {
-            // Try the secondary name:
-            $theFile = $theFile . '.htm';
-            $text = @file_get_contents($theFile);
+        if (!file_exists($filePath)) {
+            return redirect()->back()->with('error', "The liturgy file '{$fileName}' could not be found in the archive.");
         }
 
-        if ($text === false) {
-            return redirect('/rituals/0/list')->with('message', 'Ritual text missing');
-        }
-// $text now contains the file content, proceed to encoding and parsing
+        // 2. Efficiently read and handle encoding
+        $rawContent = file_get_contents($filePath);
+        $utf8Content = mb_convert_encoding($rawContent, 'UTF-8', 'ISO-8859-1');
 
-        if ($text === false) {
-            return redirect('/rituals/0/list')->with('message', 'Ritual text missing');
-        }
-// $text now contains the file content, proceed to encoding and parsing
-
-        // Parse the HTML file into array of lines $contents
-        $charset = strpos($text, 'charset=');
-
-        $type = 'utf-8';
-        if ($charset !== false) {
-            $endset = strpos(substr($text, $charset), '"');
-            if ($endset !== false) {
-                $start = $charset + 8;
-                $size = $endset;
-                $type = strtolower(substr($text, $start, $size));
-            }
-        }
-
-// Use mb_convert_encoding() for reliable conversion.
-// We use the @ symbol for error suppression during file reading, so this should
-// handle the conversion to the required UTF-8 standard.
-
-// Check if content is already UTF-8 based on file header
-        if (str_starts_with($type, 'utf')) {
-            $utftext = $text;
+        // 3. Extraction: Use Regex instead of manual line-by-line 'for' loops
+        // This grabs everything between <body> and </body> regardless of whitespace/newlines
+        if (preg_match('/<body[^>]*>(.*?)<\/body>/is', $utf8Content, $matches)) {
+            $content = $matches[1];
         } else {
-            // Convert from the assumed legacy encoding (ISO-8859-1) to UTF-8
-            $utftext = mb_convert_encoding($text, 'UTF-8', 'ISO-8859-1');
-
-            // The fragile logic for updating the charset declaration inside the HTML is maintained
-            // for compatibility, applied to the newly encoded text.
-            if ($charset !== false && isset($size)) {
-                $utftext = substr_replace($utftext, 'utf-8          ', $charset + 8, $size);
-            }
+            $content = $utf8Content; // Fallback to full file if no body tag exists
         }
 
-        $contents = preg_split("/\r?\n|\r/", $utftext);
-        if ($contents === false) {
-            return redirect('/rituals/0/list')->with('message', 'Ritual text parsing failed');
-        }
-
-        $count = count($contents);
-        $i = 0; // Start index
-        $l = $count; // End index
-
-        // Find <body>
-        for ($i = 0; $i < $count; $i++) {
-            if (strtolower(substr($contents[$i], 0, 5)) == '<body') {
-                break;
-            }
-        }
-
-        // Find </body>
-        for ($l = $i + 1; $l < $count; $l++) {
-            if (strtolower(substr($contents[$l], 0, 4)) == '</bo') {
-                break;
-            }
-        }
-
-        $parms = [$i + 1, $l, $contents];
-
-        return view('rituals.text', compact('parms'));
+        return view('rituals.liturgy', compact('ritual', 'content'));
     }
 
 
-    public function create() : View|RedirectResponse
+    public function create()
     {
-        // FIX: Inverted and incomplete authorization logic.
-        // Access should be restricted to 'admin' users.
-        $user = Auth::user();
-        // FIX: Narrowed PHPDoc type hint to \App\Models\User|null to resolve method.notFound error for hasRole()
-        /** @var \App\Models\User|null $user */
+        $activeNames = $this->getSection99Names();
+        $cultures = $this->getSection99Cultures(); // Dynamic fetch
 
-        if (!$user || !$user->hasRole('admin')) {
-            return redirect('/')->with('warning', 'Access denied. Administrator login is required.');
-        }
-
-        $elements = Element::query()->where('name', '=', 'names')->first();
-        /** @var \App\Models\Element|null $elements */
-
-        $ritualNames = [];
-        if ($elements)
-            $ritualNames = explode(',', (string)$elements->item);
-
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues */
-        $venues = Venue::all();
-        $venue_names = [];
-        foreach ($venues as $venue) {
-            $venue_names[] = $venue->name;
-        }
-
-        $elements = Element::query()->where('name', '=', 'cultures')->first();
-        /** @var \App\Models\Element|null $elements */
-
-        $cultures = [];
-        if ($elements) {
-            $cultures = explode(',', (string)$elements->item);
-        }
-
-        return view('rituals.create', compact('venue_names', 'ritualNames', 'cultures'));
+        return view('rituals.create', compact('activeNames', 'cultures'));
     }
+
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request)
     {
-        // 1. THE LOCK: Validates uniqueness and stops execution if it fails
         $request->validate([
             'year' => 'required|integer',
+            'culture' => 'required',
+            // Validates uniqueness for the name/year combo
             'name' => [
                 'required',
-                'string',
-                \Illuminate\Validation\Rule::unique('rituals')->where(function ($query) use ($request) {
-                    return $query->where('year', $request->year);
-                }),
+                Rule::unique('rituals')->where(fn ($query) =>
+                $query->where('year', $request->year)
+                ),
             ],
         ], [
-            'name.unique' => 'Ritual year and name already used!'
+            'name.unique' => 'This ritual name and year combination is already in use.'
         ]);
 
-        // 2. THE CREATION: Only happens if validation passes
-        $ritual = new Ritual($request->all());
-        $ritual->save();
+        $ritual = Ritual::create($request->all());
 
-        // 3. THE APOLLO REDIRECT: No more stranded 404s
-        return redirect()->route('rituals.index', [
-            'year' => $ritual->year,
-            'name' => $ritual->name
-        ])->with('success', "Liturgy for {$ritual->name} {$ritual->year} created successfully!");
+        return redirect()->route('rituals.show', $ritual->id)
+            ->with('success', 'Ritual created successfully!');
     }
 
     /**
@@ -315,25 +242,14 @@ class RitualController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View
+    public function edit($id)
     {
         $ritual = Ritual::findOrFail($id);
-        /** @var \App\Models\Ritual $ritual */
+        $activeNames = $this->getSection99Names();
+        $cultures = $this->getSection99Cultures(); // Dynamic fetch
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
-        $locations = Venue::all();
-
-        $elements = Element::query()->where('name', '=', 'cultures')->first();
-        /** @var \App\Models\Element|null $elements */
-        $cultures = ($elements !== null) ? explode(',', (string)$elements->item) : [];
-
-        $elements = Element::query()->where('name', '=', 'names')->first();
-        /** @var \App\Models\Element|null $elements */
-        $ritualNames = ($elements !== null) ? explode(',', (string)$elements->item) : [];
-
-        return view('rituals.edit', compact('ritual', 'ritualNames',  'locations', 'cultures'));
+        return view('rituals.edit', compact('ritual', 'activeNames', 'cultures'));
     }
-
     /**
      * Update the specified resource in storage.
      */
@@ -363,25 +279,53 @@ class RitualController extends Controller
         ])->with('success', 'Ritual updated successfully.');
     }
 
-    /**
-     * Before destroy, ask sure.
-     */
-    public function sure(int $id): View
+
+    public function uploadlit(int $id): View
     {
-        return view('/rituals.sure', ['id' => $id]);
+        $ritual = Ritual::findOrFail($id);
+
+        // Clean Phoenix Naming: 2026_Imbolc.htm
+        $litName = $ritual->year . '_' . str_replace(' ', '_', $ritual->name) . '.htm';
+
+        return view('rituals.uploadlit', compact('ritual', 'litName'));
+    }
+
+    public function storelit(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|mimes:htm,html|max:5120',
+            'id' => 'required|exists:rituals,id'
+        ]);
+
+        $ritual = Ritual::findOrFail($request->id);
+        $fullFilename = $request->litName; // e.g., 2026_Imbolc.htm
+
+        // 1. Move the public file to public_html/liturgy
+        $request->file('file')->move(public_path('liturgy'), $fullFilename);
+
+        // 2. Extract and save the base name (2026_Imbolc) to liturgy_base
+        $baseName = pathinfo($fullFilename, PATHINFO_FILENAME);
+        $ritual->liturgy_base = $baseName;
+        $ritual->save();
+
+        // 3. Clear, descriptive Phoenix success message
+        return redirect()->route('rituals.index', ['year' => $ritual->year])
+            ->with('success', "Liturgy base '{$baseName}' updated. Public .htm is live, and private .docx remains secure in storage.");
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(Ritual $ritual)
     {
-        $ritual = Ritual::findOrFail($id);
-        /** @var \App\Models\Ritual $ritual */
+        // Save the year so we can "stick" to it after the redirect
+        $preservedYear = $ritual->year;
 
         $ritual->delete();
 
-        return redirect('/rituals/1/list')->with('success', 'Ritual '.$ritual->id.' was deleted');
+        // Redirect back to index while passing the year as a query parameter
+        return redirect()->route('rituals.index', ['year' => $preservedYear])
+            ->with('success', 'Ritual successfully removed.');
     }
 
 
@@ -442,6 +386,17 @@ class RitualController extends Controller
         return $nameElement
             ? array_map('trim', explode(',', $nameElement->item))
             : ['Samhain', 'Yule', 'Imbolc', 'Beltaine']; // High Day fallback
+    }
+
+    private function getSection99Cultures()
+    {
+        $cultureElement = \App\Models\Element::where('section_id', 99)
+            ->where('name', 'RitualCultures')
+            ->first();
+
+        return $cultureElement
+            ? array_map('trim', explode(',', $cultureElement->item))
+            : ['Welsh', 'Irish', 'Greek', 'Norse']; // Fallback
     }
 
 }

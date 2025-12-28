@@ -1,89 +1,94 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1 class="mb-4">Members</h1>
-
-    @canany(['change all','change members'])
-        <div class="d-flex flex-wrap gap-2 mb-4">
-            <a href="/members/create" class="btn btn-warning">New Member</a>
-
-            <a href="/members/full" class="btn btn-warning">Show All</a>
-        </div>
-
-        <div class="card p-3 mb-4">
-            <h5 class="card-title">Restore Member</h5>
-            <form method="post" action="/members/restore" id="restore">
-                @csrf <button type="submit" form='restore' class="btn btn-info fw-bold">Restore Member</button>
-                <label for="first_name">First Name:</label>
-                <input type="text" name="first_name" id="first_name" required>
-                <label for="last_name">Last Name:</label>
-                <input type="text" name="last_name" id="last_name" required>
-            </form>
-        </div>
-    @endcan
+    <div class="container py-4">
 
 
-    @if ( !($members->count()) )
-        <p class="alert alert-info">You have no members.</p>
-    @else
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr class="fw-bold">
-                    @canany(['change all','change members'])
-                        <th>ID</th>
-                    @endcan
+            <h1 class="display-6 fw-bold mb-4">Grove Membership</h1>
+
+        {{-- 1. Management Tools --}}
+        @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
+            <div class="d-flex gap-2 mb-4">
+                <a href="{{ url('/members/create') }}" class="btn btn-primary shadow-sm fw-bold px-4">+ New Member</a>
+
+                    @if($full) {{-- This is the 'showAll' variable we passed from the controller --}}
+                    <a href="{{ url('/members') }}" class="btn btn-outline-secondary">
+                        <i class="fa fa-filter"></i> Show Current Only
+                    </a>
+                    @else
+                        <a href="{{ url('/members?filter=all') }}" class="btn btn-secondary">
+                            Show All Records
+                        </a>
+                    @endif
+
+            </div>
+        @endif
+
+        {{-- 2. The Table --}}
+        <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-secondary small uppercase fw-bold">
+                <tr>
+                    @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
+                        <th class="ps-3">ID</th>
+                        <th>User</th>
+                    @endif
                     <th>Name</th>
                     <th>Category</th>
-                    @canany(['change all','change members'])
-                        <th>Status</th>
-                        <th>User</th>
-                    @endcan
-                    <th>Joined</th>
                     <th>Email</th>
-                    @canany(['change all','change members'])
-                        <th>ADF #</th>
+                    <th>ADF #</th>
+                    @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
                         <th>ADF Join</th>
                         <th>ADF Renew</th>
-                    @endcan
-                    <th>Action</th>
+                    @endif
+                    <th class="text-end pe-3">Action</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($members as $member)
-                    {{-- Assuming $user is passed to the view --}}
-                    @if (( $member->first_name[0] != '_' ) || (Auth::user()->can('change members')) || ($member->user_id == $user->id) )
-                        <tr>
-                            @canany(['change all','change members'])
-                                <td>{{$member->id}}</td>
-                            @endcan
-                            <td>{{$member->first_name}} {{$member->mid_name}} {{$member->last_name}}</td>
-                            <td>{{$member->category}}</td>
-                            @canany(['change all','change members'])
-                                <td>{{$member->status}}</td>
-                                <td>{{$member->user_id}}</td>
-                            @endcan
-                            <td>{{$member->joined}}</td>
-                            <td>{{$member->email}}</td>
-                                @canany(['change all','change members'])
-                                    <td>{{$member->adf}}</td>
-                                    {{-- Force Y-m-d format on adf_join --}}
-                                    <td>{{ $member->adf_join}}</td>
-                                    {{-- Force Y-m-d format on adf_renew --}}
-                                    <td>{{ $member->adf_renew}}</td>
-                                @endcan
-                            <td>
-                                {{-- Check if the user has permission to edit --}}
-                                @if ( (isset($change_own) && $change_own && ($member->user_id == $user->id)) || (isset($change_members) && $change_members) || (isset($change_all) && $change_all))
-                                    {{-- Replaced form with simple anchor tag for navigation --}}
-                                    <a href="/members/{{ $member['id'] }}/edit" class="btn btn-sm btn-warning">Edit</a>
+                    <tr>
+                        @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
+                            <td class="ps-3 text-muted small">{{ $member->id }}</td>
+                            <td>{{ $member->user_id ?? '0' }}</td>
+                        @endif
+
+                        <td class="fw-bold">{{ $member->first_name }} {{ $member->last_name }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ $member->category }}</span></td>
+                        <td class="small">{{ $member->email }}</td>
+                        <td class="font-monospace small">{{ $member->adf }}</td>
+
+                        @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
+                            <td>{{ $member->adf_join }}</td>
+                            <td>{{ $member->adf_renew }}</td>
+                        @endif
+
+                            <td class="text-end pe-3">
+                                @php
+                                    // 1. Fetch current user
+                                    $user = auth()->user();
+
+                                    // 2. Use data_get to bypass IDE property checks
+                                    $currentUserId = data_get($user, 'id');
+
+                                    // 3. Match the logic exactly to your working Phoenix code
+                                    $canChangeOwn = $user->can('change own');
+                                    $isManager = $user->canAny(['change all', 'change members', 'change_members']);
+
+                                    // Match the user_id from the member row to the logged-in user's id
+                                    $isMyRecord = ($canChangeOwn && $member->user_id == $currentUserId);
+                                @endphp
+
+                                @if($isManager || $isMyRecord)
+                                    <a href="{{ url('/members/' . $member->id . '/edit') }}"
+                                       class="btn btn-primary btn-sm px-3 shadow-sm fw-bold">
+                                        Edit
+                                    </a>
                                 @endif
                             </td>
-                        </tr>
-                    @endif
+                    </tr>
                 @endforeach
                 </tbody>
             </table>
         </div>
-    @endif
+    </div>
 @endsection

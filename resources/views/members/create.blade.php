@@ -1,90 +1,69 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container my-5'>
-        <h1>Add a Member</h1>
+    <div class="container py-4">
+        <div class="card shadow-sm border-0" style="border-radius: 12px; background-color: #f8f9fa;">
+            <div class="card-body p-4">
 
-        <form method="post" action="/members" id="create">
-            {{-- Use the Blade directive, which is cleaner than the raw input --}}
-            @csrf
+                @if ($errors->any())
+                    <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 8px;">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-            {{-- Hidden fields are better placed near the top, or even handled in the controller --}}
-            <input type="hidden" name="status" value="Current">
-            <input type="hidden" name="category" value="Member">
+                <div class="alert alert-warning border-0 shadow-sm mb-4" style="border-radius: 8px; background-color: #fff3cd;">
+                    <small><strong>Administrative Manual Entry:</strong> Use only for manual repairs. For regular applicants, use the Joining Form.</small>
+                </div>
 
-            {{-- 1. NAME FIELDS (Horizontal Row) --}}
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label for="first_name" class="form-label">First Name:</label>
-                    <input type="text" name="first_name" id="first_name" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="mid_name" class="form-label">Middle Name:</label>
-                    <input type="text" name="mid_name" id="mid_name" class="form-control">
-                </div>
-                <div class="col-md-3">
-                    <label for="last_name" class="form-label">Last Name:</label>
-                    <input type="text" name="last_name" id="last_name" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="rel_name" class="form-label">Religious Name:</label>
-                    <input type="text" name="rel_name" id="rel_name" class="form-control">
-                </div>
+                <h2 class="fw-bold mb-4">Add New Member</h2>
+
+                <form method="POST" action="{{ url('/members') }}">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-7 border-end pe-md-4">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label text-secondary fw-bold small uppercase">First Name</label>
+                                    <input type="text" name="first_name" class="form-control" value="{{ old('first_name') }}" style="border-radius: 8px;" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label text-secondary fw-bold small uppercase">Last Name</label>
+                                    <input type="text" name="last_name" class="form-control" value="{{ old('last_name') }}" style="border-radius: 8px;" required>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label text-secondary fw-bold small uppercase">Email Address</label>
+                                <input type="email" name="email" class="form-control" value="{{ old('email') }}" style="border-radius: 8px;" required>
+                            </div>
+
+                            <p class="text-muted small mt-3 italic">
+                                * System will automatically generate a User record and link it to this Member.
+                            </p>
+                        </div>
+
+                        <div class="col-md-5 ps-md-4">
+                            <label class="form-label text-secondary fw-bold small uppercase mb-3">Initial Role</label>
+                            <select name="role" class="form-select shadow-sm" style="border-radius: 8px;">
+                                <option value="member" selected>Member</option>
+                                <option value="scribe">Scribe</option>
+                                <option value="curator">Curator</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url('/users') }}" class="btn btn-outline-secondary px-4 fw-bold" style="height: 38px; border-radius: 8px;">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm" style="height: 38px; border-radius: 8px;">Create Member & User</button>
+                    </div>
+                </form>
             </div>
-
-            {{-- 2. CONTACT FIELDS (Horizontal Row) --}}
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="email" name="email" id="email" class="form-control" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="pri_phone" class="form-label">Primary Phone:</label>
-                    {{-- Use the pattern attribute for phone validation hint --}}
-                    <input type="tel" name="pri_phone" id="pri_phone" class="form-control" placeholder="(000) 000-0000" pattern="[0-9]{3} [0-9]{3}-[0-9]{4}">
-                </div>
-                <div class="col-md-4">
-                    <label for="alt_phone" class="form-label">Alternate Phone:</label>
-                    <input type="tel" name="alt_phone" id="alt_phone" class="form-control" placeholder="(000) 000-0000" pattern="[0-9]{3} [0-9]{3}-[0-9]{4}">
-                </div>
-            </div>
-
-            {{-- 3. ADDRESS FIELD (Single Full Row) --}}
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <label for="address" class="form-label">Address (street;city;state;zip):</label>
-                    <input type="text" name="address" id="address" class="form-control" placeholder="123 Main St; Anytown; CA; 90210" required>
-                </div>
-            </div>
-
-            <hr class="my-4">
-
-            {{-- 4. ADF AND JOIN DATES (Horizontal Row) --}}
-            <div class="row mb-3">
-                <div class="col-md-3">
-                    <label for="joined" class="form-label">Joined Grove:</label>
-                    <input type="date" name="joined" id="joined" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="adf" class="form-label">ADF Number:</label>
-                    <input type="number" name="adf" id="adf" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="adf_join" class="form-label">ADF Join Date:</label>
-                    <input type="date" name="adf_join" id="adf_join" class="form-control" required>
-                </div>
-                <div class="col-md-3">
-                    <label for="adf_renew" class="form-label">ADF Renew Date:</label>
-                    <input type="date" name="adf_renew" id="adf_renew" class="form-control" required>
-                </div>
-            </div>
-
-            {{-- Submit button is now wrapped in a row/col for proper spacing --}}
-            <div class="row mt-4">
-                <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </div>
-        </form>
+        </div>
     </div>
 @endsection

@@ -126,67 +126,36 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View|RedirectResponse
+    public function edit(User $user)
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole('admin')) {
-                $editUser = User::query()->findOrFail($id);
-                /** @var \App\Models\User $editUser */
-
-                $checks = [];
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles */
-                $roles = Role::all();
-
-                foreach ($roles as $role) {
-                    $name = $role->name;
-                    // hasRole() is now recognized via the HasRoles mixin
-                    if ($editUser->hasRole($name)) {
-                        $checks[$name] = 'checked';
-                    } else {
-                        $checks[$name] = '';
-                    }
-                }
-
-                return view('users.edit', [
-                    'user' => $editUser, // Pass $editUser to the view as $user
-                    'roles' => $roles,
-                    'checks' => $checks,
-                ]);            }
-        }
-
-        return redirect('/');
+        // Fetch all roles from the Spatie table shown in your structure
+        $roles = \Spatie\Permission\Models\Role::all();
+        return view('users.edit', compact('user', 'roles'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, User $user)
     {
-        $user = User::query()->findOrFail($id);
-        /** @var \App\Models\User $user */
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|min:8',
+        ]);
 
-        // Use $request->input()
-        $item = $request->input('name');
-        if (!is_string($item)) $item = '';
-        $user->name = $item;
+        // Update Identity
+        $user->name = $request->name;
+        $user->email = $request->email;
 
-        // Use $request->input()
-        $item = $request->input('email');
-        if (!is_string($item)) $item = '';
-        $user->email = $item;
+        // Safe Password Handling: Only update if not empty
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
 
         $user->save();
 
-        // Use $request->input()
-        $roles = $request->input('role');
-        if (!is_array($roles)) $roles = [];
+        // Spatie Sync: Automatically manages the model_has_roles pivot table
+        $user->syncRoles($request->input('roles', []));
 
-        // syncRoles() is now recognized via the HasRoles mixin
-        $user->syncRoles($roles);
-
-        return redirect('/users')->with('success', 'User was updated');
+        return redirect()->route('users.index')->with('status', 'User updated successfully.');
     }
 
     /**
@@ -200,13 +169,23 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(Member $member): RedirectResponse
     {
-        $user = User::query()->findOrFail($id);
-        /** @var \App\Models\User $user */
+        // Authorization check using modern Laravel gates
+        if (auth()->user()->cannot('delete members')) {
+            return redirect()->back()->with('error', 'Unauthorized.');
+        }
 
-        $user->delete();
+        // Safe User Deletion: Only attempt if a user_id exists
+        if ($member->user_id) {
+            $user = \App\Models\User::find($member->user_id);
+            if ($user) {
+                $user->delete();
+            }
+        }
 
-        return redirect('/users')->with('success', 'User was deleted');
-    }
-}
+        // Final Member Cleanup
+        $member->delete();
+
+        return redirect('/members')->with('success', 'Member data removed.');
+    }}

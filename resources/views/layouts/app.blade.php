@@ -58,7 +58,7 @@
                     <li class="nav-item">
                         <a class="px-2 text-white" href="{{ url('/slideshows') }}">Photos</a></li>
                     <li class="nav-item">
-                        <a class="px-2 text-white" href="{{ url('/rituals') }}">Past Rituals</a></li>
+                        <a class="px-2 text-white" href="{{ url('/rituals') }}">Rituals</a></li>
                     <li class="nav-item">
                         <a class="px-2 text-white" href="{{ url('/books') }}">Books</a></li>                </ul>
 
@@ -90,7 +90,6 @@
                                 <a  class="dropdown-item" href="/venues"> $ Venues </a>
                                 <a  class="dropdown-item" href="/books"> $ Books </a>
                                 <a  class="dropdown-item" href="/contacts"> $ Contacts </a>
-                                <a  class="dropdown-item" href="/slideshows/1/list"> $ Photos </a>
                                 <a  class="dropdown-item" href="/members/newmembers"> $ New Members </a>
                                 <a  class="dropdown-item" href="/rituals/editNames"> $ Ritual Names </a>
                                 <a  class="dropdown-item" href="/rituals/editCultures"> $ Ritual Cultures </a>
@@ -133,34 +132,15 @@
 
     <div class="startpad">
         <div class="content">
-            @if (Session::has('message'))
-                {{-- Assuming 'message' is often used for success or informational feedback --}}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ Session::get('message') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
 
-                @if (Session::has('warning'))
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        {{ Session::get('warning') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
 
-                @if ($errors->any())
-                    <div class='alert alert-danger'>
-                        <h4 class="alert-heading">Validation Errors:</h4>
-                        <ul class="mb-0">
-                            @foreach ( $errors->all() as $error )
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+
+
 
                 <main class="py-4">
-                <div class="container" >
+                    <div class="container mt-4">
+                        <x-alert-danger />
+                        <x-alert-success />
                     @yield('content')
                 </div>
             </main>
@@ -196,6 +176,24 @@
 {{-- This must be in your main layout file, usually near the </body> tag --}}
 
 @stack('scripts')
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p class="mb-0">Are you sure you want to delete this item? This action is irreversible.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger px-4 fw-bold" id="modal-confirm-delete">Yes, Delete It</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

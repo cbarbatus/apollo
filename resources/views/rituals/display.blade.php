@@ -1,59 +1,80 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container'>
-        <h1>{{ $ritual->year }} {{ $ritual->name }} Ritual </h1>
-        <br>
-        <form method="get" action="/rituals/{{ $ritual['id'] }}/text" id="text">
-        </form>
-
-        <div class="my-4">
-            @if ($slideshow)
-                {{-- Assuming a route exists to view the slideshow by ID --}}
-                <a href="{{ url('/slideshows/' . $slideshow->id) }}" class="btn btn-info">
-                    View Associated Slideshow
-                </a>
-            @else
-                <span class="text-muted fst-italic">No slideshow associated with this ritual.</span>
-            @endif
+    <div class="container py-4">
+        {{-- Clean, Dignified Header --}}
+        <div class="mb-4">
+            <h1 class="h2 fw-bold text-dark border-bottom pb-3">{{ $ritual->year }} {{ $ritual->name }} Ritual</h1>
         </div>
 
-        <div class="my-4">
-            @if ($lit_file != '')
-            <button type="submit" form='text' class="btn btn-info">View Liturgy Text</button>
-        @else <span class="text-muted fst-italic">No liturgy text associated with this ritual.</span>
-        @endif
-        </div>
-
-        <div class="my-5">
-            @if (!$announcement )
-                <span class="text-muted fst-italic">No announcement associated with this ritual.</span>
-            @else
-                <div class="my-5 fs-2 fw-bold">
-                    Announcement Information:
-                </div>
-
-            @if ($announcement->picture_file == '')
-                    <span class="text-muted fst-italic">No announcement picture associated with this ritual.</span>
-            @else
-                Click on the image to open it full size in a new window.<br>
-                    <a target="_blank" href="/img/{{ $announcement->picture_file }}">
-                    <img src="/img/{{ $announcement->picture_file}}" alt="Ritual" style="max-height:120px">
+        {{-- The Four Media Pillars --}}
+        <div class="row g-3 mb-5">
+            {{-- 1. Liturgy --}}
+            <div class="col-sm-6 col-md-3">
+                @if ($ritual->liturgy_base)
+                    <a href="{{ route('rituals.liturgy', $ritual->id) }}" class="btn btn-primary w-100 shadow-sm fw-bold">
+                        View Liturgy
                     </a>
-            @endif
+                @else
+                    <div class="p-2 border rounded text-center text-muted small bg-light">No Liturgy Text</div>
+                @endif
+            </div>
+
+            {{-- 2. Slideshow --}}
+            <div class="col-sm-6 col-md-3">
+                @if ($slideshow)
+                    <a href="{{ url('/slideshows/' . $slideshow->id) }}" class="btn btn-info w-100 shadow-sm fw-bold">
+                        View Slideshow
+                    </a>
+                @else
+                    <div class="p-2 border rounded text-center text-muted small bg-light">No Slideshow</div>
+                @endif
+            </div>
+
+            {{-- 3. Announcement --}}
+            {{-- 3. Announcement Status (Non-button indicator) --}}
+            <div class="col-sm-6 col-md-3">
+                @if ($announcement)
+                    <div class="p-2 border rounded text-center text-success fw-bold bg-white shadow-sm" style="border-color: #198754 !important;">
+                        <i class="bi bi-check-circle-fill me-1"></i> Announcement Listed
+                    </div>
+                @else
+                    <div class="p-2 border rounded text-center text-muted small bg-light">No Announcement</div>
+                @endif
+            </div>
+
+            {{-- 4. Photos --}}
+            <div class="col-sm-6 col-md-3">
+                @if ($announcement && $announcement->picture_file)
+                    <a target="_blank" href="/img/{{ $announcement->picture_file }}" class="btn btn-warning w-100 shadow-sm fw-bold">
+                        View Photo
+                    </a>
+                @else
+                    <div class="p-2 border rounded text-center text-muted small bg-light">No Photo</div>
+                @endif
+            </div>
         </div>
 
-            <br><br>
-            <b>Summary:</b> {!! $announcement->summary !!}
-            <br><br>
-            <b>When:</b> {{ $announcement->when }}
-            <br><br>
-            <b>Where:</b> {{ $venue_title }}
-
+        {{-- Detail Section (Only shows if Announcement exists) --}}
+        @if ($announcement)
+            <div id="announcement-details" class="p-4 bg-white border rounded shadow-sm mb-5">
+                <h4 class="fw-bold mb-3">Event Details</h4>
+                <div class="mb-4">
+                    <strong>Summary:</strong>
+                    <div class="mt-2 text-secondary">{!! $announcement->summary !!}</div>
+                </div>
+                <div class="row pt-3 border-top">
+                    <div class="col-md-6"><strong>When:</strong> {{ $announcement->when }}</div>
+                    <div class="col-md-6"><strong>Where:</strong> {{ $venue_title }}</div>
+                </div>
+            </div>
         @endif
-        <br><br>
-        <a href="/rituals/{{$ritual->year}}/0/year" class="btn btn-go">More Rituals</a>
-    </div>
-    <br>
 
+        {{-- Footer --}}
+        {{-- Footer Navigation converted to a proper button --}}
+        <div class="mt-5 pt-4 border-top">
+            <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-secondary shadow-sm px-4">
+                <i class="bi bi-arrow-left me-2"></i>More {{ $ritual->year }} Rituals
+            </a>
+        </div>  </div>
 @endsection

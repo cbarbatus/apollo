@@ -88,18 +88,17 @@ class BookController extends Controller
      * Update the specified resource in storage.
      * FIX: Signature changed to UpdateBookRequest.
      */
-    public function update(UpdateBookRequest $request, int $id): RedirectResponse // <-- FIX APPLIED
+    public function update(UpdateBookRequest $request, int $id): RedirectResponse
     {
-        /** @var \App\Models\Book $book */
-        $book = \App\Models\Book::query()->findOrFail($id);
+        $book = \App\Models\Book::findOrFail($id);
 
-        // $request->validated() is now GUARANTEED to work.
+        // This single line validates against your 'sequence' rule
+        // and fills the model safely
         $book->fill($request->validated());
         $book->save();
 
-        return redirect('/books')->with('success', 'Book was updated');
+        return redirect('/books')->with('success', 'Book updated successfully');
     }
-
     /**
      * Before destroy, ask sure.
      */
