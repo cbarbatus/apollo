@@ -25,55 +25,28 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach($sections as $section)
-                        <tr>
-                            <td class="ps-4 text-muted">{{ $section->id }}</td>
-                            <td class="fw-bold">{{ $section->name }}</td>
-                            <td>{{ $section->title }}</td>
-                            <td class="text-center">{{ $section->sequence }}</td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ url('/sections/' . $section->id . '/edit') }}"
-                                       class="btn btn-warning btn-sm shadow-sm fw-bold border-0 px-3"
-                                       style="height: 32px; border-radius: 8px; display: flex; align-items: center;">
-                                        Edit
-                                    </a>
-                                    <a href="{{ url('/sections/' . $section->id . '/edit#section-elements') }}"
-                                       class="btn btn-outline-secondary btn-sm shadow-sm px-3"
-                                       style="height: 32px; border-radius: 8px; display: flex; align-items: center; color: #6c757d;">
-                                        Elements
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>                  @foreach($sections as $section)
-                        <tr>
-                            <td class="ps-4 text-muted">{{ $section->id }}</td>
-                            {{-- MISSION: Information only --}}
-                            <td class="fw-bold">{{ $section->name }}</td>
-                            <td>{{ $section->title }}</td>
-                            <td class="text-center">{{ $section->sequence }}</td>
-
-                            <td class="text-end pe-4">
-                                <div class="d-flex justify-content-end gap-2">
-                                    {{-- MISSION: Edit Section Settings (Top of Page) --}}
-                                    <a href="{{ url('/sections/' . $section->id . '/edit') }}"
-                                       class="btn btn-warning btn-sm shadow-sm fw-bold border-0 d-flex align-items-center px-3"
-                                       style="height: 32px; border-radius: 8px;">
-                                        Edit
-                                    </a>
-
-                                    {{-- MISSION: Manage Content (Jump to Table) --}}
-                                    <a href="{{ url('/sections/' . $section->id . '/edit#section-elements') }}"
-                                       class="btn btn-outline-secondary btn-sm shadow-sm d-flex align-items-center px-3"
-                                       style="height: 32px; border-radius: 8px; color: #6c757d;">
-                                        Elements
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
+                        @foreach($sections as $section)
+                            <tr>
+                                <td class="ps-4 text-muted">{{ $section->id }}</td>
+                                <td class="fw-bold">{{ $section->name }}</td>
+                                <td>{{ $section->title }}</td>
+                                <td class="text-center">{{ $section->sequence }}</td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="{{ url('/sections/' . $section->id . '/edit') }}"
+                                           class="btn btn-warning btn-sm shadow-sm fw-bold border-0 px-3"
+                                           style="height: 32px; border-radius: 8px; display: flex; align-items: center;">
+                                            Edit
+                                        </a>
+                                        <a href="{{ url('/sections/' . $section->id . '/edit#section-elements') }}"
+                                           class="btn btn-outline-secondary btn-sm shadow-sm px-3"
+                                           style="height: 32px; border-radius: 8px; display: flex; align-items: center; color: #6c757d;">
+                                            Elements
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>

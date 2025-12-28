@@ -90,7 +90,7 @@ class GroveController extends Controller
     {
         $file = $request->file('file');
         if (is_null($file)) {
-            Session::flash('warning', 'No File Selected.');
+            Session()->flash('warning', 'No File Selected.');
 
             return redirect('grove/upload');
         }
@@ -139,12 +139,12 @@ class GroveController extends Controller
                     rename(public_path('/liturgy/'.$filename), public_path('/liturgy/'.$shortname));
                 }
 
-                Session::flash('message', 'Upload Successful.');
+                Session()->flash('message', 'Upload Successful.');
             } else {
-                Session::flash('warning', 'File too large. File must be less than 2MB.');
+                Session()->flash('warning', 'File too large. File must be less than 2MB.');
             }
         } else {
-            Session::flash('warning', 'Invalid File Extension.');
+            Session()->flash('warning', 'Invalid File Extension.');
         }
 
         // Redirect to index

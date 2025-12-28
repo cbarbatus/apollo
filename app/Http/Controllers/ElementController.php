@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
 use App\Models\Section;
 use App\Http\Requests\ElementRequest;
+use Illuminate\Support\Facades\DB;
 
 class ElementController extends Controller
 {

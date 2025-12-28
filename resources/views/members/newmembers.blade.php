@@ -56,7 +56,7 @@
                                 <td>{{$member->email}}</td>
                                 <td>{{$member->pri_phone}}</td>
                                 <td>{{$member->adf}}</td>
-                                <td>
+
                                     {{-- Update $newmember to $member --}}
                                     <td class="text-nowrap">
                                         {{-- Container to prevent stacking --}}
@@ -113,7 +113,6 @@
                                             </td>
                                         </div>
                                     </td>
-                                </td>
                             </tr>
                         @endif
                     @endforeach
