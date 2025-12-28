@@ -136,7 +136,7 @@ class SectionController extends Controller
         ]);
 
         // 2. Update the sections table (No 'item' here!)
-        \DB::table('sections')
+        DB::table('sections')
             ->where('id', $id)
             ->update([
                 'name'       => $request->input('name'),
