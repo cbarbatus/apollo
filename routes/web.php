@@ -55,7 +55,6 @@ Route::get('/rituals/editNames', [RitualController::class, 'editNames']);
 Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
 Route::resource('rituals', RitualController::class);
 Route::get('/rituals/{admin}/list', [RitualController::class, 'list']);
-Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
 Route::put('/rituals/{id}/updateParameter', [RitualController::class, 'updateParameter']);
 Route::get('/rituals/{id}/display', [RitualController::class, 'display']);
 Route::get('/rituals/{id}/liturgy', [RitualController::class, 'liturgy'])->name('rituals.liturgy');

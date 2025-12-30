@@ -177,39 +177,48 @@ h3, h2 {
     padding: 20px;
 }
 
-/* Ensure the button has a fixed size based on bold text */
+/* --- THE FINAL BUTTON SHIELD --- */
 
-/* target the specific year buttons */
-.btn-ritual-year {
-    display: inline-block;
-    min-width: 60px; /* Gives the numbers a bit of breathing room */
-    text-align: center;
-}
-
-.btn-ritual-year:hover {
-    font-weight: bold;
-}
-
-/* Target the hover state specifically for Firefox stability */
-.btn-ritual-year:hover {
-    font-weight: bold !important;
-    /* Tighten the letters slightly to keep the total width the same as 'normal' weight */
-    letter-spacing: -0.02em !important;
-    /* Force Firefox to respect the box sizing */
+/* Force all buttons to behave as solid blocks, not links */
+.btn, a.btn {
+    text-decoration: none !important;
     display: inline-block !important;
 }
 
-/* Force the formatting by targeting the exact parent div you just added */
-div.mt-3 h3 {
-    font-weight: 800 !important;
-    font-size: 1.5rem !important;
-    display: block !important;
-    margin-bottom: 10px !important;
-    color: #000 !important;
+/* Fix the 'Ghost' Primary Buttons (+ New Member) */
+.btn-primary, a.btn-primary {
+    background-color: #0d6efd !important; /* Standard Bootstrap Blue */
+    color: #ffffff !important;
+    border: none !important;
 }
 
-div.mt-3 p {
-    margin-bottom: 20px !important;
-    display: block !important;
-    line-height: 1.6 !important;
+/* Fix the 'Underlined' Yellow Buttons (Edit) */
+.btn-warning, a.btn-warning, .btn-yellow {
+    background-color: #ffc107 !important; /* Standard Bootstrap Yellow */
+    color: #000000 !important;
+    text-decoration: none !important;
+}
+
+
+/* THE NUCLEAR OPTION: TARGET TAGS DIRECTLY */
+
+/* 1. Force all button-classed links to ignore the blue/underline reset */
+a.btn, button.btn, .btn {
+    text-decoration: none !important;
+    color: #ffffff !important; /* Default white for blue/red buttons */
+    display: inline-block !important;
+}
+
+/* 2. Specific fix for Yellow Edit buttons - force black text */
+a.btn-warning, .btn-warning, a.btn-yellow, [class*="btn-yellow"] {
+    color: #000000 !important;
+    text-decoration: none !important;
+    background-color: #ffff00 !important; /* Solid Yellow */
+}
+
+/* 3. Ensure hover doesn't trigger the blue underline ghost */
+a.btn:hover, button.btn:hover {
+    text-decoration: none !important;
+    color: inherit !important;
+    opacity: 0.8;
 }

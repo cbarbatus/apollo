@@ -52,8 +52,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <a href="{{ url('elements/create?section_id=' . $section->id) }}"
-               class="btn btn-success shadow-sm fw-bold border-0 px-3 d-inline-flex align-items-center justify-content-center"
-               style="height: 32px; border-radius: 8px; font-size: 0.9rem; min-width: 140px;">
+               class="btn btn-success shadow-sm fw-bold border-0 px-4 py-2 d-inline-flex align-items-center justify-content-center">
                 <i class="bi bi-plus-lg me-2"></i> Add New Element
             </a>
         </div>

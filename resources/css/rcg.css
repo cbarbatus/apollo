@@ -240,3 +240,371 @@ p {
     display: block !important;
     line-height: 1.6 !important;
 }
+/* --- THE ULTIMATE BUTTON OVERRIDE --- */
+
+/* Target the exact combination of tag and class to outrank Tailwind resets */
+a.btn.btn-primary,
+a.btn-primary,
+.btn-primary {
+    background-color: #0056b3 !important;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+}
+
+/* Force the Yellow Edit buttons to drop the blue text */
+a.btn-warning,
+.btn-warning,
+a.btn-yellow {
+    background-color: #ffff00 !important;
+    color: #000000 !important; /* Force Black */
+    text-decoration: none !important;
+    font-weight: bold !important;
+}
+
+/* The 'Nuclear' Underline Killer - targets the pseudo-state */
+a.btn:link, a.btn:visited, a.btn:hover, a.btn:active {
+    text-decoration: none !important;
+    outline: none !important;
+}
+
+
+/* FORCE YELLOW BUTTONS TO BE BLACK REGARDLESS OF LINK STATUS */
+a.btn-warning,
+a.btn-warning:link,
+a.btn-warning:visited,
+a.btn-warning:hover,
+.btn-yellow {
+    color: #000000 !important;
+    text-decoration: none !important;
+    background-color: #ffff00 !important;
+}
+
+/* FORCE WHITE TEXT FOR EVERYTHING ELSE */
+a.btn-primary, a.btn-primary:visited,
+a.btn-danger, a.btn-danger:visited,
+a.btn-info, a.btn-info:visited {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* 1. Hardened 'Public View' (Info) Button */
+a.btn-info, .btn-info {
+    background-color: #00a8cc !important; /* A deeper, more vibrant cyan */
+    border: 1px solid #008ba8 !important; /* Adding a darker border for 'weight' */
+    color: #ffffff !important;
+    text-decoration: none !important;
+    font-weight: 600 !important; /* Make the text slightly bolder for readability */
+}
+
+/* 2. Ensure all button links stay readable */
+a.btn-info:hover, a.btn-info:visited {
+    color: #ffffff !important;
+    background-color: #008ba8 !important; /* Darkens slightly on hover */
+}
+
+/* --- SECTION MANAGEMENT BUTTON FIXES --- */
+
+/* Target the 'Add New Element' specifically to give it 'Weight' */
+#section-elements a.btn,
+.container a[href*="elements/create"],
+.btn-success {
+    background-color: #198754 !important; /* Solid Forest Green */
+    color: #ffffff !important;           /* Force White Text */
+    text-decoration: none !important;
+    padding: 10px 20px !important;       /* This fixes the 'squashed' look */
+    display: inline-block !important;
+    border-radius: 6px !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;         /* Ensures text sits centrally */
+    border: none !important;
+}
+
+/* Ensure it doesn't turn blue or underlined when hovered/visited */
+#section-elements a.btn:hover,
+#section-elements a.btn:visited {
+    color: #ffffff !important;
+    background-color: #157347 !important; /* Slightly darker green on hover */
+    text-decoration: none !important;
+}
+
+/* Clean up the small 'Edit' buttons in the table to match */
+.table a.btn-outline-primary {
+    padding: 2px 12px !important;
+    line-height: 1.5 !important;
+}
+
+/* FORCE OVERRIDE FOR THE INLINE-STYLED ADD BUTTON */
+a.btn-success[style],
+.btn-success {
+    height: auto !important;          /* Kills the 32px restriction */
+    padding: 10px 20px !important;    /* Forces proper button 'girth' */
+    color: #ffffff !important;        /* Crisp white text */
+    background-color: #198754 !important;
+    text-decoration: none !important;
+}
+
+/* Kills the blue 'visited' link color for this button */
+a.btn-success:visited,
+a.btn-success:hover {
+    color: #ffffff !important;
+    text-decoration: none !important;
+}
+
+/* 1. Force 'Add New Element' to be White and readable */
+a.btn-success,
+a.btn-success:link,
+a.btn-success:visited,
+a.btn-success:hover {
+    color: #ffffff !important;
+    text-decoration: none !important;
+    height: auto !important; /* Overrides the inline 32px height */
+    padding: 10px 20px !important;
+    line-height: 1.5 !important;
+}
+
+/* 2. Fix 'Edit' button sizing in the table */
+.table a.btn-outline-primary,
+.table .btn-sm {
+    padding: 6px 15px !important;
+    line-height: 1.5 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+}
+
+/* --- GROVE MEMBERSHIP: BUTTON STATE LOCKDOWN --- */
+
+/* Target the secondary button in ALL its forms */
+a.btn-secondary,
+a.btn-outline-secondary,
+.btn-secondary {
+    background-color: #6c757d !important; /* Solid Slate Gray */
+    color: #ffffff !important;           /* Force White text for better contrast on gray */
+    border: none !important;
+    padding: 8px 18px !important;
+    text-decoration: none !important;
+}
+
+/* Force WHITE text even after clicking (Visited/Focus/Active) */
+a.btn-secondary:visited,
+a.btn-secondary:focus,
+a.btn-secondary:active,
+a.btn-secondary:hover {
+    color: #ffffff !important;
+    background-color: #5a6268 !important; /* Slightly darker gray on interaction */
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+/* --- MATCHING THE MEMBERSHIP TOGGLE BUTTONS --- */
+
+/* Force 'Show Current Only' to match the solid 'Show All' look */
+a.btn-outline-secondary,
+a.btn-outline-secondary:visited,
+a.btn-outline-secondary:hover {
+    background-color: #6c757d !important; /* Solid Slate Gray */
+    color: #ffffff !important;           /* Force White Text */
+    border: none !important;
+    padding: 8px 18px !important;       /* Sync the padding/size */
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    line-height: 1.5 !important;
+}
+
+/* Ensure the icon inside doesn't turn blue */
+a.btn-outline-secondary i {
+    color: #ffffff !important;
+    margin-right: 8px;
+}
+
+/* CONSOLIDATED MEMBERSHIP BUTTON SHIELD */
+a.btn-secondary,
+a.btn-outline-secondary {
+    background-color: #6c757d !important; /* Solid Slate Gray */
+    color: #ffffff !important;           /* Crisp White Text */
+    padding: 8px 18px !important;       /* Uniform Size */
+    display: inline-flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    border: none !important;
+}
+
+/* Maintain White Text through all interactions */
+a.btn-secondary:visited, a.btn-outline-secondary:visited,
+a.btn-secondary:hover, a.btn-outline-secondary:hover,
+a.btn-secondary:active, a.btn-outline-secondary:active {
+    color: #ffffff !important;
+    background-color: #5a6268 !important; /* Slightly darker on click */
+}
+
+/* --- ROLES & PERMISSIONS: FINAL ALIGNMENT & COLOR --- */
+
+/* 1. Fix the Blue Text on all Roles buttons */
+.container a.btn-info,
+.container a.btn-danger,
+.container a.btn-outline-danger,
+.container a.btn-primary {
+    color: #ffffff !important;           /* Force white text */
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 2. Unify the Delete Buttons to Solid Red */
+a.btn-outline-danger,
+a.btn-danger {
+    background-color: #dc3545 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* 3. Fix the "Wasteland" - Limit the width of the Actions column */
+th.text-end,
+td.text-end {
+    width: 200px !important;            /* Pulls buttons closer to the names */
+    white-space: nowrap;
+}
+
+/* 4. Ensure New Permission (Info) stays readable */
+a.btn-info {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+    color: #000 !important;              /* Black text is better on Cyan */
+}
+
+/* --- ROLES TABLE: WASTELAND KILLER --- */
+
+/* 1. Prevent the table from stretching unnecessarily */
+.container .card-body table {
+    width: auto !important;
+    min-width: 600px; /* Ensures it doesn't get too skinny on desktop */
+    margin-right: auto;
+}
+
+/* 2. Target the Actions header and cells specifically */
+.table th.text-end,
+.table td.text-end {
+    width: 1px !important;       /* Forces the column to shrink to its content */
+    white-space: nowrap !important;
+    padding-right: 2rem !important;
+    text-align: left !important; /* Optional: Pulls them left toward the Name */
+}
+
+/* 3. Adjust the button container for tighter grouping */
+.d-flex.justify-content-end.gap-2 {
+    justify-content: flex-start !important; /* Moves buttons toward the Name column */
+}
+
+/* --- SCOPED ROLES PAGE FIXES (WILL NOT AFFECT OTHER PAGES) --- */
+
+/* Only shrinks the table on the Roles page */
+#roles-permissions-page table {
+    width: auto !important;
+    min-width: 600px;
+    margin-right: auto;
+}
+
+/* Only changes these specific buttons on the Roles page */
+#roles-permissions-page a.btn-info {
+    background-color: #20c997 !important; /* Teal */
+    color: #ffffff !important;
+}
+
+#roles-permissions-page a.btn-danger {
+    background-color: #dc3545 !important;
+    color: #000000 !important; /* Black text as requested */
+}
+
+/* Only kills the wasteland on the Roles page header */
+#roles-permissions-page .d-flex.justify-content-between {
+    justify-content: flex-start !important;
+    gap: 2rem !important;
+}
+
+/* Specific column constraint for Roles only */
+#roles-permissions-page td.text-end {
+    width: 220px !important;
+    white-space: nowrap;
+}
+
+/* --- ROLES & PERMISSIONS: THE WASTELAND KILLER --- */
+
+/* 1. Constraint: Snap the whole page width to the content */
+#roles-management-context {
+    max-width: 900px !important; /* Forces headers to stop stretching */
+    margin-left: 0;              /* Keeps everything aligned left */
+}
+
+/* 2. The Teal: Hardened Phoenix Teal with White Text */
+#roles-management-context .btn-teal {
+    background-color: #20c997 !important;
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* 3. The Red: Vibrant Apollo Red with BLACK Text */
+#roles-management-context .btn-danger,
+#roles-management-context .btn-outline-danger {
+    background-color: #ff0000 !important; /* Pure, vibrant red */
+    color: #000000 !important;           /* Forced Black Text */
+    border: none !important;
+    font-weight: bold !important;
+    opacity: 1 !important;
+}
+
+/* 4. Table Header Fix: Align 'Actions' header with the buttons */
+#roles-management-context .table th.text-end,
+#roles-management-context .table td.text-end {
+    text-align: left !important;
+    width: 150px !important;
+    padding-left: 1rem !important;
+}
+
+/* 5. Card Background: Match the table width */
+#roles-management-context .card {
+    border: none !important;
+    background: transparent !important;
+}
+
+/* --- ROLES: THE FINAL APOLLO SHIELD --- */
+
+/* 1. Kill the Heading Wasteland: Snap everything to the table width */
+#roles-management-context {
+    max-width: 900px !important;
+    margin-left: 0 !important;
+}
+
+/* 2. Fix the Headers: Stop the gray bars from stretching */
+#roles-management-context .card,
+#roles-management-context .card-header {
+    max-width: 100% !important;
+}
+
+/* 3. The Teal: Force the exact Phoenix Teal (#20c997) */
+#roles-management-context a.btn-teal,
+#roles-management-context .btn-teal {
+    background-color: #20c997 !important;
+    color: #ffffff !important;           /* Crisp White for Teal */
+    border: none !important;
+    font-weight: bold !important;
+}
+
+/* 4. The Red: Force Vibrant Red with BLACK Text */
+#roles-management-context a.btn-danger,
+#roles-management-context .btn-danger,
+#roles-management-context a.btn-outline-danger {
+    background-color: #ff0000 !important; /* Pure Vibrant Red */
+    color: #000000 !important;           /* FORCED BLACK TEXT */
+    border: none !important;
+    font-weight: bold !important;
+    opacity: 1 !important;
+}
+
+/* 5. Force the 'New' Buttons to the left under the title */
+#roles-management-context .mb-4 .d-flex {
+    justify-content: flex-start !important;
+    margin-top: 10px;
+}

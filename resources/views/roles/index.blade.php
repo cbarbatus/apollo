@@ -1,80 +1,115 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        /* 1. RESTORE CABIN FONT */
+        @import url('https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;600;700&display=swap');
 
-    <div class='container'>
+        #roles-management-context,
+        #roles-management-context h1,
+        #roles-management-context h3,
+        #roles-management-context table {
+            font-family: 'Cabin', sans-serif !important;
+        }
 
+        /* 2. THE HOVER SHIELD: White text on green background */
+        #roles-management-context .btn-outline-success:hover {
+            background-color: #198754 !important;
+            color: #ffffff !important;
+            border-color: #198754 !important;
+        }
 
-        <h1>Roles</h1>
+        /* 3. THE WASTELAND KILLER: Snap card to table width */
+        #roles-management-context .card {
+            display: table !important;
+            min-width: 700px;
+            border: 1px solid #dee2e6 !important;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+        }
+    </style>
 
-        <br>
-        <form method="get" action="/roles/create" id="create">
-        </form>
-        <button type="submit" form='create' class="btn btn-warning">New Role</button>
-        <br><br>
+    <div id="roles-management-context" style="margin-left: 20px !important; margin-top: 20px !important;">
 
+        <h1 style="margin-bottom: 20px !important; font-weight: 700; font-size: 2.2rem;">Roles & Permissions Management</h1>
 
-        <table class="table table-striped">
-            <thead>
-            <tr style="font-weight:bold">
-                <td>Name</td>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($roles as $role)
-                <tr>
-                    <td>{{$role->name}}</td>
-                    <td><form method="get" action="/roles/{{ $role->name}}/edit" id="edit">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                            @method('GET')
-                            <button type="submit" class="btn btn-warning" >Edit</button>
-                        </form>
-                    </td>
+        {{-- 'New' Buttons --}}
+        <div style="display: flex !important; gap: 12px !important; margin-bottom: 30px !important;">
+            <a href="{{ url('/roles/create') }}"
+               style="background-color: #0d6efd !important; color: #ffffff !important; padding: 10px 22px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 600;">
+                + New Role
+            </a>
+            <a href="{{ url('/roles/pcreate') }}"
+               style="background-color: #008080 !important; color: #ffffff !important; padding: 10px 22px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 600;">
+                + New Permission
+            </a>
+        </div>
 
-                    <td>
-                        <form method="get" action="/roles/{{ $role->name }}/sure" id="sure">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                            @method('GET')
-                            <button type="submit" class="btn btn-danger" >Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <br><br>
+        {{-- ROLES SECTION --}}
+        <div class="card mb-5">
+            <div class="card-header" style="background-color: #f8f9fa !important; padding: 18px 20px;">
+                {{-- Section Headers: Larger and Bold --}}
+                <h3 style="margin: 0; font-size: 1.5rem !important; font-weight: 700; color: #212529;">Current Roles</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="width: auto !important; min-width: 700px;">
+                    <thead>
+                    <tr style="border-bottom: 2px solid #dee2e6;">
+                        <th style="padding: 15px 20px; font-weight: 700; color: #495057;">Role Name</th>
+                        <th style="width: 220px; padding: 15px 20px; font-weight: 700; color: #495057;">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($roles as $role)
+                        <tr>
+                            <td style="padding: 15px 20px; vertical-align: middle; font-weight: 500;">{{ $role->name }}</td>
+                            <td style="padding: 15px 20px; vertical-align: middle;">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <a href="{{ url('/roles/' . $role->name . '/edit') }}"
+                                       class="btn btn-sm btn-outline-success"
+                                       style="padding: 7px 16px; font-weight: 600; min-height: 38px; display: flex; align-items: center; border-width: 2px;">
+                                        Edit
+                                    </a>
+                                    <a href="{{ url('/roles/' . $role->name . '/sure') }}"
+                                       style="background-color: #ff0000 !important; color: #000000 !important; padding: 7px 16px !important; border-radius: 4px !important; text-decoration: none !important; font-weight: 700; font-size: 0.95rem !important; min-height: 38px; display: flex; align-items: center; border: none !important;">
+                                        Delete
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-        <h2>Permissions</h2>
-
-        <br>
-        <form method="get" action="/roles/pcreate" id="pcreate">
-        </form>
-        <button type="submit" form='pcreate' class="btn btn-warning">New Permission</button>
-        <br><br>
-
-
-        <table class="table table-striped">
-            <thead>
-            <tr style="font-weight:bold">
-                <td>Name</td>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($permissions as $permission)
-                <tr>
-                    <td>{{$permission->name}}</td>
-                    <td>
-                        <form method="get" action="/roles/{{ $permission->name }}/psure" id="sure">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}" />
-                            @method('GET')
-                            <button type="submit" class="btn btn-danger" >Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-
+        {{-- PERMISSIONS SECTION --}}
+        <div class="card">
+            <div class="card-header" style="background-color: #f8f9fa !important; padding: 18px 20px;">
+                <h3 style="margin: 0; font-size: 1.5rem !important; font-weight: 700; color: #212529;">System Permissions</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0" style="width: auto !important; min-width: 700px;">
+                    <thead>
+                    <tr style="border-bottom: 2px solid #dee2e6;">
+                        <th style="padding: 15px 20px; font-weight: 700; color: #495057;">Permission Name</th>
+                        <th style="width: 220px; padding: 15px 20px; font-weight: 700; color: #495057;">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($permissions as $permission)
+                        <tr>
+                            <td style="padding: 15px 20px; vertical-align: middle; font-weight: 500;">{{ $permission->name }}</td>
+                            <td style="padding: 15px 20px; vertical-align: middle;">
+                                <a href="{{ url('/roles/' . $permission->name . '/psure') }}"
+                                   style="background-color: #ff0000 !important; color: #000000 !important; padding: 7px 16px !important; border-radius: 4px !important; text-decoration: none !important; font-weight: 700; font-size: 0.95rem !important; min-height: 38px; width: fit-content; display: flex; align-items: center; border: none !important;">
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-<br>
 @endsection
