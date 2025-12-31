@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 // Explicitly import the User model for PHPDoc casting
 use App\Models\User;
-use App\Http\Requests\SectionRequest;
 use Illuminate\Support\Facades\DB;
 
 class SectionController extends Controller
