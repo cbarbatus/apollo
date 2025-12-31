@@ -165,7 +165,7 @@ class SectionController extends Controller
 
         $section->delete();
 
-        return redirect('/sections')->with('status', 'Section deleted successfully.');
+        return redirect()->back()->with('status', 'Section deleted successfully.');
     }
 
 }

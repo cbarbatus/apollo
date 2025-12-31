@@ -158,13 +158,6 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('status', 'User updated successfully.');
     }
 
-    /**
-     * Before destroy, ask sure.
-     */
-    public function sure(int $id): View
-    {
-        return view('/users.sure', ['id' => $id]);
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -187,5 +180,6 @@ class UserController extends Controller
         // Final Member Cleanup
         $member->delete();
 
-        return redirect('/members')->with('success', 'Member data removed.');
-    }}
+        return redirect()->back()->with('success', 'Member data removed.');
+    }
+}

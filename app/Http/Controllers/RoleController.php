@@ -64,13 +64,6 @@ class RoleController extends Controller
         return redirect('/roles');
     }
 
-    /**
-     * Delete a role, before destroy, ask sure.
-     */
-    public function sure(string $name): View
-    {
-        return view('/roles.sure', ['name' => $name]);
-    }
 
     /**
      * Remove the role.
@@ -116,13 +109,6 @@ class RoleController extends Controller
         return redirect('/roles');
     }
 
-    /**
-     * Delete a permission, before destroy, ask sure.
-     */
-    public function psure(string $name): View
-    {
-        return view('/roles.psure', ['name' => $name]);
-    }
 
     /**
      * Remove the permission.

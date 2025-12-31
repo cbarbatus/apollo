@@ -69,10 +69,12 @@
                                        style="padding: 7px 16px; font-weight: 600; min-height: 38px; display: flex; align-items: center; border-width: 2px;">
                                         Edit
                                     </a>
-                                    <a href="{{ url('/roles/' . $role->name . '/sure') }}"
-                                       style="background-color: #ff0000 !important; color: #000000 !important; padding: 7px 16px !important; border-radius: 4px !important; text-decoration: none !important; font-weight: 700; font-size: 0.95rem !important; min-height: 38px; display: flex; align-items: center; border: none !important;">
-                                        Delete
-                                    </a>
+                                    <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
+                                        <x-delete-button
+                                            :action="url('/roles/' . $role->name . '/destroy')"
+                                            resource="role"
+                                        />
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -100,10 +102,12 @@
                         <tr>
                             <td style="padding: 15px 20px; vertical-align: middle; font-weight: 500;">{{ $permission->name }}</td>
                             <td style="padding: 15px 20px; vertical-align: middle;">
-                                <a href="{{ url('/roles/' . $permission->name . '/psure') }}"
-                                   style="background-color: #ff0000 !important; color: #000000 !important; padding: 7px 16px !important; border-radius: 4px !important; text-decoration: none !important; font-weight: 700; font-size: 0.95rem !important; min-height: 38px; width: fit-content; display: flex; align-items: center; border: none !important;">
-                                    Delete
-                                </a>
+                                <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
+                                    <x-delete-button
+                                        :action="url('/roles/' . $permission->name . '/pdestroy')"
+                                        resource="permission"
+                                    />
+                                </div>
                             </td>
                         </tr>
                     @endforeach

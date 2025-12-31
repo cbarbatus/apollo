@@ -44,13 +44,12 @@
                                 </a>
 
                                 {{-- Delete: Manual style to match Edit height exactly --}}
-                                <form method="get" action="/books/{{ $book->id }}/sure" class="m-0">
-                                    <button type="submit"
-                                            class="btn btn-sm btn-danger shadow-sm fw-bold border-0 d-flex align-items-center justify-content-center"
-                                            style="height: 32px; min-width: 70px; border-radius: 8px; line-height: 1;">
-                                        Delete
-                                    </button>
-                                </form>
+                                <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
+                                    <x-delete-button
+                                        :action="url('/books/' . $book->id)"
+                                        resource="book"
+                                    />
+                                </div>
 
                             </div>
                         @endif

@@ -115,13 +115,8 @@ class VenueController extends Controller
         return redirect()->route('venues.index')
             ->with('status', "Venue '{$venue->name}' updated successfully.");
     }
-    /*
 
-    public function sure(int $id): View
-    {
-        return view('/venues.sure', ['id' => $id]);
-    }
-*/
+
     /**
      * Remove the specified resource from storage.
      */
@@ -129,6 +124,6 @@ class VenueController extends Controller
     {
         $venue->delete();
 
-        return redirect()->route('venues.index')->with('success', 'Venue was successfully deleted.');
+        return redirect()->back()->with('success', 'Venue was successfully deleted.');
     }
 }

@@ -99,14 +99,8 @@ class BookController extends Controller
 
         return redirect('/books')->with('success', 'Book updated successfully');
     }
-    /**
-     * Before destroy, ask sure.
-     */
-    public function sure(int $id): View
-    {
-        // Middleware handles the user being logged in and authorized.
-        return view('books.sure', ['id' => $id]);
-    }
+
+
 
     /**
      * Remove the specified resource from storage.
@@ -118,6 +112,6 @@ class BookController extends Controller
         $book = \App\Models\Book::query()->findOrFail($id);
         $book->delete();
 
-        return redirect('/books')->with('success', 'Book '.$book->id.' was deleted');
+        return redirect()->back()->with('success', 'Book #'.$id.' was deleted');
     }
 }

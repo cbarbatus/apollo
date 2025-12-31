@@ -69,7 +69,7 @@ Route::post('/books', [BookController::class, 'store']);
 Route::get('/books/{id}/edit', [BookController::class, 'edit']);
 Route::get('/books/create', [BookController::class, 'create']);
 Route::get('/books/{id}/sure', [BookController::class, 'sure']);
-Route::delete('/books/{id}/destroy', [BookController::class, 'destroy']);
+Route::delete('/books/{id}', [BookController::class, 'destroy']);
 
 Route::get('/contact', [ContactController::class, 'contactus']);
 Route::get('/contacts/thanks', [ContactController::class, 'thanks']);
@@ -119,18 +119,19 @@ Route::resource('users', UserController::class);;;
 Route::put('/users/{id}/make', [UserController::class, 'make']);
 Route::put('/users/{id}/superuser', [UserController::class, 'superuser']);
 
+// Display Routes (GET is correct here)
 Route::get('/roles/create', [RoleController::class, 'create']);
-Route::post('/roles/store', [RoleController::class, 'store']);
-Route::get('/roles/{name}/sure', [RoleController::class, 'sure']);
-Route::get('/roles/{name}/destroy', [RoleController::class, 'destroy']);
 Route::get('/roles/pcreate', [RoleController::class, 'pcreate']);
-Route::post('/roles/pstore', [RoleController::class, 'pstore']);
 Route::get('/roles/{name}/edit', [RoleController::class, 'edit']);
-Route::get('/roles/{name}/{pname}/remove', [RoleController::class, 'remove']);
 Route::get('/roles/{name}/add', [RoleController::class, 'add']);
-Route::get('/roles/{name}/set', [RoleController::class, 'set']);
-Route::get('/roles/{name}/psure', [RoleController::class, 'psure']);
-Route::get('/roles/{name}/pdestroy', [RoleController::class, 'pdestroy']);
+// Action Routes (Switching to POST for security)
+Route::post('/roles/store', [RoleController::class, 'store']);
+Route::post('/roles/pstore', [RoleController::class, 'pstore']);
+Route::post('/roles/{name}/set', [RoleController::class, 'set']); // Fixed for your new 'Add' form
+// Destructive Action Routes (Should be POST or DELETE)
+Route::delete('/roles/{name}/destroy', [RoleController::class, 'destroy']);
+Route::delete('/roles/{name}/pdestroy', [RoleController::class, 'pdestroy']);
+Route::post('/roles/{name}/{pname}/remove', [RoleController::class, 'remove']);
 
 Route::resource('announcements', AnnouncementController::class);
 Route::delete('/announcements/{id}/destroy', [AnnouncementController::class, 'destroy']);

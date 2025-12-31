@@ -66,4 +66,12 @@ class Member extends Model
      * @return array<string, string>
      */
 
+    /**
+     * Get the user associated with the member.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 }

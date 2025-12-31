@@ -259,7 +259,7 @@ class AnnouncementController extends Controller
         $announcement->picture_file = $filename;
         $announcement->save();
 
-        return redirect()->route('announcements.index')
+        return redirect()->back()
             ->with('success', "Picture for Announcement {$announcement->id} updated in /Img.");
     }
 
