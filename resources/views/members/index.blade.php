@@ -22,6 +22,24 @@
                     @endif
 
             </div>
+
+            <div class="card p-3 mb-4 shadow-sm">
+                <h5 class="card-title text-info">Restore Member</h5>
+                <form method="POST" action="/members/restore" id="restoreForm" class="row g-3 align-items-center">
+                    @csrf
+                    <div class="col-auto">
+                        <label for="first_name" class="form-label">First Name:</label>
+                        <input type="text" name="first_name" id="first_name" class="form-control" required>
+                    </div>
+                    <div class="col-auto">
+                        <label for="last_name" class="form-label">Last Name:</label>
+                        <input type="text" name="last_name" id="last_name" class="form-control" required>
+                    </div>
+                    <div class="col-auto pt-4">
+                        <button type="submit" class="btn btn-info fw-bold">Restore Member</button>
+                    </div>
+                </form>
+            </div>
         @endif
 
         {{-- 2. The Table --}}
@@ -48,14 +66,19 @@
                 @foreach($members as $member)
                     <tr>
                         @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
-                            <td class="ps-3 text-muted small">{{ $member->id }}</td>
+                            {{-- REMOVED 'small' and 'text-muted' to match Name weight --}}
+                            <td class="ps-3">{{ $member->id }}</td>
                             <td>{{ $member->user_id ?? '0' }}</td>
                         @endif
 
                         <td class="fw-bold">{{ $member->first_name }} {{ $member->last_name }}</td>
                         <td><span class="badge bg-light text-dark border">{{ $member->category }}</span></td>
-                        <td class="small">{{ $member->email }}</td>
-                        <td class="font-monospace small">{{ $member->adf }}</td>
+
+                        {{-- REMOVED 'small' here --}}
+                        <td>{{ $member->email }}</td>
+
+                        {{-- REMOVED 'font-monospace' and 'small' here --}}
+                        <td>{{ $member->adf }}</td>
 
                         @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
                             <td>{{ $member->adf_join }}</td>

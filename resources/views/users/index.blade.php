@@ -3,7 +3,7 @@
 @section('content')
     <div class="container py-4">
         {{-- 1. Restore the H1 Title --}}
-        <h1 class="display-6 fw-bold mb-4" style="color: #333;">Grove Membership</h1>
+        <h1 class="display-6 fw-bold mb-4">System Access Control</h1>
 
         {{-- 2. Create the Message Area for success/warnings --}}
         @if(session('success'))
@@ -12,24 +12,7 @@
             </div>
         @endif
 
-        {{-- 3. The Professional Button Row (Replacing clown yellow) --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="d-flex gap-2">
-                <a href="{{ url('/members/create') }}" class="btn btn-primary shadow-sm fw-bold border-0 px-4"
-                   style="height: 38px; border-radius: 8px;">
-                    + New Member
-                </a>
-                <a href="{{ url('/members?filter=all') }}" class="btn btn-outline-secondary shadow-sm fw-bold px-4"
-                   style="height: 38px; border-radius: 8px;">
-                    Show All Records
-                </a>
-            </div>
-
-            {{-- Total Count Badge (Optional, but helpful for your 187 records) --}}
-            <span class="badge bg-light text-dark border shadow-sm px-3 py-2" style="border-radius: 20px;">
-            Total Records: 187
-        </span>
-        </div>
+    </div>
 
         <x-alert-success />
 

@@ -110,7 +110,7 @@ Route::get('/members/join', [MemberController::class, 'join']); // Join form (SA
 Route::post('/members', [MemberController::class, 'store']); // Create new member (from /members/create)
 Route::post('/members/join', [MemberController::class, 'savejoin']); // Save new joiner (from /members/join)
 Route::delete('/members/{member}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
-Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');// CRITICAL FIXES: Changing GET to secure verbs for state-changing actions
+Route::put('/members/{member}', [MemberController::class, 'update'])->name('members.update');
 Route::post('/members/restore', [MemberController::class, 'restore']); // Restore/undelete a member
 Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('members.destroy');// Custom workflow route
 Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');

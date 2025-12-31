@@ -312,28 +312,22 @@ class MemberController extends Controller
 
         $data = $request->validate([
             'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'mid_name'   => 'nullable|string',
-            'rel_name'   => 'nullable|string',
-            'address'    => 'nullable|string',
-            'pri_phone'  => 'nullable|string',
-            'alt_phone'  => 'nullable|string',
-            'email' => [
-                'required',
-                'email',
-                // Validate against the 'members' table and ignore this specific member's ID
-                Rule::unique('members', 'email')->ignore($member->id),
-
-            ],
+            'last_name' => 'required|string|max:255',
+            'mid_name' => 'nullable|string',
+            'rel_name' => 'nullable|string',
+            'address' => 'nullable|string',
+            'pri_phone' => 'nullable|string',
+            'alt_phone' => 'nullable|string',
+            'email' => 'required|email', // Remove Rule::unique entirely from here
         ]);
 
         // 2. Add Management Fields ONLY if the user is a Manager
         if ($isManager) {
             $managementData = $request->validate([
-                'status'     => 'required|string',
-                'category'   => 'required|string',
-                'joined'     => 'nullable|date',
-                'adf'        => 'nullable|string',
+                'status' => 'required|string',
+                'category' => 'required|string',
+                'joined' => 'nullable|date',
+                'adf' => 'nullable|string',
                 'adf_join' => 'nullable', // or remove 'date' if you just want to permit the string
                 'adf_renew' => 'nullable',
 
@@ -341,40 +335,22 @@ class MemberController extends Controller
             $data = array_merge($data, $managementData);
         }
 
-        // 3. Update Member (Handles all those null/item assignments at once)
-        // 3. Update Member (Handles all those null/item assignments at once)
-// Convert any null string fields to empty strings to satisfy antique NOT NULL constraints
-        $stringFields = ['mid_name', 'rel_name', 'address', 'pri_phone', 'alt_phone'];
-
-        foreach ($stringFields as $field) {
-            $data[$field] = $data[$field] ?? '';
-        }
-
-        $member->update($data);
+// 3. Update Member Attributes
         $member->update($data);
 
-// 4. Sync User Record (Safe Version)
+// 4. User Record Management [cite: 2025-12-31]
         if ($member->user_id && $user = \App\Models\User::find($member->user_id)) {
-
-            $user->name = $member->first_name . ' ' . $member->last_name;
-
-            // Only update email if it's actually different from what's in the User record
-            // This prevents the "Email already taken" database crash
-            if ($user->email !== $member->email) {
-                $user->email = $member->email;
-            }
-
-            $user->save(); // Laravel now only touches the columns that changed
-
+            // Only active members have user records [cite: 2025-12-31]
             if ($member->status !== 'Current') {
                 $user->delete();
-                return redirect('/members')->with('success', 'Member updated, User removed.');
+                $member->update(['user_id' => 0]);;
+            } else {
+                $user->update(['email' => $member->email, 'name' => $member->first_name . ' ' . $member->last_name]);
             }
         }
-        return redirect('/members')->with('success', 'Member updated successfully!');
+
+        return redirect('/members')->with('success', 'Member updated!');
     }
-
-
     /**
      * Remove the specified resource from storage.
      */
