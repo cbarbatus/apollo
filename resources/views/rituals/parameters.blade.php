@@ -20,7 +20,9 @@
                       value="{{ $element->item }}">{{ html_entity_decode($element->item) }}
                 </textarea>
             </div>
-            <button type="submit" form='edit' class="btn btn-warning">Submit</button>
+            <x-apollo-button type="submit" form="edit" color="warning">
+                Submit
+            </x-apollo-button>
         </form>
     </div>
 @endsection

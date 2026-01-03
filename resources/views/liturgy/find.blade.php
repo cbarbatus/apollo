@@ -36,10 +36,7 @@
             </div>
 
             <div class="col-auto">
-                <button type="submit" class="btn btn-success px-4 fw-bold"
-                        style="height: 38px; border-radius: 8px; margin-bottom: 0px;">
-                    Submit
-                </button>
+                <x-apollo-button type="submit" color="success" >Submit</x-apollo-button>
             </div>
         </form>
     </div>

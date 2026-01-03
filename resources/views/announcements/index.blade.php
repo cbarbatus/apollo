@@ -46,7 +46,6 @@
                             href="/announcements/{{ $announcement['id'] }}/edit"
                             color="warning"
                             size="sm"
-                            class="fw-bold shadow-sm"
                         >
                             Edit
                         </x-apollo-button>
@@ -56,7 +55,6 @@
                             href="/announcements/{{ $announcement['id'] }}/activate"
                             color="info"
                             size="sm"
-                            class="fw-bold shadow-sm"
                         >
                             Activate
                         </x-apollo-button>
@@ -75,7 +73,6 @@
                             href="/announcements/{{ $announcement['id'] }}/uploadpic"
                             color="warning"
                             size="sm"
-                            class="fw-bold shadow-sm"
                         >
                             Upload
                         </x-apollo-button>

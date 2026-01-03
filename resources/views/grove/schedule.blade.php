@@ -23,9 +23,9 @@
 
             <br><br>
         </form>
-        <button type="submit" form='edit' class="btn btn-warning">Submit</button>
-        <br>
-    </div>
+        <x-apollo-button type="submit" color="success" >Submit</x-apollo-button>
     <br>
+    <br>
+    </div>
 
 @endsection

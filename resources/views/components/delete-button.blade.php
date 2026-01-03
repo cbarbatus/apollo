@@ -1,11 +1,15 @@
-{{-- Wrap your existing delete logic/modal trigger in the standard component --}}
+@props(['action' => null, 'resource' => 'item'])
+
+@php
+    // Pre-calculate the onclick string so we don't break the HTML tag below
+    $onclick = $action ? "confirmDelete('{$action}', '{$resource}')" : null;
+@endphp
+
 <x-apollo-button
     type="button"
     color="danger"
     size="sm"
-    {{-- This ensures it matches the height/weight of Edit/Activate --}}
-    {{ $attributes->merge(['class' => 'fw-bold shadow-sm rounded']) }}
-    onclick="confirmDelete('{{ $action }}', '{{ $resource }}')"
+    {{ $attributes->merge(['class' => 'fw-bold shadow-sm rounded', 'onclick' => $onclick]) }}
 >
-    Delete
+    {{ $slot }}
 </x-apollo-button>

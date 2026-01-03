@@ -84,7 +84,8 @@
                     ></trix-editor>
                 </div>
             </div>
-            <button type="submit" form='edit' class="btn btn-go">Submit</button>
+            <x-apollo-button type="submit" color="success" >Submit</x-apollo-button>
+
         </form>
     </div>
 @endsection

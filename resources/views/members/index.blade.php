@@ -36,8 +36,9 @@
                         <input type="text" name="last_name" id="last_name" class="form-control" required>
                     </div>
                     <div class="col-auto pt-4">
-                        <button type="submit" class="btn btn-info fw-bold">Restore Member</button>
+                        <x-apollo-button type="submit" color="info" >Restore Member</x-apollo-button>
                     </div>
+
                 </form>
             </div>
         @endif
