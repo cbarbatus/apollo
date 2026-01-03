@@ -31,8 +31,11 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-success">Create Element</button>
-            <a href="{{ url('sections/' . $section_id . '/edit') }}" class="btn btn-outline-secondary">Cancel</a>
+            <x-apollo-button type="submit" color="success">
+                Create Element
+            </x-apollo-button>
+
+            <x-cancel-button href="/section" />
         </form>
     </div>
 @endsection

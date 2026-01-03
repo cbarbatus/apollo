@@ -43,9 +43,7 @@
                             <x-apollo-button type="submit">
                                 Save Changes
                             </x-apollo-button>
-                            <a href="{{ url('sections/' . $element->section_id . '/edit') }}" class="btn btn-outline-secondary shadow-sm px-4 d-flex align-items-center" style="height: 38px; border-radius: 8px;">
-                                Cancel
-                            </a>
+                            <x-cancel-button href="/sections" />
                         </div>
                     </div>
                 </div>

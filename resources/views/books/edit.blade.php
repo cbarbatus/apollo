@@ -64,9 +64,7 @@
                             </x-apollo-button>
 
                             {{-- Use the component for Cancel so it doesn't "compete" for focus --}}
-                            <x-apollo-button href="/books" color="secondary">
-                                Cancel
-                            </x-apollo-button>
+                            <x-cancel-button href="/books" />
                         </div>
 
 

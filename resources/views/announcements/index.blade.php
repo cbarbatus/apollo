@@ -41,17 +41,25 @@
                     <td>{{$announcement->when}}</td>
                     <td>{{$announcement->venue_name}} </td>
                     <td>{{substr($announcement['notes'], 0, 60)}} </td>
-                    <td><form method="get" action="/announcements/{{ $announcement['id']}}/edit" id="edit">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-warning" >Edit</button>
-                        </form>
+                    <td>
+                        <x-apollo-button
+                            href="/announcements/{{ $announcement['id'] }}/edit"
+                            color="warning"
+                            size="sm"
+                            class="fw-bold shadow-sm"
+                        >
+                            Edit
+                        </x-apollo-button>
                     </td>
-                    <td><form method="get" action="/announcements/{{ $announcement['id']}}/activate" id="edit">
-                            @csrf
-                            @method('GET')
-                            <button type="submit" class="btn btn-info" ><strong>Activate</strong></button>
-                        </form>
+                    <td>
+                        <x-apollo-button
+                            href="/announcements/{{ $announcement['id'] }}/activate"
+                            color="info"
+                            size="sm"
+                            class="fw-bold shadow-sm"
+                        >
+                            Activate
+                        </x-apollo-button>
                     </td>
                     <td>
                         <x-delete-button
@@ -62,11 +70,15 @@
                     <td>
                     <img src="/img/{{ $announcement->picture_file}}" alt="None" style="max-height:50px">
                     </td>
-                    <td><form method="get" action="/announcements/{{ $announcement['id']}}/uploadpic" id="uppic">
-                            @csrf
-                            @method('GET')
-                            <x-apollo-button type="submit">Upload</x-apollo-button>
-                        </form>
+                    <td>
+                        <x-apollo-button
+                            href="/announcements/{{ $announcement['id'] }}/uploadpic"
+                            color="warning"
+                            size="sm"
+                            class="fw-bold shadow-sm"
+                        >
+                            Upload
+                        </x-apollo-button>
                     </td>
                 </tr>
             @endforeach
