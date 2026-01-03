@@ -50,9 +50,9 @@
                             Cancel
                         </a>
                         {{-- Apollo Blue Submit: 38px / 8px rounding --}}
-                        <button type="submit" class="btn btn-primary shadow-sm px-5 fw-bold border-0" style="height: 38px; border-radius: 8px;">
+                        <x-apollo-button type="submit">
                             Create Member & User
-                        </button>
+                        </x-apollo-button>
                     </div>
                 </form>
             </div>

@@ -40,9 +40,9 @@
 
                     <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary shadow-sm px-4 fw-bold border-0" style="height: 38px; border-radius: 8px;">
+                            <x-apollo-button type="submit">
                                 Save Changes
-                            </button>
+                            </x-apollo-button>
                             <a href="{{ url('sections/' . $element->section_id . '/edit') }}" class="btn btn-outline-secondary shadow-sm px-4 d-flex align-items-center" style="height: 38px; border-radius: 8px;">
                                 Cancel
                             </a>

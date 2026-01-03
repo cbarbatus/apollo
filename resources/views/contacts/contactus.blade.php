@@ -38,7 +38,7 @@
 
             <div class="row mb-3">
                 <div class="col-sm-10 offset-sm-2">
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <x-apollo-button type="submit">Submit</x-apollo-button>
                 </div>
             </div>
         </form>

@@ -65,7 +65,7 @@
                     <td><form method="get" action="/announcements/{{ $announcement['id']}}/uploadpic" id="uppic">
                             @csrf
                             @method('GET')
-                            <button type="submit" class="btn btn-primary px-4 fw-bold border-0 shadow-sm">Upload</button>
+                            <x-apollo-button type="submit">Upload</x-apollo-button>
                         </form>
                     </td>
                 </tr>

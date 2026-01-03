@@ -58,9 +58,9 @@
                     </div>
 
                     <div class="mt-4 pt-3 border-top">
-                        <button type="submit" class="btn btn-primary shadow-sm px-4 fw-bold" style="border-radius: 8px;">
+                        <x-apollo-button type="submit">
                             {{ isset($book) ? 'Update Book' : 'Create Book' }}
-                        </button>
+                        </x-apollo-button>
                         <a href="/books" class="btn btn-outline-secondary ms-2" style="border-radius: 8px;">Cancel</a>
                     </div>
                 </div>

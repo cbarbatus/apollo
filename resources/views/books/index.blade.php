@@ -4,8 +4,6 @@
     <div class='container py-4'>
         <h1 class="mb-5 display-6 fw-bold">Suggested Reading</h1>
 
-        <x-alert-success />
-
         @if ($changeok)
             {{-- 1. New Book Button: Changed to Blue with 8px corners --}}
             <a href="/books/create" class="btn btn-primary shadow-sm px-4 fw-bold border-0 d-inline-flex align-items-center mb-5"
@@ -36,12 +34,12 @@
                             {{-- 2. Aligned Actions: Forced 32px height and matching 8px radius --}}
                             <div class="d-flex align-items-center gap-2 mt-4">
 
-                                {{-- Edit: border-0 kills the clown ring --}}
-                                <a href="/books/{{ $book->id }}/edit"
-                                   class="btn btn-sm btn-warning shadow-sm fw-bold border-0 d-flex align-items-center justify-content-center"
-                                   style="height: 32px; min-width: 70px; border-radius: 8px; line-height: 1;">
+                                <x-apollo-button
+                                    href="/books/{{ $book->id }}/edit"
+                                    color="warning"
+                                    class="px-4"> {{-- This adds the missing width --}}
                                     Edit
-                                </a>
+                                </x-apollo-button>
 
                                 {{-- Delete: Manual style to match Edit height exactly --}}
                                 <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">

@@ -9,7 +9,7 @@
         {{-- 1. Management Tools --}}
         @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
             <div class="d-flex gap-2 mb-4">
-                <a href="{{ url('/members/create') }}" class="btn btn-primary shadow-sm fw-bold px-4">+ New Member</a>
+                <x-apollo-button href="{{ url('/members/create') }}">+ New Member</x-apollo-button>
 
                     @if($full) {{-- This is the 'showAll' variable we passed from the controller --}}
                     <a href="{{ url('/members') }}" class="btn btn-outline-secondary">

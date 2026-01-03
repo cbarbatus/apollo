@@ -35,9 +35,9 @@
                     </div>
 
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-5 fw-bold border-0 shadow-sm">
+                        <x-apollo-button type="submit">
                             Upload Liturgy
-                        </button>
+                        </x-apollo-button>
                         <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-secondary px-4 border-0">
                             Cancel
                         </a>

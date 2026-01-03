@@ -35,9 +35,9 @@
                 </div>
 
                 <div class="col-auto mb-3">
-                    <button type='submit' name='submit' value='Upload File' class="btn btn-primary">
+                    <x-apollo-button type="submit">
                         Upload File
-                    </button>
+                    </x-apollo-button>
                 </div>
 
             </div>

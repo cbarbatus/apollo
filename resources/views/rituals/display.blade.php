@@ -12,9 +12,9 @@
             {{-- 1. Liturgy --}}
             <div class="col-sm-6 col-md-3">
                 @if ($ritual->liturgy_base)
-                    <a href="{{ route('rituals.liturgy', $ritual->id) }}" class="btn btn-primary w-100 shadow-sm fw-bold">
+                    <x-apollo-button href="{{ route('rituals.liturgy', $ritual->id) }}">
                         View Liturgy
-                    </a>
+                    </x-apollo-button>
                 @else
                     <div class="p-2 border rounded text-center text-muted small bg-light">No Liturgy Text</div>
                 @endif

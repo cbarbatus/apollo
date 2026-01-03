@@ -47,9 +47,9 @@
 
             {{-- Apollo Standard Buttons - INSIDE the form --}}
             <div class="mt-4 pt-4 border-top d-flex gap-3">
-                <button type="submit" class="btn btn-primary shadow-sm px-5 fw-bold">
+                <x-apollo-button type="submit">
                     <i class="bi bi-save me-2"></i>Update Venue
-                </button>
+                </x-apollo-button>
 
                 <a href="{{ route('venues.index') }}" class="btn btn-outline-secondary shadow-sm px-4">
                     Cancel

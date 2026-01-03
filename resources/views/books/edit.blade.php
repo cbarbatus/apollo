@@ -4,7 +4,7 @@
     <div class="container py-4">
         <h1 class="mb-4 display-6 fw-bold">Edit Book: {{ $book->title }}</h1>
 
-        <form method="POST" action="{{ url('/books/' . $book->id) }}">
+        <form id="book-edit-form" method="POST" action="/books/{{ $book->id }}">
             @csrf
             @method('PUT') {{-- Required for "Style B" Update --}}
 
@@ -51,29 +51,25 @@
                             <trix-editor input="remarks" class="trix-content shadow-sm bg-white" style="min-height: 200px; border-radius: 8px;"></trix-editor>
                         </div>
                     </div>
-
+                </div>
+            </div>
+        </form>
                     {{-- Footer: Balanced Alignment --}}
                     <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                         {{-- Left Side: Primary Actions --}}
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-primary shadow-sm px-4 fw-bold border-0"
-                                    style="height: 38px; border-radius: 8px;">
+                            {{-- Removed the extra > bracket below --}}
+                            <x-apollo-button type="submit" form="book-edit-form">
                                 Update Book
-                            </button>
+                            </x-apollo-button>
 
-                            <a href="/books" class="btn btn-outline-secondary shadow-sm px-4 d-flex align-items-center text-decoration-none"
-                               style="height: 38px; border-radius: 8px;">
+                            {{-- Use the component for Cancel so it doesn't "compete" for focus --}}
+                            <x-apollo-button href="/books" color="secondary">
                                 Cancel
-                            </a>
+                            </x-apollo-button>
                         </div>
 
-                        {{-- Right Side: The Unified Component --}}
-                        <x-delete-button
-                            :action="url('/books/' . $book->id)"
-                            resource="book"
-                        />
-                    </div>                </div>
-            </div>
-        </form>
-    </div>
+
+                    </div>
+                </div>
 @endsection

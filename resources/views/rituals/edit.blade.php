@@ -40,7 +40,7 @@
             <br>
         </form>
 
-        <button type='submit' form='edit' class="btn btn-primary">Submit Changes</button>
+        <x-apollo-button type="submit">Submit Changes</x-apollo-button>
         <a href="{{ route('rituals.show', $ritual->id) }}" class="btn btn-secondary ms-2">Cancel</a>
 
     </div>

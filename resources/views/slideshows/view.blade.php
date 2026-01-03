@@ -15,9 +15,9 @@
     </div>
 
     <br><br>
-    <a href="{{ route('slideshows.index', ['year' => $slideshow->year]) }}" class="btn btn-primary">
+    <x-apollo-button href="{{ route('slideshows.index', ['year' => $slideshow->year]) }}">
         <i class="bi bi-arrow-left"></i> More Slideshows
-    </a>
+    </x-apollo-button>
 
 
 @endsection

@@ -37,7 +37,7 @@
                     <input type="number" id="sequence" name="sequence" class="form-control" value="{{ $section->sequence }}">
                 </div>
                 <div class="col-md-9 d-flex align-items-end justify-content-end">
-                    <button type="submit" class="btn btn-primary">Save Section Changes</button>
+                    <x-apollo-button type="submit">Save Section Changes</x-apollo-button>
                 </div>
             </div>
 

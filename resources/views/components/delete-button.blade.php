@@ -1,16 +1,17 @@
 @props(['action', 'resource'])
 
-<form method="POST" action="{{ $action }}" class="d-inline"
-      onsubmit="return confirm('Are you sure you want to delete this {{ $resource }}? This action is irreversible.');">
-
+<form method="POST" action="{{ $action }}" class="d-inline" id="delete-form-{{ $resource }}">
     @csrf
     @method('DELETE')
 
-    <button type="button"
-            class="btn btn-danger confirm-delete-btn px-4 fw-bold shadow-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#confirmDeleteModal"
-            data-action="{{ $action }}">
+    <x-apollo-button
+        type="button"
+        color="danger"
+        class="px-4 fw-bold shadow-sm confirm-delete-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#confirmDeleteModal"
+        data-action="{{ $action }}"
+        data-resource="{{ $resource }}">
         Delete
-    </button>
+    </x-apollo-button>
 </form>

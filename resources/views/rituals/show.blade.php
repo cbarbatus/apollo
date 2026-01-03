@@ -17,9 +17,9 @@
                         </a>
 
                         @auth
-                            <a href="/rituals/{{ $ritual->id }}/uploadlit" class="btn btn-primary px-4 fw-bold border-0 shadow-sm">
+                            <x-apollo-button href="/rituals/{{ $ritual->id }}/uploadlit">
                                 Upload
-                            </a>
+                            </x-apollo-button>
 
                             <a href="{{ route('rituals.edit', $ritual->id) }}" class="btn btn-warning px-4 fw-bold border-0 shadow-sm">
                                 Edit Details

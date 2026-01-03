@@ -9,9 +9,9 @@
         {{-- 1. Standardized New Venue Button --}}
         <div class="row mb-4">
             <div class="col-md-4">
-                <a href="{{ url('/venues/create') }}" class="btn btn-primary shadow-sm px-4 fw-bold">
+                <x-apollo-button href="{{ url('/venues/create') }}">
                     <i class="bi bi-plus-lg me-2"></i>New Venue
-                </a>
+                </x-apollo-button>
             </div>
         </div>
 

@@ -109,9 +109,9 @@
 
                 {{-- MOVE THE BUTTON INSIDE THE FORM HERE --}}
                 <div class="mt-4">
-                    <button type="submit" class="btn btn-primary px-4 shadow-sm fw-bold">
+                    <x-apollo-button type="submit">
                         Save Changes
-                    </button>
+                    </x-apollo-button>
                 </div>
             </div>
         </form> {{-- The form now correctly closes AFTER the button --}}

@@ -34,9 +34,9 @@
 
                     <div class="d-flex gap-2">
                         {{-- Standardized Phoenix Buttons --}}
-                        <button type="submit" class="btn btn-primary px-5 fw-bold border-0 shadow-sm">
+                        <x-apollo-button type="submit">
                             Upload Picture
-                        </button>
+                        </x-apollo-button>
                         <a href="{{ route('announcements.index') }}" class="btn btn-secondary px-4 border-0">
                             Cancel
                         </a>

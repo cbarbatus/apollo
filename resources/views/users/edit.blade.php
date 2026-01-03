@@ -51,38 +51,36 @@
                     <hr class="my-4">
 
                     <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                        {{-- Secondary Button for navigation --}}
                         <a href="{{ url('/users') }}" class="btn btn-outline-secondary shadow-sm fw-bold d-flex align-items-center px-4"
                            style="height: 38px; border-radius: 8px;">
                             Cancel
                         </a>
 
-                        {{-- Apollo Blue for the primary action --}}
-                        <button type="submit" class="btn btn-primary shadow-sm px-5 fw-bold border-0 d-flex align-items-center"
-                                style="height: 38px; border-radius: 8px;">
+                        {{-- Use your new Gold Standard Component here! --}}
+                        <x-apollo-button type="submit" color="primary" class="px-5 shadow-sm fw-bold">
                             Save User Changes
-                        </button>
+                        </x-apollo-button>
                     </div>
-                    <hr class="my-5">
+                </form> {{-- <--- MOVED THIS UP: This closes the EDIT form --}}
 
-                    <div class="p-3 bg-light border-start border-danger border-4" style="border-radius: 8px;">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h5 class="text-danger fw-bold mb-1">Danger Zone</h5>
-                                <p class="small text-muted mb-0">Removing this user will revoke login access. The Member record will remain intact.</p>
-                            </div>
+                <hr class="my-5">
 
-                            <form action="{{ route('users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to revoke login access for this user?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger fw-bold shadow-sm" style="border-radius: 8px;">
-                                    Delete User Login
-                                </button>
-                            </form>
+                {{-- DANGER ZONE: This is now its own independent section --}}
+                <div class="p-3 bg-light border-start border-danger border-4" style="border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="text-danger fw-bold mb-1">Danger Zone</h5>
+                            <p class="small text-muted mb-0">Removing this user will revoke login access. The Member record will remain intact.</p>
                         </div>
+
+                        {{-- Use your new Gold Standard Delete Component here! --}}
+                        <x-delete-button
+                            :action="route('users.destroy', $user->id)"
+                            resource="user login"
+                        />
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </div> {{-- Card Body End --}}
+        </div> {{-- Card End --}}
     </div>
 @endsection

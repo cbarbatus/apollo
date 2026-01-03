@@ -63,13 +63,7 @@ Route::get('rituals/{id}/uploadlit', [RitualController::class, 'uploadlit'])
 Route::post('rituals/storelit', [RitualController::class, 'storelit'])
     ->name('rituals.storelit');
 
-Route::put('/books/{id}', [BookController::class, 'update']);
-Route::get('/books', [BookController::class, 'index']);
-Route::post('/books', [BookController::class, 'store']);
-Route::get('/books/{id}/edit', [BookController::class, 'edit']);
-Route::get('/books/create', [BookController::class, 'create']);
-Route::get('/books/{id}/sure', [BookController::class, 'sure']);
-Route::delete('/books/{id}', [BookController::class, 'destroy']);
+Route::resource('books', BookController::class);
 
 Route::get('/contact', [ContactController::class, 'contactus']);
 Route::get('/contacts/thanks', [ContactController::class, 'thanks']);

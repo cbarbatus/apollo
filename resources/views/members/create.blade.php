@@ -60,7 +60,7 @@
 
                     <div class="d-flex justify-content-between">
                         <a href="{{ url('/users') }}" class="btn btn-outline-secondary px-4 fw-bold" style="height: 38px; border-radius: 8px;">Cancel</a>
-                        <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm" style="height: 38px; border-radius: 8px;">Create Member & User</button>
+                        <x-apollo-button type="submit">Create Member & User</x-apollo-button>
                     </div>
                 </form>
             </div>

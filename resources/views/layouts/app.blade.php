@@ -84,7 +84,6 @@
 
                                 @role(['SeniorDruid', 'admin'])
                                 $ SeniorDruid:
-                                <a  class="dropdown-item" href="/rituals/1/list"> $ Rituals </a>
                                 <a  class="dropdown-item" href="/announcements"> $ Announcements </a>
                                 <a  class="dropdown-item" href="/schedule"> $ Schedule </a>
                                 <a  class="dropdown-item" href="/venues"> $ Venues </a>

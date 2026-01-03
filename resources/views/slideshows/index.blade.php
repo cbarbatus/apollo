@@ -63,7 +63,7 @@
                 <div class="card-body py-3 text-center">
                     <h5 class="card-title">Selected: <strong>{{ $selectedName }} {{ $selectedYear }}</strong></h5>
                     <div class="d-flex justify-content-center gap-2 mt-3">
-                        <a href="{{ route('slideshows.show', $choiceId) }}" class="btn btn-primary">View</a>
+                        <x-apollo-button href="{{ route('slideshows.show', $choiceId) }}">View</x-apollo-button>
                         <a href="{{ route('slideshows.edit', $choiceId) }}" class="btn btn-warning">Edit</a>
 
                         {{-- The Cleanup Button --}}
@@ -114,9 +114,9 @@
                                 <span class="badge rounded-pill bg-light text-muted border ms-2 fw-normal">{{ $slideshow->year }}</span>
                             </div>
 
-                            <a href="{{ route('slideshows.show', $slideshow->id) }}" class="btn btn-primary px-4 shadow-sm">
+                            <x-apollo-button href="{{ route('slideshows.show', $slideshow->id) }}">
                                 View Slideshow
-                            </a>
+                            </x-apollo-button>
                         </div>
                     @endforeach
                 </div>
@@ -129,9 +129,9 @@
                                 <span class="fs-5 fw-bold">{{ $slideshow->name }}</span>
                                 <span class="badge rounded-pill bg-light text-dark border ms-2">{{ $slideshow->year }}</span>
                             </div>
-                            <a href="{{ route('slideshows.show', $slideshow->id) }}" class="btn btn-primary">
+                            <x-apollo-button href="{{ route('slideshows.show', $slideshow->id) }}">
                                 View Slideshow
-                            </a>
+                            </x-apollo-button>
                         </div>
                     @endforeach
                 </div>

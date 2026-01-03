@@ -74,7 +74,7 @@
                             <p class="h5 mb-3">{{ $ritual->name }} {{ $ritual->year }}</p>
                             <div class="d-flex gap-2">
                                 <a href="/rituals/{{ $ritual->id }}/display" class="btn btn-info btn-sm text-white">Public View</a>
-                                <a href="{{ route('rituals.show', $ritual->id) }}" class="btn btn-primary btn-sm">Details</a>
+                                <x-apollo-button href="{{ route('rituals.show', $ritual->id) }}">Details</x-apollo-button>
                             </div>
                         </div>
                     </div>
@@ -83,19 +83,17 @@
         @endif
 
         {{-- 3. THE SPIGOT (The Year Buttons) --}}
-        <p class="mb-1">Choose a ritual year</p>
-        <ul class="list-unstyled d-flex flex-wrap gap-1 mb-4">
+        <p class="mb-1 fw-bold small text-secondary uppercase">Choose a ritual year</p>
+        <div class="d-flex flex-wrap gap-2 mb-4">
             @foreach ($activeYears as $y)
-                    <a href="{{ route('rituals.index', ['year' => $y]) }}"
-                       class="btn btn-ritual-year {{ $y == $selectedYear ? 'btn-primary' : 'btn-outline-secondary' }}"
-                       data-text="{{ $y }}"> {{-- This 'data-text' reserves the space --}}
-                        {{ $y }}
-                    </a>
-
+                <x-apollo-button
+                    href="{{ route('rituals.index', ['year' => $y]) }}"
+                    color="{{ $y == $selectedYear ? 'primary' : 'secondary' }}"
+                    size="sm">
+                    {{ $y }}
+                </x-apollo-button>
             @endforeach
-
-        </ul>
-
+        </div>
 
 
     </div>
