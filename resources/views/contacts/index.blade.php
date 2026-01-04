@@ -1,25 +1,61 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        .table-fixed {
+            table-layout: fixed;
+            width: 100%;
+            margin: 0;
+        }
+
+        /* Fixed percentages that total exactly 100% */
+        .col-id { width: 4%; }
+        .col-name { width: 14%; }
+        .col-email { width: 18%; }
+        .col-message { width: 42%; } /* Message gets the lion's share */
+        .col-status { width: 7%; }
+        .col-action { width: 15%; }
+
+        .truncate-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+            width: 100%;
+        }
+
+        .break-word {
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.1;
+            font-size: 0.85rem; /* Slightly smaller to prevent vertical bloating */
+        }
+
+        /* Keep the buttons small and snug */
+        .col-action .btn {
+            padding: 1px 4px;
+            font-size: 0.75rem;
+        }
+    </style>
 
     <div class='container my-5'>
         <h1>Contacts</h1>
 
-        <div class="mt-4">
-        <form method="get" action="/contacts/replied/list" id="reply">
-            <button type="submit" class="btn btn-go" >Show Replied</button>
-        </form>
+        <div class="mb-3">
+            <x-apollo-button color="primary" href="/contacts/replied/list">Show Replied</x-apollo-button>
+            <x-apollo-button color="primary" href="/contacts/spam/list">Show Spam</x-apollo-button>
+            <x-apollo-button color="primary" href="/contacts/all/list">Show All</x-apollo-button>
         </div>
 
-        <div class="mt-4">
-            <form method="get" action="/contacts/spam/list" id="reply">
-            <button type="submit" class="btn btn-go" >Show Spam</button>
-        </form>
-        </div>
-        <div class="mt-4">
-        <form method="get" action="/contacts/all/list" id="reply">
-            <button type="submit" class="btn btn-go" >Show All</button>
-        </form>
+        <div>
+            <x-delete-button
+                :action="url('/contacts/delete-spam')"
+                method="DELETE"
+                resource="all messages currently marked as spam"
+                color="danger"
+            >
+                <i class="fa fa-trash"></i> Purge All Spam
+            </x-delete-button>
         </div>
     </div>
 
@@ -29,46 +65,61 @@
                 You have no contacts
                 </div>
             @else
-                <table class="table table-striped">
-                    <thead>
-                    <tr style="font-weight:bold">
-                        <td>ID</td>
-                        <td>Name</td>
-                        <td>Email</td>
-                        <td>Message</td>
-                        <td>Status</td>
-                        <td>Received</td>
-                        <td>Responded</td>
-                        <td colspan="2">Action</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($contacts as $contact)
+                <div style="overflow-x: hidden;">
+                    <table class="table table-hover table-fixed">
+                        <thead>
                         <tr>
-                            <td>{{$contact->id}} </td>
-                            <td>{{$contact->name}} </td>
-                            <td>{{$contact->email}}</td>
-                            <td>{{$contact->message}}</td>
-                            <td>{{$contact->status}}</td>
-                            <td>{{$contact->created_at}}</td>
-                            <td>{{$contact->when_replied}}</td>
+                            <th class="col-id">ID</th>
+                            <th class="col-name">Name</th>
+                            <th class="col-email">Email</th>
+                            <th class="col-message">Message</th>
+                            <th class="col-status">Status</th>
+                            <th class="col-action">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($contacts as $contact)
+                            <tr class="align-middle">
+                                <td class="text-muted small">{{ $contact->id }}</td>
+                                <td class="break-word fw-bold">{{ $contact->name }}</td>
+                                <td class="break-word text-secondary">{{ $contact->email }}</td>
+                                <td class="col-message">
+                <span class="truncate-text" title="{{ $contact->message }}">
+                    {{ $contact->message }}
+                </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border p-1">{{ $contact->status }}</span>
+                                </td>
+                                <td class="col-action text-nowrap text-end">
 
-                            <td>
-                                    <form method="get" action="/contacts/{{ $contact['id']}}/reply" id="reply">
-                                        <button type="submit" class="btn btn-warning" >Mark Replied</button>
-                                    </form>
-                            </td>
-                            <td>
-                                    <form method="get" action="/contacts/{{ $contact['id']}}/spam" id="spam">
-                                        <button type="submit" class="btn btn-danger" >Mark Spam</button>
-                                    </form>
+                                <x-delete-button
+                                    :action="url('/contacts/' . $contact->id . '/reply')"
+                                    method="POST"
+                                    resource="message as replied"
+                                    class="btn-sm"
+                                    style="background-color: yellow; color: black;" {{-- Matching your yellow style --}}
+                                >
+                                    Mark Replied
+                                </x-delete-button>
+
+                                <x-delete-button
+                                    :action="url('/contacts/' . $contact->id . '/spam')"
+                                    method="POST"
+                                    resource="message as spam"
+                                    class="btn-sm"
+                                    color="danger"
+                                >
+                                    Mark Spam
+                                </x-delete-button>
                             </td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
+                </div>
+
             @endif
         </div>
 
-<br>
 @endsection

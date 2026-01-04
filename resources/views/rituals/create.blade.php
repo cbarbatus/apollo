@@ -39,8 +39,8 @@
                 </div>
             </div>
 
-            <button type='submit' class="btn btn-success mt-3">Submit</button>
-            <a href="{{ route('rituals.index') }}" class="btn btn-secondary mt-3 ms-2">Cancel</a>
+            <x-apollo-button type='submit' color="primary">Submit</x-apollo-button>
+            <x-cancel-button></x-cancel-button>
         </form>
     </div>
 @endsection

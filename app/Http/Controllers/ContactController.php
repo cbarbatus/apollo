@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 use App\Models\User;
 
+
+
 class ContactController extends Controller
 {
     /**
@@ -182,6 +184,15 @@ class ContactController extends Controller
         $contact->save();
 
         return redirect('/contacts');
+    }
+
+    public function massDeleteSpam()
+    {
+        // 1. Delete all records where status is 'spam'
+        $deletedCount = Contact::where('status', 'spam')->delete();
+
+        // 2. Redirect back with a success message
+        return redirect()->back()->with('success', "Successfully purged $deletedCount spam messages.");
     }
 
 }

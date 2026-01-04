@@ -61,20 +61,26 @@
                     <tbody>
                     @foreach($roles as $role)
                         <tr>
-                            <td style="padding: 15px 20px; vertical-align: middle; font-weight: 500;">{{ $role->name }}</td>
-                            <td style="padding: 15px 20px; vertical-align: middle;">
-                                <div style="display: flex; gap: 10px; align-items: center;">
-                                    <a href="{{ url('/roles/' . $role->name . '/edit') }}"
-                                       class="btn btn-sm btn-outline-success"
-                                       style="padding: 7px 16px; font-weight: 600; min-height: 38px; display: flex; align-items: center; border-width: 2px;">
+                            <td class="px-4 py-3 align-middle fw-medium">{{ $role->name }}</td>
+                            <td class="px-4 py-3 align-middle">
+                                <div class="d-flex align-items-center gap-2">
+                                    {{-- 1. Standardized Edit --}}
+                                    <x-apollo-button
+                                        href="{{ url('/roles/' . $role->name . '/edit') }}"
+                                        color="warning"
+                                        size="sm"
+                                        class="px-3"
+                                    >
                                         Edit
-                                    </a>
-                                    <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
-                                        <x-delete-button
-                                            :action="url('/roles/' . $role->name . '/destroy')"
-                                            resource="role"
-                                        />
-                                    </div>
+                                    </x-apollo-button>
+
+                                    {{-- 2. Standardized Role Delete --}}
+                                    <x-delete-button
+                                        :action="url('/roles/' . $role->name . '/destroy')"
+                                        resource="role"
+                                    >
+                                        Delete
+                                    </x-delete-button>
                                 </div>
                             </td>
                         </tr>
@@ -103,6 +109,7 @@
                             <td style="padding: 15px 20px; vertical-align: middle; font-weight: 500;">{{ $permission->name }}</td>
                             <td style="padding: 15px 20px; vertical-align: middle;">
                                 <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
+                                    {{-- Changed $pname to $permission to match your loop --}}
                                     <x-delete-button
                                         :action="url('/roles/' . $permission->name . '/pdestroy')"
                                         resource="permission"

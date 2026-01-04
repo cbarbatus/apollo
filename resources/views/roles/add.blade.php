@@ -26,10 +26,7 @@
                     </div>
 
                     <div style="display: flex; gap: 12px; margin-top: 30px;">
-                        {{-- The Success Button --}}
-                        <button type="submit" class="btn" style="background-color: #198754 !important; color: #ffffff !important; padding: 10px 25px !important; border-radius: 6px !important; font-weight: 700; border: none !important;">
-                            Save Permission
-                        </button>
+                        <x-apollo-button type="submit">Save Permission</x-apollo-button>
 
                         {{-- Cancel Link --}}
                         <a href="{{ url('/roles') }}" style="background-color: #6c757d !important; color: #ffffff !important; padding: 10px 25px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 600; display: flex; align-items: center;">

@@ -37,13 +37,13 @@
                                 <td style="padding: 12px 15px; vertical-align: middle; font-weight: 500;">{{ $pname->name }}</td>
                                 <td style="padding: 12px 15px; vertical-align: middle;">
                                     {{-- Use POST since we updated the routes, or DELETE if your controller supports it --}}
-                                    <form method="POST" action="{{ url('/roles/' . $role->name . '/' . $pname->name . '/remove') }}" style="margin: 0;">
-                                        @csrf
-                                        <button type="submit"
-                                                style="background-color: #ff0000 !important; color: #000000 !important; padding: 6px 14px !important; border-radius: 4px !important; border: none !important; font-weight: 700; font-size: 0.9rem !important; cursor: pointer;">
-                                            Remove
-                                        </button>
-                                    </form>
+                                    <x-delete-button
+                                        :action="url('/roles/' . $role->name . '/' . $pname->name . '/remove')"
+                                        method="POST"
+                                        resource="permission"
+                                    >
+                                        Remove
+                                    </x-delete-button>
                                 </td>
                             </tr>
                         @endforeach

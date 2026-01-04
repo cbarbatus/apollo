@@ -4,26 +4,6 @@
 
     <div class='container'>
 
-        <div class="container mt-3">
-            {{-- Success Message (Green) --}}
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-
-            {{-- Error Message (Red) --}}
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-        </div>
-
         <h1>Raven's Cry Grove, ADF Rituals</h1>
 
         @auth
@@ -62,7 +42,7 @@
                     @endforeach
                 </select>
 
-            <button type="submit" form="one-ritual" class="btn btn-success px-4 fw-bold">Select</button>
+            <x-apollo-button type="submit" form="one-ritual" color="success">Select</x-apollo-button>
         </form>
 
         @if(auth()->check() && $ritual)
@@ -82,19 +62,21 @@
             </div>
         @endif
 
-        {{-- 3. THE SPIGOT (The Year Buttons) --}}
+        {{-- 3. THE SPIGOT (The "Good Wall" Version) --}}
         <p class="mb-1 fw-bold small text-secondary uppercase">Choose a ritual year</p>
-        <div class="d-flex flex-wrap gap-2 mb-4">
+        <div class="d-flex flex-wrap gap-1 mb-4">
             @foreach ($activeYears as $y)
                 <x-apollo-button
                     href="{{ route('rituals.index', ['year' => $y]) }}"
-                    color="{{ $y == $selectedYear ? 'primary' : 'secondary' }}"
-                    size="sm">
+                    color="{{ $y == $selectedYear ? 'primary' : 'light' }}"
+                    size="sm"
+                    {{-- Add 'border' to define the white boxes on the light background --}}
+                    class="px-2 shadow-none border {{ $y == $selectedYear ? '' : 'text-primary' }}"
+                    style="min-width: 45px; font-weight: 500;"
+                >
                     {{ $y }}
                 </x-apollo-button>
             @endforeach
         </div>
-
-
     </div>
 @endsection

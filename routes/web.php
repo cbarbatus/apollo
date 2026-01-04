@@ -72,6 +72,7 @@ Route::get('/contacts', [ContactController::class, 'index']);
 Route::get('/contacts/{id}/spam', [ContactController::class, 'spam']);
 Route::get('/contacts/{id}/reply', [ContactController::class, 'reply']);
 Route::get('/contacts/{type}/list', [ContactController::class, 'list']);
+Route::delete('/contacts/delete-spam', [ContactController::class, 'massDeleteSpam']);
 
 Route::get('/grove/setup', [GroveController::class, 'setup']);
 Route::get('/grove/hack', [GroveController::class, 'hack']);

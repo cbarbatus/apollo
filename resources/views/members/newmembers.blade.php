@@ -57,52 +57,52 @@
                                 <td>{{$member->pri_phone}}</td>
                                 <td>{{$member->adf}}</td>
 
-                                    {{-- Update $newmember to $member --}}
-                                    <td class="text-nowrap">
+                                {{-- Update $newmember to $member --}}
+                                <td class="text-nowrap">
+                                    <div class="d-flex align-items-center gap-2">
+
+                                        {{-- 1. Accept Button --}}
+                                        {{-- 1. Standardized Small Accept Button --}}
                                         <div class="d-flex align-items-center gap-2">
-
                                             {{-- 1. Accept Button --}}
-                                            {{-- 1. Standardized Small Accept Button --}}
-                                            <div class="d-flex align-items-center gap-2">
-                                                {{-- 1. Accept Button --}}
-                                                <form action="{{ route('members.accept', $member->id) }}" method="POST" class="m-0 d-flex align-items-center">
-                                                    @csrf
-                                                    <x-apollo-button
-                                                        type="submit"
-                                                        color="success"
-                                                        size="sm"
-                                                        class="py-0 px-3"
-                                                        style="height: 31px; line-height: 1;"
-                                                    >
-                                                        Accept
-                                                    </x-apollo-button>
-                                                </form>
-
-                                                {{-- 2. Scrub Trigger --}}
+                                            <form action="{{ route('members.accept', $member->id) }}" method="POST" class="m-0 d-flex align-items-center">
+                                                @csrf
                                                 <x-apollo-button
-                                                    type="button"
-                                                    color="danger"
+                                                    type="submit"
+                                                    color="success"
                                                     size="sm"
                                                     class="py-0 px-3"
                                                     style="height: 31px; line-height: 1;"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#scrubModal{{ $member->id }}"
                                                 >
-                                                    Scrub
+                                                    Accept
                                                 </x-apollo-button>
-                                            </div>
-                                            {{-- 3. The Custom Popup (Reusable Component) --}}
-                                            <x-confirmation-modal
-                                                id="scrubModal{{ $member->id }}"
-                                                :action="route('members.deletejoin', $member->id)"
-                                                title="Scrub Applicant?"
-                                                buttonText="Yes, Scrub"
-                                            >
-                                                Are you sure you want to permanently remove <strong>{{ $member->first_name }}</strong> from the Grove records?
-                                            </x-confirmation-modal>
+                                            </form>
 
+                                            {{-- 2. Scrub Trigger --}}
+                                            <x-apollo-button
+                                                type="button"
+                                                color="danger"
+                                                size="sm"
+                                                class="py-0 px-3"
+                                                style="height: 31px; line-height: 1;"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#scrubModal{{ $member->id }}"
+                                            >
+                                                Scrub
+                                            </x-apollo-button>
                                         </div>
-                                    </td>                                   </td>
+                                        {{-- 3. The Custom Popup (Reusable Component) --}}
+                                        <x-confirmation-modal
+                                            id="scrubModal{{ $member->id }}"
+                                            :action="route('members.deletejoin', $member->id)"
+                                            title="Scrub Applicant?"
+                                            buttonText="Yes, Scrub"
+                                        >
+                                            Are you sure you want to permanently remove <strong>{{ $member->first_name }}</strong> from the Grove records?
+                                        </x-confirmation-modal>
+
+                                    </div>
+                                </td>
                             </tr>
                         @endif
                     @endforeach

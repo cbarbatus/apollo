@@ -328,8 +328,8 @@ class MemberController extends Controller
                 'category' => 'required|string',
                 'joined' => 'nullable|date',
                 'adf' => 'nullable|string',
-                'adf_join' => 'nullable', // or remove 'date' if you just want to permit the string
-                'adf_renew' => 'nullable',
+                'adf_join' => 'nullable|string',
+                'adf_renew' => 'nullable|string',
 
             ]);
             $data = array_merge($data, $managementData);

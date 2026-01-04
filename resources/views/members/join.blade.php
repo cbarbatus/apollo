@@ -68,7 +68,7 @@
         </form>
 
         <div class="d-flex justify-content-end">
-            <button type="submit" form='create' class="btn btn-warning btn-lg">Submit Application</button>
+            <x-apollo-button type="submit" form='create' color="warning">Submit Application </x-apollo-button>
         </div>
 
     </div>

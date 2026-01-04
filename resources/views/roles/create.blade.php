@@ -23,10 +23,7 @@
 
                     <div style="display: flex; gap: 12px; margin-top: 30px;">
                         {{-- Blue Apollo Submit Button --}}
-                        <button type="submit" class="btn"
-                                style="background-color: #0d6efd !important; color: #ffffff !important; padding: 10px 25px !important; border-radius: 6px !important; font-weight: 700; border: none !important;">
-                            Create Role
-                        </button>
+                        <x-apollo-button type="submit" color="primary">Create Role</x-apollo-button>
 
                         {{-- Gray Cancel Button --}}
                         <a href="{{ url('/roles') }}"
