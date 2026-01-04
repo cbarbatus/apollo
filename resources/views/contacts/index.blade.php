@@ -31,11 +31,6 @@
             font-size: 0.85rem; /* Slightly smaller to prevent vertical bloating */
         }
 
-        /* Keep the buttons small and snug */
-        .col-action .btn {
-            padding: 1px 4px;
-            font-size: 0.75rem;
-        }
     </style>
 
     <div class='container my-5'>
