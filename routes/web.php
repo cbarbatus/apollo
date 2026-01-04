@@ -69,8 +69,8 @@ Route::get('/contact', [ContactController::class, 'contactus']);
 Route::get('/contacts/thanks', [ContactController::class, 'thanks']);
 Route::post('/contacts/submit', [ContactController::class, 'submit']);
 Route::get('/contacts', [ContactController::class, 'index']);
-Route::get('/contacts/{id}/spam', [ContactController::class, 'spam']);
-Route::get('/contacts/{id}/reply', [ContactController::class, 'reply']);
+Route::post('/contacts/{contact}/reply', [ContactController::class, 'markReplied']);
+Route::post('/contacts/{contact}/spam', [ContactController::class, 'markSpam']);
 Route::get('/contacts/{type}/list', [ContactController::class, 'list']);
 Route::delete('/contacts/delete-spam', [ContactController::class, 'massDeleteSpam']);
 

@@ -91,28 +91,25 @@
                                 <td>
                                     <span class="badge bg-light text-dark border p-1">{{ $contact->status }}</span>
                                 </td>
-                                <td class="col-action text-nowrap text-end">
+                                <td class="col-action text-nowrap">
+                                    <div class="d-flex gap-1">
+                                        {{-- Mark Replied Form --}}
+                                        <form action="/contacts/{{ $contact->id }}/reply" method="POST">
+                                            @csrf
+                                            <x-apollo-button type="submit" class="btn-warning btn-sm">
+                                                Mark Replied
+                                            </x-apollo-button>
+                                        </form>
 
-                                <x-delete-button
-                                    :action="url('/contacts/' . $contact->id . '/reply')"
-                                    method="POST"
-                                    resource="message as replied"
-                                    class="btn-sm"
-                                    style="background-color: yellow; color: black;" {{-- Matching your yellow style --}}
-                                >
-                                    Mark Replied
-                                </x-delete-button>
-
-                                <x-delete-button
-                                    :action="url('/contacts/' . $contact->id . '/spam')"
-                                    method="POST"
-                                    resource="message as spam"
-                                    class="btn-sm"
-                                    color="danger"
-                                >
-                                    Mark Spam
-                                </x-delete-button>
-                            </td>
+                                        {{-- Mark Spam Form --}}
+                                        <form action="/contacts/{{ $contact->id }}/spam" method="POST">
+                                            @csrf
+                                            <x-apollo-button type="submit" class="btn-danger btn-sm">
+                                                Mark Spam
+                                            </x-apollo-button>
+                                        </form>
+                                    </div>
+                                </td>
                         </tr>
                     @endforeach
                     </tbody>

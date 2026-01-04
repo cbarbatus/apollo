@@ -7,6 +7,12 @@
 
         <form name="frmContact" id="frmContact" method="post" action="/contacts/submit">
             @csrf
+            <input type="hidden" name="form_load_time" value="{{ time() }}">
+
+            <div style="display:none !important; visibility:hidden;" aria-hidden="true">
+                <label for="middle_name">Do not fill this out</label>
+                <input type="text" name="middle_name" id="middle_name" tabindex="-1" autocomplete="off">
+            </div>
 
             <div class="row mb-3">
                 <label for="name" class="col-sm-2 col-form-label">Name</label>
@@ -27,6 +33,7 @@
                     </div>
                 </div>
             </div>
+
 
             <div class="row mb-3">
                 <label for="message" class="col-sm-2 col-form-label">Message</label>

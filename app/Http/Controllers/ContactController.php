@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
 use App\Models\User;
-
+use Carbon\Carbon;
 
 
 class ContactController extends Controller
@@ -141,15 +141,48 @@ class ContactController extends Controller
         return view('contacts.contactus');
     }
 
+
+// ... inside the ContactController class ...
+
+    public function markReplied($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $contact->status = 'replied';
+        $contact->when_replied = Carbon::now()->format('Y-m-d H:i');
+        $contact->save();
+
+        return back()->with('success', 'Message marked as replied.');
+    }
+
+    public function markSpam($id)
+    {
+        $contact = Contact::findOrFail($id);
+        $contact->status = 'spam';
+        // We keep the epoch date or update it as needed
+        $contact->save();
+
+        return back()->with('success', 'Message moved to spam.');
+    }
+
+
     public function submit(Request $request): RedirectResponse
     {
-        $contact = new Contact;
-        /** @var \App\Models\Contact $contact */
+        // 1. Honeypot Check: If the hidden field is filled, it's a bot.
+        if ($request->filled('middle_name')) {
+            return redirect('/contacts/thanks');
+        }
 
-        // Switched from request('key') to $request->input('key', '') for type safety
-        $contact->name = (string) $request->input('name', '');
-        $contact->email = (string) $request->input('email', '');
-        $contact->message = (string) $request->input('message', '');
+        // 2. Timing Check: If submitted in less than 3 seconds, it's a bot.
+        $loadTime = $request->input('form_load_time');
+        if (!$loadTime || (time() - $loadTime) < 3) {
+            return redirect('/contacts/thanks');
+        }
+
+        // 3. Normal Save Logic
+        $contact = new Contact;
+        $contact->name = strip_tags((string) $request->input('name', ''));
+        $contact->email = strip_tags((string) $request->input('email', ''));
+        $contact->message = strip_tags((string) $request->input('message', ''));
 
         $contact->status = 'received';
         $contact->when_replied = '1970-01-09 00:00';
@@ -196,3 +229,4 @@ class ContactController extends Controller
     }
 
 }
+
