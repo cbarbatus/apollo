@@ -31,14 +31,21 @@
                 </div>
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-3">
+            {{-- Input Row --}}
+            <div class="row">
+                <div class="col-md-2">
                     <label for="sequence" class="form-label">Sequence</label>
-                    <input type="number" id="sequence" name="sequence" class="form-control" value="{{ $section->sequence }}">
+                    <input type="number" name="sequence" value="0" class="form-control mb-3">
                 </div>
-                <div class="col-md-9 d-flex align-items-end justify-content-end">
-                    <x-apollo-button type="submit">Save Section Changes</x-apollo-button>
-                </div>
+            </div>
+
+            {{-- Action Row: Now separated to avoid the "jammed" look --}}
+            <div class="d-flex gap-2 mt-2 mb-4">
+                <x-apollo-button type="submit" color="primary" class="fw-bold px-4">
+                    Save Section Changes
+                </x-apollo-button>
+
+                <x-cancel-button href="/sections" />
             </div>
 
         </form>
@@ -51,10 +58,13 @@
         <hr class="my-5">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="{{ url('elements/create?section_id=' . $section->id) }}"
-               class="btn btn-success shadow-sm fw-bold border-0 px-4 py-2 d-inline-flex align-items-center justify-content-center">
+            <x-apollo-button
+                href="/elements/create?section_id={{ $section->id }}"
+                color="success"
+                class="fw-bold border-0 px-4"
+            >
                 <i class="bi bi-plus-lg me-2"></i> Add New Element
-            </a>
+            </x-apollo-button>
         </div>
 
         <table class="table table-striped border">
@@ -75,12 +85,19 @@
                         {{ Str::limit(str_replace('&nbsp;', ' ', strip_tags($element->item)), 50) }}
                     </td>
                     <td class="text-end">
-                        <a href="{{ url('elements/' . $element->id . '/edit') }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <div class="d-flex gap-2">
+                            <x-apollo-button
+                                href="/elements/{{ $element->id }}/edit"
+                                color="warning"
+                                size="sm"
+                            >
+                                Edit
+                            </x-apollo-button>
 
-                        <x-delete-button
-                            :action="url('elements/' . $element->id)"
-                            resource="Element"
-                        />
+                            <x-delete-button
+                                :action="url('/elements/' . $element->id)"
+                            />
+                        </div>
                     </td>
                 </tr>
             @endforeach

@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        <h2>Add New Element to Section {{ $section_id }}</h2>
+        <h1>Add New Element to Section {{ $section_id }}</h1>
 
         <form method="POST" action="{{ url('elements/store') }}">
             @csrf
@@ -31,11 +31,21 @@
                 </div>
             </div>
 
-            <x-apollo-button type="submit" color="success">
-                Create Element
-            </x-apollo-button>
+            <div class="d-flex gap-2 mt-3">
+                <x-apollo-button type="submit" color="success" class="fw-bold px-4">
+                    Create Element
+                </x-apollo-button>
 
-            <x-cancel-button href="/section" />
+                {{-- Send them back to the specific section and anchor --}}
+                <x-apollo-button
+                    href="/sections/{{ $section_id }}/edit#section-elements"
+                    color="secondary"
+                    class="px-4"
+                    style="color: #ffffff !important;"
+                >
+                    Cancel
+                </x-apollo-button>
+            </div>
         </form>
     </div>
 @endsection

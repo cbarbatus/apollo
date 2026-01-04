@@ -53,7 +53,7 @@
                     <td>
                         <x-apollo-button
                             href="/announcements/{{ $announcement['id'] }}/activate"
-                            color="info"
+                            style="background-color: #008080 !important; border-color: #008080 !important; color: white !important;"
                             size="sm"
                         >
                             Activate

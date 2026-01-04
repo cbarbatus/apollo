@@ -39,23 +39,36 @@
                     </div>
 
                     {{-- SECTION CONTENT (Conditional Display) --}}
+                    {{-- SECTION CONTENT (Conditional Display) --}}
                     @if ( $section->showit )
                         <div class="card-body">
-                            {{-- Button to close the section --}}
-                            <a href="/sections/{{ $section->id }}/off" class="btn btn-sm btn-outline-secondary float-end mb-3">CLOSE SECTION</a>
+                            {{-- 1. Use a real button look with forced white/gray text to stop the blue leak --}}
+                            <a href="/sections/{{ $section->id }}/off"
+                               class="btn btn-sm btn-secondary float-end mb-3 border-0 shadow-sm"
+                               style="color: white !important;">
+                                CLOSE SECTION
+                            </a>
 
-                            @foreach( $section->elements as $element )
-                                {{-- 3. Removed raw HTML concatenation. Use a structured div for content spacing. --}}
-                                <div class="mt-3">
-                                    {!! $element->item !!}
-                                </div>
-                            @endforeach
+                            @if($section->elements->isEmpty())
+                                <p class="text-muted italic">Information for this section is coming soon.</p>
+                            @else
+                                @foreach( $section->elements as $element )
+                                    <div class="mt-3">
+                                        {!! $element->item !!}
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
+
+                        {{-- 2. Consider if the footer 'Close' is redundant for short sections --}}
                         <div class="card-footer text-end bg-light">
-                            <a href="/sections/{{ $section->id }}/off" class="btn btn-sm btn-outline-secondary">CLOSE SECTION</a>
+                            <a href="/sections/{{ $section->id }}/off"
+                               class="btn btn-sm btn-secondary border-0"
+                               style="color: white !important;">
+                                CLOSE SECTION
+                            </a>
                         </div>
-                    @endif
-                </div>
+                    @endif             </div>
 
             @endif
         @endforeach

@@ -32,17 +32,26 @@
                                 <td>{{ $section->title }}</td>
                                 <td class="text-center">{{ $section->sequence }}</td>
                                 <td class="text-end pe-4">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ url('/sections/' . $section->id . '/edit') }}"
-                                           class="btn btn-warning btn-sm shadow-sm fw-bold border-0 px-3"
-                                           style="height: 32px; border-radius: 8px; display: flex; align-items: center;">
+                                    <div class="d-flex gap-2">
+                                        {{-- Main Edit Button --}}
+                                        <x-apollo-button
+                                            href="/sections/{{ $section->id }}/edit"
+                                            color="warning"
+                                            size="sm"
+                                            class="fw-bold border-0 px-3"
+                                        >
                                             Edit
-                                        </a>
-                                        <a href="{{ url('/sections/' . $section->id . '/edit#section-elements') }}"
-                                           class="btn btn-outline-secondary btn-sm shadow-sm px-3"
-                                           style="height: 32px; border-radius: 8px; display: flex; align-items: center; color: #6c757d;">
+                                        </x-apollo-button>
+
+                                        {{-- Jump to Elements Button --}}
+                                        <x-apollo-button
+                                            href="/sections/{{ $section->id }}/edit#section-elements"
+                                            size="sm"
+                                            class="px-3"
+                                            style="background-color: #6c757d; border: none; color: #ffffff !important;"
+                                        >
                                             Elements
-                                        </a>
+                                        </x-apollo-button>
                                     </div>
                                 </td>
                             </tr>
