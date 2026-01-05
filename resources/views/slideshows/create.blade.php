@@ -13,7 +13,7 @@
                  <input type="text" name="year" id="year" size="4">
                 </div>
 
-                <div class="col-md-2 mb-3">
+                <div class="col-md-1 mb-3">
                     <label for="name">Name:</label>
                     <input type="text" name="name" id="name" size="10">
                 </div>
@@ -38,6 +38,7 @@
                 <input type="number" name="sequence" id="sequence" size="4">
             </div>
             <button type="submit" form='create' class="btn btn-go">Submit</button>
+            <x-apollo-button type="submit" form='create'>Submit</x-apollo-button>
         </form>
     </div>
 @endsection

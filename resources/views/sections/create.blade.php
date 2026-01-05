@@ -24,7 +24,7 @@
                     <input type="number" name="sequence" id="sequence" class="form-control" maxlength="4" value=''>
                 </div>
             </div>
-            <button type="submit" class="btn btn-go">Submit</button>
+            <x-apollo-button type="submit">Submit</x-apollo-button>
         </form>
     </div>
 @endsection

@@ -23,16 +23,9 @@
 
                     <div style="display: flex; gap: 12px; margin-top: 30px;">
                         {{-- Hardened Teal Submit Button --}}
-                        <button type="submit" class="btn"
-                                style="background-color: #008080 !important; color: #ffffff !important; padding: 10px 25px !important; border-radius: 6px !important; font-weight: 700; border: none !important;">
-                            Create Permission
-                        </button>
-
+                        <x-apollo-button type="submit">Create Permission</x-apollo-button>
                         {{-- Gray Cancel Button --}}
-                        <a href="{{ url('/roles') }}"
-                           style="background-color: #6c757d !important; color: #ffffff !important; padding: 10px 25px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 600; display: flex; align-items: center;">
-                            Cancel
-                        </a>
+                        <x-cancel-button/>
                     </div>
                 </form>
             </div>

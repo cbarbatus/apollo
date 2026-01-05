@@ -87,7 +87,6 @@
                                 <a  class="dropdown-item" href="/announcements"> $ Announcements </a>
                                 <a  class="dropdown-item" href="/schedule"> $ Schedule </a>
                                 <a  class="dropdown-item" href="/venues"> $ Venues </a>
-                                <a  class="dropdown-item" href="/books"> $ Books </a>
                                 <a  class="dropdown-item" href="/contacts"> $ Contacts </a>
                                 <a  class="dropdown-item" href="/members/newmembers"> $ New Members </a>
                                 <a  class="dropdown-item" href="/rituals/editNames"> $ Ritual Names </a>
