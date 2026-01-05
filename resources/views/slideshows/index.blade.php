@@ -7,17 +7,19 @@
         <h1>Slideshows Selection</h1>
 
         @auth
-            <div class="my-4">
-                <form method="get" action="/slideshows/create" id="create"></form>
-                <button type="submit" form="create" class="btn btn-warning">New Slideshow</button>
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <x-apollo-button href="/slideshows/create" color="warning" class="fw-bold px-4 shadow-sm">
+                        New Slideshow
+                    </x-apollo-button>
+                </div>
             </div>
         @endauth
 
         <h3>Choose one slideshow</h3>
 
-        <form action="{{ route('slideshows.index') }}" method="GET" id="oneshow" class="d-flex align-items-center gap-2 mb-4">
+        <form action="{{ route('slideshows.index') }}" method="GET" id="oneshow" class="d-flex align-items-end gap-2 mb-4">
             @csrf
-
             <select name="year" id="year" class="form-select w-auto">
                 @foreach ($activeYears as $year)
                     <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>
@@ -27,7 +29,7 @@
             </select>
 
             <select name="name" id="name" class="form-select w-auto">
-                <option value="">-- Select Ritual --</option>
+                <option value="">-- Select Slideshow --</option>
                 @foreach ($activeNames as $name)
                     <option value="{{ $name }}" {{ request('name') == $name ? 'selected' : '' }}>
                         {{ $name }}
@@ -35,87 +37,43 @@
                 @endforeach
             </select>
 
-            <button type="submit" form="oneshow" class="btn btn-success">Select</button>
+            <x-apollo-button type="submit" form="oneshow" color="success">Select</x-apollo-button>
         </form>
 
+        {{-- 1. Standardized Management Card --}}
         @if(isset($choiceId))
-            <div class="card border-primary shadow-sm mb-4 mx-auto" style="max-width: 600px;">
-                <div class="card-body py-3 text-center">
-                    <h5 class="card-title">Selected: <strong>{{ $selectedName }} {{ $selectedYear }}</strong></h5>
-                    <div class="d-flex justify-content-center gap-2 mt-3">
-                        <x-apollo-button href="{{ route('slideshows.show', $choiceId) }}">View</x-apollo-button>
-                        <a href="{{ route('slideshows.edit', $choiceId) }}" class="btn btn-warning">Edit</a>
-
-                        {{-- The Cleanup Button --}}
-                        <form action="{{ route('slideshows.destroy', $choiceId) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to delete this specific entry?');"
-                              style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger">
-                                <i class="bi bi-trash"></i> Delete
-                            </button>
-                        </form>
+            <div class="row">
+                <div class="col-md-6 col-lg-5">
+                    <div class="card mb-4 bg-light shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted small uppercase">Manage Slideshow</h5>
+                            <p class="h5 mb-3">{{ $selectedName }} {{ $selectedYear }}</p>
+                            <div class="d-flex gap-2">
+                                <x-apollo-button href="{{ route('slideshows.show', $choiceId) }}">View</x-apollo-button>
+                                <x-apollo-button href="{{ route('slideshows.edit', $choiceId) }}" color="warning">Edit</x-apollo-button>
+                                <x-delete-button :action="url('slideshows/' . $choiceId)" resource="Slideshow" />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         @endif
 
-        <h3>Choose an event year</h3>
-        <ul class="list-unstyled d-flex flex-wrap gap-3">
-            @foreach ($activeYears as $year)
-                <li class="nav-item">
-                    {{-- REMOVED 'admin' => $admin from the route array below --}}
-                    <a class="btn btn-sm btn-outline-secondary"
-                       href="{{ route('slideshows.index', ['year' => $year]) }}">
-                        {{ $year }}
-                    </a>
-                </li>
+        {{-- 2. THE SPIGOT (Unified Wall of Years) --}}
+        <p class="mb-1 fw-bold small text-secondary uppercase">Choose an event year</p>
+        <div class="d-flex flex-wrap gap-1 mb-5">
+            @foreach ($activeYears as $y)
+                <x-apollo-button
+                    href="{{ route('slideshows.index', ['year' => $y]) }}"
+                    color="{{ $y == $selectedYear ? 'primary' : 'light' }}"
+                    size="sm"
+                    class="px-2 shadow-none border {{ $y == $selectedYear ? '' : 'text-primary' }}"
+                    style="min-width: 45px; font-weight: 500;"
+                >
+                    {{ $y }}
+                </x-apollo-button>
             @endforeach
-        </ul>
-
-        {{-- Give the horizontal rule some vertical margin (top and bottom) --}}
-        <hr class="my-5">
-
-        <div class="results-container pb-5">
-            @if($slideshows->isNotEmpty())
-                {{-- Heavy Header to match the 'Year Choice' buttons --}}
-                <h3 class="fw-bolder text-dark mb-4 ms-1">
-                    Slideshows Found for {{ request('year') ?? 'All Years' }}
-                </h3>
-
-                <div class="list-group shadow-sm border-0">
-                    @foreach($slideshows as $slideshow)
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3 border-start-0 border-end-0">
-                            <div>
-                                {{-- Lighter Name for elegance and balance --}}
-                                <span class="fs-5 fw-light text-secondary">{{ $slideshow->name }}</span>
-                                {{-- Small Pill Badge for the year --}}
-                                <span class="badge rounded-pill bg-light text-muted border ms-2 fw-normal">{{ $slideshow->year }}</span>
-                            </div>
-
-                            <x-apollo-button href="{{ route('slideshows.show', $slideshow->id) }}">
-                                View Slideshow
-                            </x-apollo-button>
-                        </div>
-                    @endforeach
-                </div>
-            @elseif(request('year'))
-                <h3 class="mt-5">Slideshows Found for {{ request('year') }}</h3>
-                <div class="list-group shadow-sm">
-                    @foreach($slideshows as $slideshow)
-                        <div class="list-group-item d-flex justify-content-between align-items-center py-3">
-                            <div>
-                                <span class="fs-5 fw-bold">{{ $slideshow->name }}</span>
-                                <span class="badge rounded-pill bg-light text-dark border ms-2">{{ $slideshow->year }}</span>
-                            </div>
-                            <x-apollo-button href="{{ route('slideshows.show', $slideshow->id) }}">
-                                View Slideshow
-                            </x-apollo-button>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
         </div>
+
     </div>
 @endsection

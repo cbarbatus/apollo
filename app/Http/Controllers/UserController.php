@@ -71,57 +71,7 @@ class UserController extends Controller
         return redirect('/users');
     }
 
-    /**
-     * Make user for member.
-     */
-    public function make(int $id): RedirectResponse
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole('admin')) {
-                $member = Member::query()->findOrFail($id);
-                /** @var \App\Models\Member $member */
 
-                $newUser = new User;
-                /** @var \App\Models\User $newUser */
-
-                $newUser->name = $member->first_name . $member->last_name;
-                $newUser->email = $member->email;
-                $newUser->password = '';
-
-                // assignRole() is now recognized via the HasRoles mixin
-                $newUser->assignRole('member');
-                $newUser->save();
-
-                $member->user_id = $newUser->id;
-                $member->save();
-
-                return redirect('/members');
-            }
-        }
-
-        return redirect('/');
-    }
-
-    /**
-     * Make superuser of a member.
-     */
-    public function superuser(int $id): RedirectResponse
-    {
-        $member = Member::query()->findOrFail($id);
-        /** @var \App\Models\Member $member */
-
-        $user_id = $member->user_id;
-        $user = User::findOrFail($user_id);
-        /** @var \App\Models\User $user */
-
-        // assignRole() is now recognized via the HasRoles mixin
-        $user->assignRole('admin');
-        $user->save();
-
-        return redirect('/members');
-    }
 
     /**
      * Show the form for editing the specified resource.

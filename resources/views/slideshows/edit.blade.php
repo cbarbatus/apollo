@@ -13,7 +13,7 @@
                     <label for="year">Year:</label>
                     <input type="text" name="year" id="year" size='4' value="{{ $slideshow->year }}">
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-1 mb-3">
                     <label for="name">Name:</label>
                     <input type="text" name="name" id="name" size='10' value="{{ $slideshow->name }}">
                 </div>
@@ -33,7 +33,9 @@
                 <label for="sequence">Sequence:</label>
                 <input type="number" name="sequence" id="sequence" size="4" value="{{ $slideshow->sequence }}">
             </div>
-            <button type="submit" form='edit' class="btn btn-go">Submit</button>
+            <x-apollo-button type="submit" form='edit'>Submit</x-apollo-button>
+            <x-cancel-button></x-cancel-button>
+
         </form>
     </div>
     <br>

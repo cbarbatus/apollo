@@ -111,8 +111,6 @@ Route::delete('/members/{id}', [MemberController::class, 'destroy'])->name('memb
 Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
 
 Route::resource('users', UserController::class);;;
-Route::put('/users/{id}/make', [UserController::class, 'make']);
-Route::put('/users/{id}/superuser', [UserController::class, 'superuser']);
 
 // Display Routes (GET is correct here)
 Route::get('/roles/create', [RoleController::class, 'create']);

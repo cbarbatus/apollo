@@ -28,61 +28,37 @@ class SlideshowController extends Controller
 
     public function index(Request $request)
     {
-        $year = $request->input('year');
-        $name = $request->input('name');
+        // 1. Capture the selection state (The "Parallel" variables)
+        $selectedYear = $request->get('year');
+        $selectedName = $request->get('name');
 
-        $query = \App\Models\Slideshow::query();
-        if ($year) {
-            $query->where('year', $year);
-        }
-        if ($name) {
-            $query->where('name', 'LIKE', "%{$name}%");
-        }
+        // 2. Your existing logic to fetch dropdown data
+        // (Assuming these are already in your controller)
+        $activeYears = Slideshow::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+        $activeNames = [];
 
-        $slideshows = ($year || $name) ? $query->get() : collect();
-
-
-// --- THE TRANSPORTER SECTION ---
-        if ($name && $slideshows->isNotEmpty()) {
-            $id = $slideshows->first()->id;
-
-            if (@auth()) {
-                $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
-                $activeNames = $this->getSection99Names();
-
-                return view('slideshows.index', [
-                    'slideshows' => $slideshows,
-                    'activeYears' => $activeYears,
-                    'activeNames' => $activeNames,
-                    'choiceId' => $id,
-                    'selectedName' => $name,
-                    'selectedYear' => $year
-                ]);
-            }
-            return redirect()->route('slideshows.show', $id);
+        if ($selectedYear) {
+            $activeNames = Slideshow::where('year', $selectedYear)->orderBy('name')->pluck('name');
         }
 
-// --- THE HONEST ARCHIVE FAILURE SECTION ---
-        if ($name && $slideshows->isEmpty()) {
-            $slideshows = \App\Models\Slideshow::where('year', $year)->get();
-
-            $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
-            $activeNames = $this->getSection99Names();
-
-            // Use session()->flash to ensure the Blade @if(session('error')) catches it
-            session()->flash('error', "A slideshow for $name $year is not available in the archive.");
-
-            return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames'));
+        // 3. Logic to determine if a specific record is "Selected"
+        $choiceId = null;
+        if ($selectedYear && $selectedName) {
+            $slideshow = Slideshow::where('year', $selectedYear)
+                ->where('name', $selectedName)
+                ->first();
+            $choiceId = $slideshow ? $slideshow->id : null;
         }
 
-// --- THE DEFAULT VIEW (SPIGOT) ---
-        $activeYears = \App\Models\Slideshow::distinct()->orderByDesc('year')->pluck('year');
-        $activeNames = $this->getSection99Names();
-
-        return view('slideshows.index', compact('slideshows', 'activeYears', 'activeNames'));
-
+        // 4. Return everything to the view
+        return view('slideshows.index', compact(
+            'selectedYear',
+            'selectedName',
+            'activeYears',
+            'activeNames',
+            'choiceId'
+        ));
     }
-
         /**
      * Display a listing of the resource.
      */

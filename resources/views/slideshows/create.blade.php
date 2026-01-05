@@ -37,7 +37,6 @@
                 <label for="sequence">Sequence:</label>
                 <input type="number" name="sequence" id="sequence" size="4">
             </div>
-            <button type="submit" form='create' class="btn btn-go">Submit</button>
             <x-apollo-button type="submit" form='create'>Submit</x-apollo-button>
         </form>
     </div>
