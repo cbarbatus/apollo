@@ -24,7 +24,6 @@
                     <div style="display: flex; gap: 12px; margin-top: 30px;">
                         {{-- Hardened Teal Submit Button --}}
                         <x-apollo-button type="submit">Create Permission</x-apollo-button>
-                        {{-- Gray Cancel Button --}}
                         <x-cancel-button/>
                     </div>
                 </form>

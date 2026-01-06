@@ -96,7 +96,6 @@ Route::resource('venues', VenueController::class);
 // Standard Views & Listing (Safe GET requests)
 Route::get('/members', [MemberController::class, 'index']); // List all members
 Route::get('/members/full', [MemberController::class, 'full']); // List all (full view)
-Route::get('/members/create', [MemberController::class, 'create']); // Form to create
 Route::get('/members/{id}/edit', [MemberController::class, 'edit']); // Form to edit
 Route::get('/members/{id}/sure', [MemberController::class, 'sure']); // Confirmation view (SAFE)
 Route::get('/members/newmembers', [MemberController::class, 'newmembers']); // List pending members

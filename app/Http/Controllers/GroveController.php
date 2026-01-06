@@ -88,15 +88,15 @@ class GroveController extends Controller
 
     public function uploadFile(Request $request): RedirectResponse
     {
-        $file = $request->file('file');
-        if (is_null($file)) {
-            Session()->flash('warning', 'No File Selected.');
+        // Standardizing the validation to match the Venues behavior
+        $request->validate([
+            'file' => 'required|file|max:2048', // 2MB limit
+            'visibility' => 'required|string',
+        ]);
 
-            return redirect('grove/upload');
-        }
-        // File Details
+        $file = $request->file('file');
         $filename = $file->getClientOriginalName();
-        $extension = $file->getClientOriginalExtension();
+        $extension = strtolower($file->getClientOriginalExtension());
         $tempPath = $file->getRealPath();
         $fileSize = $file->getSize();
         $mimeType = $file->getMimeType();
@@ -139,7 +139,8 @@ class GroveController extends Controller
                     rename(public_path('/liturgy/'.$filename), public_path('/liturgy/'.$shortname));
                 }
 
-                Session()->flash('message', 'Upload Successful.');
+                return redirect()->back()->with('success', 'Upload Successful.');
+
             } else {
                 Session()->flash('warning', 'File too large. File must be less than 2MB.');
             }

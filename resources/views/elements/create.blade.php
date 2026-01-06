@@ -37,14 +37,7 @@
                 </x-apollo-button>
 
                 {{-- Send them back to the specific section and anchor --}}
-                <x-apollo-button
-                    href="/sections/{{ $section_id }}/edit#section-elements"
-                    color="secondary"
-                    class="px-4"
-                    style="color: #ffffff !important;"
-                >
-                    Cancel
-                </x-apollo-button>
+                <x-cancel-button href="/sections/{{ $section_id }}/edit#section-elements"/>
             </div>
         </form>
     </div>

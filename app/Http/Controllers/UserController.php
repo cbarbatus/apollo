@@ -31,47 +31,6 @@ class UserController extends Controller
         return redirect('/');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(): View|RedirectResponse
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole('admin')) {
-                return view('users.create');
-            }
-        }
-
-        return redirect('/');
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request): RedirectResponse
-    {
-        $user = new User;
-        /** @var \App\Models\User $user */
-
-        // Use $request->input()
-        $item = $request->input('name');
-        if (!is_string($item)) $item = '';
-        $user->name = $item;
-
-        // Use $request->input()
-        $item = $request->input('email');
-        if (!is_string($item)) $item = '';
-        $user->email = $item;
-
-        $user->password = '';
-        $user->save();
-
-        return redirect('/users');
-    }
-
-
 
     /**
      * Show the form for editing the specified resource.

@@ -51,9 +51,7 @@
                     <i class="bi bi-save me-2"></i>Update Venue
                 </x-apollo-button>
 
-                <a href="{{ route('venues.index') }}" class="btn btn-outline-secondary shadow-sm px-4">
-                    Cancel
-                </a>
+                <x-cancel-button href="{{ route('venues.index') }}" />
             </div>
         </form>
     </div>

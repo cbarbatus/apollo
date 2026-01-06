@@ -95,27 +95,22 @@ class VenueController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(Request $request, Venue $venue)
     {
-        $venue = Venue::findOrFail($id);
-
-        // 1. Validate the data (this fixes the BadMethodCallException)
-        $validated = $request->validate([
-            'name'       => 'required|string',
-            'title'      => 'required|string',
-            'address'    => 'nullable|string',
-            'map_link'   => 'nullable|string', // Corrected to match DB
+        $request->validate([
+            // The 'unique' rule ignores the current venue ID to allow saving without changing the name
+            'name' => 'required|unique:venues,name,' . $venue->id,
+            'title' => 'required|string|max:255',
+            'address' => 'required|string',
+            'map_link' => 'nullable|url',
             'directions' => 'nullable|string',
         ]);
 
-        // 2. Update and Save in one go
-        // This is the Gold Standard: it validates, updates, and saves to DB
-        $venue->update($validated);
-        $venue->save(); // This forces the DB write
-        return redirect()->route('venues.index')
-            ->with('status', "Venue '{$venue->name}' updated successfully.");
-    }
+        $venue->update($request->all());
 
+        return redirect()->route('venues.index')
+            ->with('success', 'Venue updated successfully.');
+    }
 
     /**
      * Remove the specified resource from storage.

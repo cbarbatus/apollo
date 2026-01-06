@@ -27,7 +27,7 @@
                         <x-apollo-button type="submit">
                             Update Schedule
                         </x-apollo-button>
-                        <a href="/" class="btn btn-secondary px-4 border-0">Cancel</a>
+                        <x-cancel-button href="/"/>
                     </div>
                 </form>
             </div>

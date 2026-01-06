@@ -41,7 +41,8 @@
 
                 </div>
             </div>
-            <button type="submit" form='create' class="btn btn-go">Submit</button>
+            <x-apollo-button type="submit" form='create'>Submit</x-apollo-button>
+            <x-cancel-button></x-cancel-button>
         </form>
     </div>
 @endsection

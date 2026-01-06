@@ -20,7 +20,12 @@
                         Files must be <strong>.htm</strong> for public readability.
                     </div>
                     <p class="mt-2 text-muted">The file will be automatically renamed to:
-                        <code class="text-danger fw-bold">{{ $litName }}</code>
+                        <code class="text-danger fw-bold">
+                            {{ Str::limit($litName, 47, '')}}
+                        </code>
+                        @if(strlen($litName) > 50)
+                            <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Original name was shortened to fit 50-character limit.</small>
+                        @endif
                     </p>
                 </div>
 
@@ -31,16 +36,18 @@
 
                     <div class="mb-4">
                         <label for="file" class="form-label fw-bold">Select .htm File:</label>
-                        <input type="file" name="file" class="form-control form-control-lg border-0 bg-light shadow-sm" required>
+                        {{-- w-50 or col-md-6 keeps the input from stretching across the whole screen --}}
+                        <div style="max-width: 500px;">
+                            <input type="file" name="file" class="form-control form-control-lg border-0 bg-light shadow-sm" required>
+                            <div class="form-text">Max 50 characters recommended.</div>
+                        </div>
                     </div>
 
                     <div class="d-flex gap-2">
                         <x-apollo-button type="submit">
                             Upload Liturgy
                         </x-apollo-button>
-                        <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-secondary px-4 border-0">
-                            Cancel
-                        </a>
+                        <x-cancel-button href="{{ route('rituals.index', ['year' => $ritual->year]) }}"/>
                     </div>
                 </form>
             </div>

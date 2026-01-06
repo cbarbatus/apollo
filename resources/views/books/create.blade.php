@@ -61,11 +61,11 @@
                         <x-apollo-button type="submit">
                             {{ isset($book) ? 'Update Book' : 'Create Book' }}
                         </x-apollo-button>
-                        <a href="/books" class="btn btn-outline-secondary ms-2" style="border-radius: 8px;">Cancel</a>
+                        <x-cancel-button href="/books"/>
                     </div>
                 </div>
-            </div>   </form>
-
+            </div>
+        </form>
     </div>
     <br>
 

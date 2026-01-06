@@ -5,7 +5,7 @@
         {{-- Phoenix Card: border-0 and shadow-sm for depth --}}
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-primary text-white py-3">
-                <h4 class="mb-0 fw-bold">Upload Announcement Picture</h4>
+                <h4 class="mb-0 fw-bold">Upload Announcement Picture right here</h4>
             </div>
 
             <div class="card-body p-4">
@@ -30,6 +30,8 @@
                     <div class="mb-4">
                         <label for="file" class="form-label fw-bold">Select Picture File:</label>
                         <input type="file" name="file" class="form-control form-control-lg border-0 bg-light shadow-sm" required>
+
+                    say what?
                     </div>
 
                     <div class="d-flex gap-2">
@@ -37,9 +39,15 @@
                         <x-apollo-button type="submit">
                             Upload Picture
                         </x-apollo-button>
+                        <x-cancel-button href="{{ route('announcements.index') }}"/>
+
                         <a href="{{ route('announcements.index') }}" class="btn btn-secondary px-4 border-0">
                             Cancel
                         </a>
+                        <x-cancel-button href="{{ route('announcements.index') }}"/>
+                        <x-cancel-button href="{{ route('venues.index') }}" />
+                        <x-cancel-button href="{{ route('venues.index') }}" />
+                        what??
                     </div>
                 </form>
             </div>

@@ -37,9 +37,7 @@
                         <x-apollo-button type="submit">
                             Upload Picture
                         </x-apollo-button>
-                        <a href="{{ route('announcements.index') }}" class="btn btn-secondary px-4 border-0">
-                            Cancel
-                        </a>
+                        <x-cancel-button href="{{ route('announcements.index') }}"/>
                     </div>
                 </form>
             </div>
