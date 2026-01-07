@@ -14,17 +14,17 @@ class SlideshowController extends Controller
 {
     public function __construct()
     {
-        // 1. Apply 'auth' middleware to ALL methods in this controller by default.
-        // This solves the session timeout/null user error for 95% of your functions.
+        // 1. Requirement: Ensure user is logged in for most actions [cite: 2026-01-06]
         $this->middleware('auth')->except([
-            'list',        // Public: display list of years
-            'one',         // Public: display one show
-            'year',         // Public: display one year
-            'view',         // Public: display one year
+            'index', 'list', 'one', 'year', 'view'
         ]);
 
+        // 2. Requirement: Only Admin OR SeniorDruid can create/edit/delete [cite: 2026-01-06]
+        // Note: We except the same public methods so guests aren't blocked from the gallery.
+        $this->middleware('role:admin|SeniorDruid')->except([
+            'index', 'list', 'one', 'year', 'view'
+        ]);
     }
-
 
     public function index(Request $request)
     {
@@ -41,16 +41,26 @@ class SlideshowController extends Controller
             $activeNames = Slideshow::where('year', $selectedYear)->orderBy('name')->pluck('name');
         }
 
-        // 3. Logic to determine if a specific record is "Selected"
+// 3. Logic to determine if a specific record is "Selected"
         $choiceId = null;
         if ($selectedYear && $selectedName) {
             $slideshow = Slideshow::where('year', $selectedYear)
                 ->where('name', $selectedName)
                 ->first();
             $choiceId = $slideshow ? $slideshow->id : null;
+
+            // 🚦 The Public Redirect Interceptor
+            if ($choiceId) {
+                $isStaff = auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']);
+
+                if (!$isStaff) {
+                    // Redirect to the newly synced route and method
+                    return redirect()->route('slideshows.view', ['id' => $choiceId]);
+                }
+            }
         }
 
-        // 4. Return everything to the view
+// 4. Return everything to the view (Only Staff reach this if a choiceId is set)
         return view('slideshows.index', compact(
             'selectedYear',
             'selectedName',
@@ -59,6 +69,8 @@ class SlideshowController extends Controller
             'choiceId'
         ));
     }
+
+
         /**
      * Display a listing of the resource.
      */
@@ -181,7 +193,7 @@ class SlideshowController extends Controller
     /**
      * View a slideshow.
      */
-    public function show(int $id): View
+    public function view(int $id): View
     {
         $slideshow = Slideshow::findOrFail($id);
         /** @var \App\Models\Slideshow $slideshow */

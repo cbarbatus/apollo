@@ -16,6 +16,15 @@ use Illuminate\Validation\Rule;
 
 class RitualController extends Controller
 {
+    public function __construct()
+    {
+        // Add 'display' and 'liturgy' to the whitelist
+        $this->middleware('auth')->except(['index', 'display', 'liturgy']);
+
+        // Ensure leaders can still manage, but members/guests can view these three
+        $this->middleware('role:admin|SeniorDruid')->except(['index', 'display', 'liturgy']);
+    }
+
 
     public function index(Request $request)
     {
@@ -43,15 +52,21 @@ class RitualController extends Controller
         }
 
         // 5. THE FLOW LOGIC
+// 5. THE FLOW LOGIC [cite: 2026-01-06]
         if ($ritual) {
-            // GUESTS: Transport immediately to the clean public view
-            if (auth()->guest()) {
+            // Check if the user has the 'Master Key' (Admin or SeniorDruid)
+            $isStaff = auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']);
+
+            if (!$isStaff) {
+                // GUESTS & MEMBERS: Transport immediately to the clean public view
+                // Using the direct path you already had established
                 return redirect()->to("/rituals/{$ritual->id}/display");
             }
-            // AUTHORIZED: Stay here to show the Ritual Management card
+
+            // AUTHORIZED STAFF: Stay here to show the Ritual Management card
         }
 
-        // 6. PASS TO APOLLO
+// 6. PASS TO APOLLO
         return view('rituals.index', compact(
             'activeYears',
             'activeNames',

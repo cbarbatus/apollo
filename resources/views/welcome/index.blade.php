@@ -61,5 +61,23 @@
             @endif {{-- End id != 99 --}}
         @endforeach
 
+
+
+        <hr class="my-5">
+
+        {{-- 4. Contact and Social Media Links --}}
+        <div class="text-center">
+            <a href="/contact" class="text-decoration-none d-block mb-3">
+                <span class="text-dark fs-4 fw-bold">Contact Us</span>
+            </a>
+
+            <div class="d-inline-flex justify-content-center">
+                <a href="https://www.facebook.com/ravenscrygrove/" target="_blank" rel="noopener noreferrer">
+                    {{-- Consider using an SVG or a modern icon if possible --}}
+                    <img src="/img/facebook_button.gif" alt="Follow Us on Facebook">
+                </a>
+            </div>
+        </div>
     </div>
+
 @endsection

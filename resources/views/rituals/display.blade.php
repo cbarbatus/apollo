@@ -10,27 +10,36 @@
         {{-- The Four Media Pillars --}}
         <div class="row g-3 mb-5">
             {{-- 1. Liturgy --}}
+            {{-- 1. Liturgy --}}
             <div class="col-sm-6 col-md-3">
-                @if ($ritual->liturgy_base)
-                    <x-apollo-button href="{{ route('rituals.liturgy', $ritual->id) }}">
+                @php
+                    $filename = "{$ritual->year}_{$ritual->name}.htm";
+                    $hasLiturgy = file_exists(public_path("liturgy/{$filename}"));
+                @endphp
+
+                @if ($hasLiturgy)
+                    <a href="{{ route('rituals.liturgy', $ritual->id) }}" class="btn btn-primary w-100 shadow-sm fw-bold">
                         View Liturgy
-                    </x-apollo-button>
+                    </a>
                 @else
-                    <div class="p-2 border rounded text-center text-muted small bg-light">No Liturgy Text</div>
+                    <div class="p-2 border rounded text-center text-muted small bg-light">
+                        No Liturgy Text
+                    </div>
                 @endif
             </div>
 
             {{-- 2. Slideshow --}}
             <div class="col-sm-6 col-md-3">
                 @if ($slideshow)
-                    <a href="{{ url('/slideshows/' . $slideshow->id) }}" class="btn btn-info w-100 shadow-sm fw-bold">
+                    <a href="{{ url('/slideshows/' . $slideshow->id) . '/view' }}" class="btn btn-info w-100 shadow-sm fw-bold">
                         View Slideshow
                     </a>
                 @else
-                    <div class="p-2 border rounded text-center text-muted small bg-light">No Slideshow</div>
+                    <div class="p-2 border rounded text-center text-muted small bg-light">
+                        No Slideshow
+                    </div>
                 @endif
             </div>
-
             {{-- 3. Announcement --}}
             {{-- 3. Announcement Status (Non-button indicator) --}}
             <div class="col-sm-6 col-md-3">
@@ -73,8 +82,7 @@
         {{-- Footer --}}
         {{-- Footer Navigation converted to a proper button --}}
         <div class="mt-5 pt-4 border-top">
-            <a href="{{ route('rituals.index', ['year' => $ritual->year]) }}" class="btn btn-secondary shadow-sm px-4">
-                <i class="bi bi-arrow-left me-2"></i>More {{ $ritual->year }} Rituals
-            </a>
-        </div>  </div>
+            <x-apollo-button href="{{ route('rituals.index', ['year' => $ritual->year]) }}">More {{ $ritual->year }} Rituals</x-apollo-button>
+        </div>
+    </div>
 @endsection

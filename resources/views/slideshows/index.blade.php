@@ -9,7 +9,7 @@
         @auth
             <div class="row mb-4">
                 <div class="col-md-4">
-                    <x-apollo-button href="/slideshows/create" color="warning" class="fw-bold px-4 shadow-sm">
+                    <x-apollo-button href="/slideshows/create" color="primary" class="fw-bold px-4 shadow-sm">
                         New Slideshow
                     </x-apollo-button>
                 </div>
@@ -41,7 +41,8 @@
         </form>
 
         {{-- 1. Standardized Management Card --}}
-        @if(isset($choiceId))
+        {{-- Only show the Management Card to Admin or SeniorDruid --}}
+        @if(isset($choiceId) && auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']))
             <div class="row">
                 <div class="col-md-6 col-lg-5">
                     <div class="card mb-4 bg-light shadow-sm border-0">
@@ -49,7 +50,9 @@
                             <h5 class="card-title text-muted small uppercase">Manage Slideshow</h5>
                             <p class="h5 mb-3">{{ $selectedName }} {{ $selectedYear }}</p>
                             <div class="d-flex gap-2">
-                                <x-apollo-button href="{{ route('slideshows.show', $choiceId) }}">View</x-apollo-button>
+                                <x-apollo-button href="{{ route('slideshows.view', ['id' => $choiceId]) }}" color="primary">
+                                    View
+                                </x-apollo-button>
                                 <x-apollo-button href="{{ route('slideshows.edit', $choiceId) }}" color="warning">Edit</x-apollo-button>
                                 <x-delete-button :action="url('slideshows/' . $choiceId)" resource="Slideshow" />
                             </div>

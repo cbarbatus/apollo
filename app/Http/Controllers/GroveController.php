@@ -18,17 +18,25 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class GroveController extends Controller
 {
+    public function __construct()
+    {
+        // Protect everything EXCEPT the member pages with Admin role
+        $this->middleware('role:admin')->except(['bylaws', 'pay']);
+
+        // Specifically protect those two pages with the Member role
+        $this->middleware('role:member')->only(['bylaws', 'pay']);
+    }
+
+
+
     public function bylaws(): BinaryFileResponse|RedirectResponse
     {
-        if (Auth::check()) {
-            $fileName = 'bylaws.pdf';
-            $location = storage_path('app/grove');
-            $fullName = $location.'/'.$fileName;
+        $fileName = 'bylaws.pdf';
+        $location = storage_path('app/grove');
+        $fullName = $location.'/'.$fileName;
 
-            return response()->file($fullName);
-        }
+        return response()->file($fullName);
 
-        return redirect('/');
     }
 
     public function pay(): View|RedirectResponse
@@ -151,12 +159,5 @@ class GroveController extends Controller
         // Redirect to index
         return redirect('grove/upload');
     }
-
-        /* public allowed to donate */
-    public function donate(): View
-    {
-        return view('grove.donate');
-    }
-
 
 }
