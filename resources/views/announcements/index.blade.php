@@ -9,8 +9,9 @@
 
         <div class="row mb-4">
             <div class="col-md-4">
-                {{-- Form action is a GET request, so it doesn't strictly need a <form> wrapper if just a link --}}
-                <a href="{{ url('/announcements/create') }}" class="btn btn-warning">New Announcement</a>
+                <x-apollo-button href="{{ url('/announcements/create') }}">
+                    <i class="bi bi-plus-lg me-2"></i>New Announcement
+                </x-apollo-button>
             </div>
         </div>
 

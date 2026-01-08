@@ -10,7 +10,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [WelcomeController::class, 'index'])->name('home');
-Route::get('/home', [HomeController::class, 'index']);
+Route::get('/home', [WelcomeController::class, 'index']);
+Route::get('/dashboard', [WelcomeController::class, 'index'])->name('dashboard');
+
 
 // Rituals & Slideshows (Public Views)
 Route::get('/rituals', [RitualController::class, 'index'])->name('rituals.index');
@@ -23,8 +25,9 @@ Route::get('/slideshows/{id}/view', [SlideshowController::class, 'view'])->name(
 // Books & Contacts (Public Views)
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
-Route::get('/contact', [ContactController::class, 'contactus']);
-Route::post('/contacts/submit', [ContactController::class, 'submit']);
+Route::get('/contact', [ContactController::class, 'contactus'])->name('contactus');
+Route::get('/contacts/thanks', [ContactController::class, 'thanks'])->name('contacts.thanks');
+Route::post('/contacts/submit', [ContactController::class, 'submit'])->name('contacts.submit');
 
 // Onboarding
 Route::get('/members/join', [MemberController::class, 'join']);
@@ -39,8 +42,13 @@ Route::post('/members/join', [MemberController::class, 'savejoin']);
 Route::middleware(['auth', 'role:member|SeniorDruid|admin'])->group(function () {
     Route::get('/members', [MemberController::class, 'index']);
     Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
+    Route::get('/liturgy/list', [LiturgyController::class, 'list'])->name('liturgy.list');
+    Route::get('/liturgy/{id}/downloadSource', [LiturgyController::class, 'downloadSource'])->name('liturgy.downloadSource');
     Route::get('/grove/pay', [GroveController::class, 'pay']);
     Route::get('/grove/bylaws', [GroveController::class, 'bylaws']);
+    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
+    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
+    Route::post('/members/{id}/update', [MemberController::class, 'update'])->name('members.update');
 });
 
 
@@ -66,12 +74,19 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::get('rituals/{id}/uploadlit', [RitualController::class, 'uploadlit'])->name('rituals.uploadlit');
     Route::post('rituals/storelit', [RitualController::class, 'storelit'])->name('rituals.storelit');
     Route::get('announcements/{id}/uploadpic', [AnnouncementController::class, 'uploadpic'])->name('announcements.uploadpic');
+    Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
+    Route::post('/contacts/{id}/spam', [ContactController::class, 'spam'])->name('contacts.spam');
+    Route::post('/contacts/{id}/replied', [ContactController::class, 'reply'])->name('contacts.replied');
+    Route::get('/contacts/{type}/list', [ContactController::class, 'list'])->name('contacts.list');
+    Route::delete('/members/{id}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
+    Route::delete('/contacts/delete-spam', [ContactController::class, 'massDeleteSpam'])->name('contacts.deleteSpam');
 
     // Schedule & Members Management
     Route::get('/schedule', [ElementController::class, 'editSchedule'])->name('schedule.edit');
     Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');
     Route::get('/members/newmembers', [MemberController::class, 'newmembers']);
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
+    Route::delete('/members/{id}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
 });
 
 

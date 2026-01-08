@@ -60,57 +60,55 @@
                 You have no contacts
                 </div>
             @else
-                <div style="overflow-x: hidden;">
-                    <table class="table table-hover table-fixed">
+                <div class="table-responsive">
+                    {{-- Removed table-fixed --}}
+                    <table class="table table-hover align-middle">
                         <thead>
                         <tr>
-                            <th class="col-id">ID</th>
-                            <th class="col-name">Name</th>
-                            <th class="col-email">Email</th>
-                            <th class="col-message">Message</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-action">Action</th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Message</th>
+                            <th>Status</th>
+                            {{-- No width: 1% here --}}
+                            <th class="text-center">Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         @foreach($contacts as $contact)
-                            <tr class="align-middle">
+                            <tr>
                                 <td class="text-muted small">{{ $contact->id }}</td>
-                                <td class="break-word fw-bold">{{ $contact->name }}</td>
-                                <td class="break-word text-secondary">{{ $contact->email }}</td>
-                                <td class="col-message">
-                <span class="truncate-text" title="{{ $contact->message }}">
-                    {{ $contact->message }}
-                </span>
-                                </td>
+                                <td class="fw-bold">{{ $contact->name }}</td>
+                                <td class="text-secondary">{{ $contact->email }}</td>
                                 <td>
-                                    <span class="badge bg-light text-dark border p-1">{{ $contact->status }}</span>
-                                </td>
-                                <td class="col-action text-nowrap">
-                                    <div class="d-flex gap-1">
-                                        {{-- Mark Replied Form --}}
-                                        <form action="/contacts/{{ $contact->id }}/reply" method="POST">
-                                            @csrf
-                                            <x-apollo-button type="submit" class="btn-warning btn-sm">
-                                                Mark Replied
-                                            </x-apollo-button>
-                                        </form>
-
-                                        {{-- Mark Spam Form --}}
-                                        <form action="/contacts/{{ $contact->id }}/spam" method="POST">
-                                            @csrf
-                                            <x-apollo-button type="submit" class="btn-danger btn-sm">
-                                                Mark Spam
-                                            </x-apollo-button>
-                                        </form>
+                                    <div class="truncate-text" style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $contact->message }}">
+                                        {{ $contact->message }}
                                     </div>
                                 </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-                </div>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ $contact->status }}</span>
+                                </td>
+                                {{-- This cell is the key: d-flex and gap keep the buttons together and visible --}}
+                                <td class="text-nowrap text-end">
+                                    <div class="d-flex justify-content-center gap-2">
 
+                                        <form action="{{ route('contacts.replied', $contact->id) }}" method="POST" class="m-0">
+                                            @csrf
+                                            <x-apollo-button type="submit" color="warning" size="sm">Mark Replied</x-apollo-button>
+                                        </form>
+
+                                        <form action="{{ route('contacts.spam', $contact->id) }}" method="POST" class="m-0">
+                                            @csrf
+                                            <x-apollo-button type="submit" color="primary" size="sm">Mark Spam</x-apollo-button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             @endif
         </div>
 

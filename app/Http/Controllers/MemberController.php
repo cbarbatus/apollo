@@ -223,8 +223,10 @@ class MemberController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Member $member): RedirectResponse
+    public function update(Request $request, $id) // Use $id here
     {
+        // Manually find the member since we aren't using Route Model Binding
+        $member = Member::findOrFail($id);
         // 1. Validation & Security Gate
         // This ensures only the fields Susan is allowed to see are updated by her
         $isManager = auth()->user()->canAny(['change all', 'change members', 'change_members']);
@@ -239,6 +241,7 @@ class MemberController extends Controller
             'alt_phone' => 'nullable|string',
             'email' => 'required|email', // Remove Rule::unique entirely from here
         ]);
+
 
         // 2. Add Management Fields ONLY if the user is a Manager
         if ($isManager) {
@@ -255,6 +258,9 @@ class MemberController extends Controller
         }
 
 // 3. Update Member Attributes
+        // Manually find the member since we aren't using Route Model Binding
+        $member = Member::findOrFail($id);
+
         $member->update($data);
 
 // 4. User Record Management [cite: 2025-12-31]

@@ -79,7 +79,7 @@ class LiturgyController extends Controller
      *
      * @return \Illuminate\Foundation\Application|RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|BinaryFileResponse
      */
-    public function get(int $id)
+    public function downloadSource(int $id)
     {
         if (Auth::check()) {
             $ritual = Ritual::query()->findOrFail($id);

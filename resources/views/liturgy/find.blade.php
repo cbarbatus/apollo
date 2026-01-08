@@ -12,8 +12,7 @@
 
         <p class="text-muted mb-4">Select a ritual name or a culture or both to list rituals. You can then either look at a ritual or download the .docx file.</p>
 
-        <form method="post" action="/liturgy/list" id="create" class="row g-3 align-items-end">
-            @csrf
+        <form method="GET" action="/liturgy/list" id="create" class="row g-3 align-items-end">
 
             <div class="col-auto">
                 <label for="name" class="form-label fw-bold small">Name:</label>
