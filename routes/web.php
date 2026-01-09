@@ -59,21 +59,16 @@ Route::middleware(['auth', 'role:member|SeniorDruid|admin'])->group(function () 
 */
 Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
 
-    // Management Resources
-    Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);
-    Route::resource('slideshows', SlideshowController::class)->except(['index', 'view']);
-    Route::resource('sections', SectionController::class)->except(['index']);
-    Route::resource('announcements', AnnouncementController::class);
-    Route::resource('venues', VenueController::class);
-    Route::resource('books', BookController::class)->except(['index', 'show']);
-    Route::resource('elements', ElementController::class);
-
-    // Ritual & Announcement Specifics
+    // 1. Specific Ritual & Announcement Actions (The "Interceptors")
     Route::get('/rituals/editNames', [RitualController::class, 'editNames']);
     Route::get('/rituals/editCultures', [RitualController::class, 'editCultures']);
     Route::get('rituals/{id}/uploadlit', [RitualController::class, 'uploadlit'])->name('rituals.uploadlit');
     Route::post('rituals/storelit', [RitualController::class, 'storelit'])->name('rituals.storelit');
+
     Route::get('announcements/{id}/uploadpic', [AnnouncementController::class, 'uploadpic'])->name('announcements.uploadpic');
+    Route::get('announcements/{id}/activate', [AnnouncementController::class, 'activate'])->name('announcements.activate');
+
+    // 2. Contact & Member Custom Logic
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::post('/contacts/{id}/spam', [ContactController::class, 'spam'])->name('contacts.spam');
     Route::post('/contacts/{id}/replied', [ContactController::class, 'reply'])->name('contacts.replied');
@@ -81,12 +76,20 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::delete('/members/{id}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
     Route::delete('/contacts/delete-spam', [ContactController::class, 'massDeleteSpam'])->name('contacts.deleteSpam');
 
-    // Schedule & Members Management
+    // 3. Schedule & Specific Member Queries
     Route::get('/schedule', [ElementController::class, 'editSchedule'])->name('schedule.edit');
     Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');
     Route::get('/members/newmembers', [MemberController::class, 'newmembers']);
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
-    Route::delete('/members/{id}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
+
+    // 4. Management Resources (The "Catch-Alls" at the bottom)
+    Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);
+    Route::resource('slideshows', SlideshowController::class)->except(['index', 'view']);
+    Route::resource('sections', SectionController::class);
+    Route::resource('announcements', AnnouncementController::class);
+    Route::resource('venues', VenueController::class);
+    Route::resource('books', BookController::class)->except(['index', 'show']);
+    Route::resource('elements', ElementController::class);
 });
 
 

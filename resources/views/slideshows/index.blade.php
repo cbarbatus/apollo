@@ -28,11 +28,11 @@
                 @endforeach
             </select>
 
-            <select name="name" id="name" class="form-select w-auto">
+            <select name="choice_id" id="choice_id" class="form-select w-auto">
                 <option value="">-- Select Slideshow --</option>
-                @foreach ($activeNames as $name)
-                    <option value="{{ $name }}" {{ request('name') == $name ? 'selected' : '' }}>
-                        {{ $name }}
+                @foreach ($activeSlideshows as $slideshow)
+                    <option value="{{ $slideshow->id }}" {{ request('choice_id') == $slideshow->id ? 'selected' : '' }}>
+                        {{ $slideshow->name }}
                     </option>
                 @endforeach
             </select>

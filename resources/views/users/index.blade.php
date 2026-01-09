@@ -1,20 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container py-4">
-        {{-- 1. Restore the H1 Title --}}
-        <h1 class="display-6 fw-bold mb-4">System Access Control</h1>
-
-        {{-- 2. Create the Message Area for success/warnings --}}
-        @if(session('success'))
-            <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 8px;">
-                {{ session('success') }}
-            </div>
-        @endif
-
-    </div>
-
-        <x-alert-success />
 
         <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
             <div class="table-responsive">

@@ -34,38 +34,43 @@ class SlideshowController extends Controller
 
         // 2. Your existing logic to fetch dropdown data
         // (Assuming these are already in your controller)
+        // 2. Your updated logic to fetch the full objects
         $activeYears = Slideshow::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
-        $activeNames = [];
+
+// Initialize as an empty collection so the @foreach doesn't break
+        $activeSlideshows = collect();
 
         if ($selectedYear) {
-            $activeNames = Slideshow::where('year', $selectedYear)->orderBy('name')->pluck('name');
+            // We fetch the full records so the View can access $slideshow->id and $slideshow->name
+            $activeSlideshows = Slideshow::where('year', $selectedYear)
+                ->orderBy('sequence', 'asc')
+                ->get();
         }
 
 // 3. Logic to determine if a specific record is "Selected"
-        $choiceId = null;
-        if ($selectedYear && $selectedName) {
-            $slideshow = Slideshow::where('year', $selectedYear)
-                ->where('name', $selectedName)
-                ->first();
-            $choiceId = $slideshow ? $slideshow->id : null;
+        $choiceId = $request->get('choice_id'); // Get the ID directly from the new dropdown value
 
-            // 🚦 The Public Redirect Interceptor
-            if ($choiceId) {
+        if ($choiceId) {
+            // We check if it exists just to be safe
+            $slideshow = Slideshow::find($choiceId);
+
+            if ($slideshow) {
+                // 🚦 The Public Redirect Interceptor
                 $isStaff = auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']);
 
                 if (!$isStaff) {
-                    // Redirect to the newly synced route and method
-                    return redirect()->route('slideshows.view', ['id' => $choiceId]);
+                    // Redirect using the exact ID for precision
+                    return redirect()->route('slideshows.view', ['id' => $slideshow->id]);
                 }
             }
         }
-
 // 4. Return everything to the view (Only Staff reach this if a choiceId is set)
+// 4. Update the compact() to include the new variable
         return view('slideshows.index', compact(
             'selectedYear',
             'selectedName',
             'activeYears',
-            'activeNames',
+            'activeSlideshows', // Changed from activeNames
             'choiceId'
         ));
     }

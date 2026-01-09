@@ -112,6 +112,7 @@
                     <x-apollo-button type="submit">
                         Save Changes
                     </x-apollo-button>
+                    <x-cancel-button></x-cancel-button>
                 </div>
             </div>
         </form> {{-- The form now correctly closes AFTER the button --}}

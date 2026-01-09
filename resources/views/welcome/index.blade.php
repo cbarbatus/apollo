@@ -32,7 +32,8 @@
 
                     @if ($section->showit)
                         <div class="card-body">
-                            <a href="/sections/{{ $section->id }}/off"
+                            <a href="/sections/{{ $section->id }}/off"\
+"
                                class="btn btn-sm btn-secondary float-end mb-3 border-0 shadow-sm"
                                style="color: white !important;">
                                 CLOSE SECTION

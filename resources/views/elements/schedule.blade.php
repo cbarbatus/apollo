@@ -2,10 +2,6 @@
 
 @section('content')
     <div class="container">
-        {{-- Unified Alert Components --}}
-        <x-alert-success />
-        <x-alert-danger />
-
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-primary text-white py-3">
                 <h4 class="mb-0 fw-bold">Edit Ritual Schedule</h4>

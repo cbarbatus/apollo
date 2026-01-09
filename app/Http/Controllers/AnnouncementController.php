@@ -104,28 +104,22 @@ class AnnouncementController extends Controller
      */
     public function edit(int $id): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
             /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole(['admin', 'SeniorDruid'])) {
+        $announcement = Announcement::findOrFail($id);
+        /** @var \App\Models\Announcement $announcement */
 
-                $announcement = Announcement::findOrFail($id);
-                /** @var \App\Models\Announcement $announcement */
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
+        $locations = Venue::all();
 
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
-                $locations = Venue::all();
+        $element = Element::where('name', 'RitualNames')->first();
+        /** @var \App\Models\Element|null $elements */
 
-                $elements = Element::where('name', '=', 'names')->first();
-                /** @var \App\Models\Element|null $elements */
+        // Handle possible null element and property access
+        $rituals = ($element && !empty($element->item))
+            ? array_map('trim', explode(',', $element->item))
+            : [];
 
-                // Handle possible null element and property access
-                $rituals = ($elements && is_string($elements->item)) ? explode(',', $elements->item) : [];
-
-                return view('announcements.edit', compact('announcement', 'locations', 'rituals'));
-            }
-        }
-
-        return redirect('/');
+        return view('announcements.edit', compact('announcement', 'locations', 'rituals'));
     }
 
     /**
@@ -133,21 +127,21 @@ class AnnouncementController extends Controller
      */
     public function update(Request $request, Announcement $announcement): RedirectResponse
     {
-        // NO MANUAL FIND IS NEEDED! $announcement is already the correct model instance.
-        // $announcement = Announcement::find($id); <-- DELETE THIS LINE
-
-        // Your update logic (simplified):
-        $announcement->name = (string) ($request->input('name') ?? $announcement->name);
-        $announcement->when = (string) ($request->input('when') ?? $announcement->when);
-        $announcement->venue_name = (string) ($request->input('venue_name') ?? $announcement->venue_name);
-        $announcement->notes = (string) ($request->input('notes') ?? $announcement->notes);
-        $announcement->year = (string) ($request->input('year') ?? $announcement->year);
-        $announcement->summary = (string) ($request->input('summary') ?? $announcement->summary);
+        // Capture the inputs, defaulting to current values if the request is empty
+        $announcement->name         = (string) ($request->input('name') ?? $announcement->name);
+        $announcement->when         = (string) ($request->input('when') ?? $announcement->when);
+        $announcement->venue_name   = (string) ($request->input('venue_name') ?? $announcement->venue_name);
+        $announcement->year         = (string) ($request->input('year') ?? $announcement->year);
         $announcement->picture_file = (string) ($request->input('picture_file') ?? $announcement->picture_file);
 
+        // Explicitly handling the Trix fields
+        $announcement->summary      = (string) ($request->input('summary') ?? $announcement->summary);
+        $announcement->notes        = (string) ($request->input('notes') ?? $announcement->notes);
+
         $announcement->save();
-        // 🟢 CRITICAL CHANGE: Use the Named Route for reliability 🟢
-        return redirect()->route('announcements.index')->with('success', 'Announcement '.$announcement->id.' was updated');
+
+        return redirect()->route('announcements.index')
+            ->with('success', "Announcement #{$announcement->id} was updated");
     }
 
     /**
@@ -156,76 +150,42 @@ class AnnouncementController extends Controller
     /**
      * Copy announcement to front page by populating related Element records.
      */
-    public function activate(int $id): View|RedirectResponse
+    public function activate(int $id): RedirectResponse
     {
-        /** @var \App\Models\User|null $user */
-        $user = Auth::user();
-
-        if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
-
-            $announcement = Announcement::findOrFail($id);
-            /** @var \App\Models\Announcement $announcement */
-
-            // 1. Fetch Venue by name
-            // Note: Venue::where('name', ...) is used in the working version.
-            // We'll stick to this field name, assuming it's correct for the Venue model.
-            $venue = Venue::where('name', $announcement->venue_name)->first();
-
-            // Safety check: ensure venue exists before attempting to access properties
-            if (!$venue) {
-                return redirect('/')->with('error', "Venue '{$announcement->venue_name}' not found for this announcement.");
-            }
-
-            $cover_pic = '<img alt="Ritual Picture" src="/img/'.$announcement->picture_file.'" style="display:block; margin-left:auto; margin-right:auto; width:100%; height:auto; border:5px groove black;" >';
-            $driving = $venue->directions;
-            $map = $venue->map_link;
-
-            // 2. Fetch all front-page elements (section_id = 5)
-            $elements = Element::where('section_id', 5)->get();
-
-            // 3. Process and save data to Element records
-            foreach ($elements as $element) {
-
-                // Clean up the ugly switch statement by using a lookup array and consistent logic
-                switch ($element->name) {
-                    case 'picture':
-                        $element->item = $cover_pic;
-                        break;
-                    case 'summary':
-                        $element->item = $announcement->summary;
-                        break;
-                    case 'when':
-                        // MODERNIZED TIME CONVERSION: Use Carbon for reliable time formatting
-                        try {
-                            $carbonDate = Carbon::parse($announcement->when);
-                            $whenap = $carbonDate->format('M j, Y \a\t g:i A'); // Example: "Dec 15, 2025 at 7:00 PM"
-                            $element->item = 'WHEN: ' . $whenap;
-                        } catch (\Exception $e) {
-                            $element->item = 'WHEN: Invalid Date Format';
-                        }
-                        break;
-                    case 'where':
-                        $element->item = 'WHERE: ' . $venue->title;
-                        break;
-                    case 'notes':
-                        $element->item = $announcement->notes;
-                        break;
-                    case 'driving':
-                        $element->item = 'DRIVING DIRECTIONS: ' . $driving;
-                        break;
-                    case 'map':
-                        $element->item = 'Here is a Google Map to the ritual site. <a href=" ' . $map . ' ">GOOGLE MAP LINK</a>';
-                        break;
-                }
-                $element->save();
-            }
+        // Authorization check (Consider moving this to middleware or a Policy later)
+        if (!Auth::user()?->hasRole(['admin', 'SeniorDruid'])) {
+            abort(403);
         }
 
-        // 4. Redirect to the homepage after activation
-        return redirect('/');
+        $announcement = Announcement::findOrFail($id);
+        $venue = Venue::where('name', $announcement->venue_name)->first();
+
+        if (!$venue) {
+            return redirect()->back()->with('error', "Venue not found.");
+        }
+
+        // Define the Map: 'element_name' => 'new_value'
+        $dataMap = [
+            'picture' => '<img alt="Ritual Picture" src="/img/'.$announcement->picture_file.'" style="display:block; margin-left:auto; margin-right:auto; width:100%; height:auto; border:5px groove black;" >',
+            'summary' => $announcement->summary,
+            'when'    => 'WHEN: ' . Carbon::parse($announcement->when)->format('M j, Y \a\t g:i A'),
+            'where'   => 'WHERE: ' . $venue->title,
+            'notes'   => $announcement->notes,
+            'driving' => 'DRIVING DIRECTIONS: ' . $venue->directions,
+            'map'     => 'Here is a Google Map to the ritual site. <a href="'.$venue->map_link.'">GOOGLE MAP LINK</a>',
+        ];
+
+        // Bulk processing
+        Element::where('section_id', 5)
+            ->get()
+            ->each(function ($element) use ($dataMap) {
+                if (isset($dataMap[$element->name])) {
+                    $element->update(['item' => $dataMap[$element->name]]);
+                }
+            });
+
+        return redirect('/')->with('success', "Home page updated with {$announcement->name}");
     }
-
-
     /**
      * Show the Upload Form for a specific Announcement
      */

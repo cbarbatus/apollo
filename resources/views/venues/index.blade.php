@@ -4,8 +4,6 @@
     <div class='container my-5'>
         <h1 class="display-6 fw-bold border-bottom pb-3 mb-4">Venues</h1>
 
-        <x-alert-success />
-
         {{-- 1. Standardized New Venue Button --}}
         <div class="row mb-4">
             <div class="col-md-4">
