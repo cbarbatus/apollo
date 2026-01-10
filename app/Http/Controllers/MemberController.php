@@ -295,7 +295,5 @@ class MemberController extends Controller
             }
 
             return redirect('/members');
-
-        return redirect('/');
     }
 }
