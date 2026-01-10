@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');
     Route::get('/members/newmembers', [MemberController::class, 'newmembers']);
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
+    Route::put('/elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');
 
     // 4. Management Resources (The "Catch-Alls" at the bottom)
     Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);

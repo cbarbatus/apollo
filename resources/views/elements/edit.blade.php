@@ -43,7 +43,7 @@
                             <x-apollo-button type="submit">
                                 Save Changes
                             </x-apollo-button>
-                            <x-cancel-button href="/sections" />
+                            <x-cancel-button href="{{ url('sections') }}" class="text-white" />
                         </div>
                     </div>
                 </div>
