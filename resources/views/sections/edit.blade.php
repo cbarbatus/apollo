@@ -7,16 +7,6 @@
 
         </div>
 
-        @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if (session('status'))
-            <div class="alert alert-success">{{ session('status') }}</div>
-        @endif
-
         <form method="POST" action="{{ url('sections/' . $section->id . '/update') }}">
             @csrf
 
@@ -60,9 +50,10 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <x-apollo-button
                 href="/elements/create?section_id={{ $section->id }}"
-                color="success"
-                class="fw-bold border-0 px-4"
-            >
+                color="primary"
+                {{-- Using the exact Phoenix brand color to match 'Save Section Changes' --}}
+                style="background-color: #0056b3 !important; border-color: #0056b3 !important;"
+                class="fw-bold px-4 text-white">
                 <i class="bi bi-plus-lg me-2"></i> Add New Element
             </x-apollo-button>
         </div>
