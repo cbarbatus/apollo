@@ -30,9 +30,11 @@ Route::get('/contacts/thanks', [ContactController::class, 'thanks'])->name('cont
 Route::post('/contacts/submit', [ContactController::class, 'submit'])->name('contacts.submit');
 
 // Onboarding
-Route::get('/members/join', [MemberController::class, 'join']);
-Route::post('/members/join', [MemberController::class, 'savejoin']);
-
+Route::get('/members/join', [MemberController::class, 'join'])->name('members.join');
+Route::post('/members/join', [MemberController::class, 'savejoin'])->name('members.savejoin');
+Route::middleware(['auth', 'role:joiner'])->group(function () {
+    Route::get('/members/join', [MemberController::class, 'join'])->name('members.join');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -40,15 +42,15 @@ Route::post('/members/join', [MemberController::class, 'savejoin']);
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:member|SeniorDruid|admin'])->group(function () {
-    Route::get('/members', [MemberController::class, 'index']);
+    Route::get('/members', [MemberController::class, 'index'])->name('members.index');
     Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
     Route::get('/liturgy/list', [LiturgyController::class, 'list'])->name('liturgy.list');
     Route::get('/liturgy/{id}/downloadSource', [LiturgyController::class, 'downloadSource'])->name('liturgy.downloadSource');
     Route::get('/grove/pay', [GroveController::class, 'pay']);
     Route::get('/grove/bylaws', [GroveController::class, 'bylaws']);
-    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
-    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
-    Route::post('/members/{id}/update', [MemberController::class, 'update'])->name('members.update');
+    Route::get('/members/{member}/edit', [MemberController::class, 'edit'])->name('members.edit');
+    Route::put('/members/{member}', [MemberController::class, 'update'])->name('members.update');
+    Route::post('/members/{member}/update', [MemberController::class, 'update']); // Optional: Keep for legacy forms
 });
 
 
@@ -73,13 +75,13 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::post('/contacts/{id}/spam', [ContactController::class, 'spam'])->name('contacts.spam');
     Route::post('/contacts/{id}/replied', [ContactController::class, 'reply'])->name('contacts.replied');
     Route::get('/contacts/{type}/list', [ContactController::class, 'list'])->name('contacts.list');
-    Route::delete('/members/{id}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
+    Route::delete('/members/{member}/deletejoin', [MemberController::class, 'deletejoin'])->name('members.deletejoin');
     Route::delete('/contacts/delete-spam', [ContactController::class, 'massDeleteSpam'])->name('contacts.deleteSpam');
 
     // 3. Schedule & Specific Member Queries
     Route::get('/schedule', [ElementController::class, 'editSchedule'])->name('schedule.edit');
     Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');
-    Route::get('/members/newmembers', [MemberController::class, 'newmembers']);
+    Route::get('/members/newmembers', [MemberController::class, 'newmembers'])->name('members.newmembers');
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
     Route::put('/elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');
 

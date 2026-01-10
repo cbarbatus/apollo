@@ -3,8 +3,6 @@
 @section('content')
     <div class='container py-4'>
 
-        <x-alert-success />
-
         <h1 class="mb-4">Edit Member: {{ $member->first_name }} {{ $member->last_name }}</h1>
 
         <form method="post" action="/members/{{ $member->id }}" id="edit">
