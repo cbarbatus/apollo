@@ -14,9 +14,11 @@
                     <i class="fa fa-filter"></i> Show Current Only
                 </a>
                 @else
-                    <a href="{{ url('/members?filter=all') }}" class="btn btn-secondary">
+                    <x-apollo-button
+                        :href="route('members.index', ['filter' => 'all'])"
+                        class="btn-secondary">
                         Show All Records
-                    </a>
+                    </x-apollo-button>
                 @endif
             </div>
 

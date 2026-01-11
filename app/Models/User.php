@@ -48,4 +48,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Shortcut to check if the user has the 'admin' role via Spatie.
+     */
+    public function getIsAdminAttribute(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+    /**
+     * Relationship to the Member record.
+     * Only active members have user records!
+     */
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
 }

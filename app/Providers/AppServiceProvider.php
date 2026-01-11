@@ -22,16 +22,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-// THIS IS THE CRITICAL FIX for MySQL Key Length Errors
         Schema::defaultStringLength(191);
+
+        // Explicitly register the policy for Laravel 12
+        Gate::policy(\App\Models\Member::class, \App\Policies\MemberPolicy::class);
+
         Gate::before(function (User $user, string $ability) {
-
-            // This condition MUST correctly identify your admin user.
-            // Since you use Spatie, hasRole('admin') is the safest bet.
             if ($user->hasRole('admin')) {
-                return true; // Bypasses ALL other authorization checks (Spatie, Policies, etc.)
+                return true;
             }
-
             return null;
         });
     }

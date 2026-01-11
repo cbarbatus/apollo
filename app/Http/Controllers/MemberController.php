@@ -202,6 +202,7 @@ class MemberController extends Controller
      */
     public function update(Request $request, Member $member): RedirectResponse
     {
+        // Laravel looks at MemberPolicy@update automatically
         $this->authorize('update', $member);
 
         // 1. Validate everything in one go
@@ -217,9 +218,19 @@ class MemberController extends Controller
         // 2. Perform the Member update
         $member->update($validated);
 
+
+
         // 3. User Record Management [cite: 2025-12-31]
         // We use optional() or null-coalescing to avoid "if" nesting
         if ($member->user_id && $user = \App\Models\User::find($member->user_id)) {
+
+            $existingUser = \App\Models\User::where('email', $member->email)
+                ->where('id', '!=', $user->id) // Make sure it's not the current user's own email
+                ->first();
+            if ($existingUser) {
+                return back()->withInput()->with('error', "The email {$member->email} is already assigned to another user record.");
+            }
+
             if ($member->status !== 'Current') {
                 $user->delete();
                 $member->update(['user_id' => 0]);

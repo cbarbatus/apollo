@@ -71,6 +71,11 @@ class Member extends Model
      */
     public function user()
     {
+        // If the ID is 0, we know there is no user, so don't even look.
+        if ($this->user_id === 0) {
+            return null;
+        }
+
         return $this->belongsTo(User::class);
     }
 
