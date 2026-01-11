@@ -5,8 +5,6 @@
     <div class='container'>
         <h1>Announcements</h1>
 
-        <x-alert-success />
-
         <div class="row mb-4">
             <div class="col-md-4">
                 <x-apollo-button href="{{ url('/announcements/create') }}">

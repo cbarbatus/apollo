@@ -67,8 +67,9 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::get('rituals/{id}/uploadlit', [RitualController::class, 'uploadlit'])->name('rituals.uploadlit');
     Route::post('rituals/storelit', [RitualController::class, 'storelit'])->name('rituals.storelit');
 
-    Route::get('announcements/{id}/uploadpic', [AnnouncementController::class, 'uploadpic'])->name('announcements.uploadpic');
-    Route::get('announcements/{id}/activate', [AnnouncementController::class, 'activate'])->name('announcements.activate');
+    Route::get('announcements/{announcement}/uploadpic', [AnnouncementController::class, 'uploadpic'])->name('announcements.uploadpic');
+    Route::post('announcements/{announcement}/storepic', [AnnouncementController::class, 'storepic'])->name('announcements.storepic');
+    Route::get('announcements/{announcement}/activate', [AnnouncementController::class, 'activate'])->name('announcements.activate');
 
     // 2. Contact & Member Custom Logic
     Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');

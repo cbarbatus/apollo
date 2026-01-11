@@ -10,7 +10,6 @@
 
             <div class="card-body p-4">
                 {{-- Standardized Apollo Success/Message Alert --}}
-                <x-alert-success />
 
                 <div class="mb-4">
                     <div class="alert alert-info border-0 shadow-sm">
@@ -21,7 +20,7 @@
                 </div>
 
                 {{-- Updated Action: Points to the new named route --}}
-                <form method="POST" action="{{ route('announcements.storepic') }}" enctype="multipart/form-data">
+                <form method="POST" action="{{ route('announcements.storepic', $announcement) }}" enctype="multipart/form-data">
                     @csrf
                     {{-- Mirroring the controller's expectation for 'id' and 'picname' --}}
                     <input type="hidden" name="id" value="{{ $announcement->id }}">

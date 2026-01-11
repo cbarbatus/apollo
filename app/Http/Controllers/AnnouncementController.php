@@ -9,27 +9,25 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Carbon; // Use Carbon for cleaner date/time handling
+use Illuminate\Support\Carbon;
+
 
 class AnnouncementController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            // This covers every single method in this controller
+            $this->authorize('manage', Announcement::class);
+            return $next($request);
+        });
+    }
     /**
      * Display a listing of the resource.
      */
     public function index(): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole(['admin', 'SeniorDruid'])) {
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Announcement> $announcements */
-                $announcements = Announcement::all();
-
-                return view('announcements.index', compact('announcements'));
-            }
-        }
-
-        return redirect('/');
+        return view('announcements.index', ['announcements' => Announcement::all()]); // Line 2: Delivery
     }
 
     /**
@@ -37,23 +35,15 @@ class AnnouncementController extends Controller
      */
     public function create(): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user->hasRole(['admin', 'SeniorDruid'])) {
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
-                $locations = Venue::all();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
+        $locations = Venue::all();
 
-                $elements = Element::where('name', '=', 'names')->first();
-                /** @var \App\Models\Element|null $elements */
+        $elements = Element::where('name', '=', 'RitualNames')->first();
+        /** @var \App\Models\Element|null $elements */
 
-                // Handle possible null element and property access
-                $rituals = ($elements && is_string($elements->item)) ? explode(',', $elements->item) : [];
-                return view('announcements.create', compact('locations', 'rituals'));
-            }
-        }
-
-        return redirect('/');
+        // Handle possible null element and property access
+        $rituals = ($elements && is_string($elements->item)) ? explode(',', $elements->item) : [];
+        return view('announcements.create', compact('locations', 'rituals'));
     }
 
     /**
@@ -89,30 +79,16 @@ class AnnouncementController extends Controller
         return redirect('/announcements');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Announcement  $announcement
-     */
-    public function show(Announcement $announcement): void
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View|RedirectResponse
+    public function edit(Announcement $announcement): View
     {
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-        $announcement = Announcement::findOrFail($id);
-        /** @var \App\Models\Announcement $announcement */
-
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
         $locations = Venue::all();
 
         $element = Element::where('name', 'RitualNames')->first();
-        /** @var \App\Models\Element|null $elements */
 
         // Handle possible null element and property access
         $rituals = ($element && !empty($element->item))
@@ -150,16 +126,9 @@ class AnnouncementController extends Controller
     /**
      * Copy announcement to front page by populating related Element records.
      */
-    public function activate(int $id): RedirectResponse
+    public function activate(Announcement $announcement): RedirectResponse
     {
-        // Authorization check (Consider moving this to middleware or a Policy later)
-        if (!Auth::user()?->hasRole(['admin', 'SeniorDruid'])) {
-            abort(403);
-        }
-
-        $announcement = Announcement::findOrFail($id);
         $venue = Venue::where('name', $announcement->venue_name)->first();
-
         if (!$venue) {
             return redirect()->back()->with('error', "Venue not found.");
         }
@@ -184,25 +153,21 @@ class AnnouncementController extends Controller
                 }
             });
 
-        return redirect('/')->with('success', "Home page updated with {$announcement->name}");
+        return redirect()->route('announcements.index')->with('success', 'Ritual activated!');
     }
     /**
      * Show the Upload Form for a specific Announcement
      */
-    public function uploadpic(int $id): View
+    public function uploadpic(Announcement $announcement): View
     {
-        $announcement = Announcement::findOrFail($id);
-
-        // Standard Phoenix Naming: 2024_Spring_Festival.jpg
         $picname = $announcement->year . '_' . str_replace(' ', '_', $announcement->name) . '.jpg';
-
         return view('announcements.uploadpic', compact('announcement', 'picname'));
     }
 
     /**
      * Process the Picture Upload
      */
-    public function storepic(Request $request): RedirectResponse
+    public function storepic(Announcement $announcement, Request $request): RedirectResponse
     {
         $request->validate([
             'file' => 'required|image|mimes:jpeg,jpg|max:2048',
@@ -219,21 +184,18 @@ class AnnouncementController extends Controller
         $announcement->picture_file = $filename;
         $announcement->save();
 
-        return redirect()->back()
-            ->with('success', "Picture for Announcement {$announcement->id} updated in /Img.");
+        return redirect()->route('announcements.index')
+            ->with('success', "The picture for '{$announcement->year} {$announcement->name}' has been updated.");
     }
 
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(int $id): RedirectResponse
+    public function destroy(Announcement $announcement): RedirectResponse
     {
-        $announcement = Announcement::findOrFail($id);
         $idLabel = $announcement->id; // Grab the ID before it's gone
-
         $announcement->delete();
-
         // Redirect to the index with the success message
         return redirect()->route('announcements.index')
             ->with('success', "Announcement {$idLabel} was deleted.");
