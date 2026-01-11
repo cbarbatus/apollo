@@ -274,37 +274,29 @@ class MemberController extends Controller
     /**
      * Restore a Resigned member
      */
-    public function restore(Request $request) : RedirectResponse
+    public function restore(Request $request): RedirectResponse
     {
-
-        $first_name = request('first_name');
-        $last_name = request('last_name');
-
         $member = Member::whereIn('category', ['Elder', 'Member'])
-            ->where('status', '=', 'Resigned')
-            ->where('first_name', '=', $first_name)
-            ->where('last_name', '=', $last_name)
+            ->where('status', 'Resigned')
+            ->where('first_name', $request->first_name)
+            ->where('last_name', $request->last_name)
             ->first();
-        /** @var \App\Models\Member|null $member */ // FIX: Explicitly cast $member
 
-        if ($member !== null) {
+        if ($member) {
+            $member->update(['status' => 'Current']);
 
-            $member->status = 'Current';
-            $member->save();
+            // Use create() to satisfy PHPStorm and keep it clean
+            $user = User::create([
+                'name'     => "{$member->first_name} {$member->last_name}",
+                'email'    => $member->email,
+                'password' => '', // Or Hash::make(Str::random(32)) for better security
+            ]);
 
-            $user = new User;
-            /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
-            $user->name = $first_name.' '.$last_name;
-            $user->email = $member->email;
-            $user->password = '';
             $user->assignRole('member');
-            $user->save();
 
-            $member->user_id = $user->id;
-            $member->save();
+            $member->update(['user_id' => $user->id]);
+        }
 
-            }
-
-            return redirect('/members');
+        return redirect()->route('members.index');
     }
 }
