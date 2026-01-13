@@ -185,28 +185,40 @@ class MemberController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View
+    public function edit($id): View
     {
-        // FIX: Variables initialized outside the if block to resolve compact() errors
-        $member = new Member();
-        /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member
-        $user = Auth::user();
-        /** @var \App\Models\User $user */ // FIX: Explicitly cast $user
         $member = Member::findOrFail($id);
-        /** @var \App\Models\Member $member */ // FIX: Explicitly cast $member after retrieval
-        $change_members = $user->can('change members');
+        $user = Auth::user();
+
+        // The logic we know works:
+        $isManager = $user->canAny(['change all', 'change members', 'change_members']);
+        $isOwner = ($user->can('change own') && (int)$member->user_id === (int)$user->id);
+
+        if (!$isManager && !$isOwner) {
+            abort(403, 'User does not have the right roles.');
+        }
+
+        $change_members = $isManager || $isOwner;
         return view('members.edit', compact('member', 'change_members'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Member $member): RedirectResponse
+    public function update(Request $request, $id)
     {
-        // Laravel looks at MemberPolicy@update automatically
-        $this->authorize('update', $member);
+        $member = Member::findOrFail($id);
+        $user = Auth::user();
 
-        // 1. Validate everything in one go
+        // The logic that we've verified works for the Edit screen:
+        $isManager = $user->canAny(['change all', 'change members', 'change_members']);
+        $isOwner = ($user->can('change own') && (int)$member->user_id === (int)$user->id);
+
+        if (!$isManager && !$isOwner) {
+            abort(403, 'You do not have permission to update this member.');
+        }
+
+        // Now proceed with your validation and update logic
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
@@ -217,6 +229,7 @@ class MemberController extends Controller
         ]);
 
         // 2. Perform the Member update
+        $validated = $request->all(); // Or $request->validate([...]);
         $member->update($validated);
 
 
@@ -243,7 +256,7 @@ class MemberController extends Controller
                 ]);
             }
         }
-        return redirect()->route('members.index')->with('success', 'Member updated!');
+        return redirect()->route('members.index')->with('success', 'Member updated successfully.');
     }
 
 

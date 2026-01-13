@@ -17,36 +17,19 @@ class VenueController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): View | RedirectResponse
-    {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
-                $venues = Venue::all();
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues */
-
-                return view('venues.index', compact('venues'));
-            }
-        }
-
-        return redirect('/');
+    public function index(): View | RedirectResponse {
+         $venues = Venue::all();
+            /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues */
+            return view('venues.index', compact('venues'));
     }
+
+
 
     /**
      * Show the form for creating a new resource.
      */
     public function create() : View | RedirectResponse
     {
-        $user = Auth::user();
-        // FIX: Grouped the intersection type with parentheses to resolve phpDoc.parseError
-        /** @var (\App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable)|null $user */
-
-        if (is_null($user)) {
-            return redirect()->to('/')->with('warning', 'Login is needed.');
-        }
-
         return view('venues.create');
     }
 
@@ -77,18 +60,15 @@ class VenueController extends Controller
     {
         $venue = Venue::findOrFail($id);
         /** @var \App\Models\Venue $venue */
-
         return view('venues.show', compact('venue'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View
+    public function edit(Venue $venue): View
     {
-        $venue = Venue::findOrFail($id);
         /** @var \App\Models\Venue $venue */
-
         return view('venues.edit', compact('venue'));
     }
 

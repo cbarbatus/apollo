@@ -20,23 +20,14 @@ class ContactController extends Controller
      */
     public function index(): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
+        $contacts = Contact::where('status', '=', 'received')
+            ->orderBy('created_at')
+            ->get();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts */
 
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
-
-                $contacts = Contact::where('status', '=', 'received')
-                    ->orderBy('created_at')
-                    ->get();
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts */
-
-                return view('contacts.index', compact('contacts'));
-            }
-        }
-
-        return redirect('/');
+        return view('contacts.index', compact('contacts'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -113,26 +104,17 @@ class ContactController extends Controller
 
     public function list(string $type): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
-                if ($type == 'all') {
-                    // FIX: Explicitly use query() to ensure PHPStan recognizes the Query Builder and resolves the get() issue.
-                    $contacts = Contact::query()->orderBy('created_at')
-                        ->get();
-                } else {
-                    $contacts = Contact::where('status', '=', $type)
-                        ->orderBy('created_at')
-                        ->get();
-                }
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts */
-                return view('contacts.index', compact('contacts'));
-            }
+        if ($type == 'all') {
+            // FIX: Explicitly use query() to ensure PHPStan recognizes the Query Builder and resolves the get() issue.
+            $contacts = Contact::query()->orderBy('created_at')
+                ->get();
+        } else {
+            $contacts = Contact::where('status', '=', $type)
+                ->orderBy('created_at')
+                ->get();
         }
-
-        return redirect('/');
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contact> $contacts */
+        return view('contacts.index', compact('contacts'));
     }
 
 

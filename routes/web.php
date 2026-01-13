@@ -51,8 +51,8 @@ Route::middleware(['auth', 'role:member|senior_druid|admin'])->group(function ()
     Route::get('/liturgy/{id}/downloadSource', [LiturgyController::class, 'downloadSource'])->name('liturgy.downloadSource');
     Route::get('/grove/pay', [GroveController::class, 'pay']);
     Route::get('/grove/bylaws', [GroveController::class, 'bylaws']);
-    Route::get('/members/{member}/edit', [MemberController::class, 'edit'])->name('members.edit');
-    Route::put('/members/{member}', [MemberController::class, 'update'])->name('members.update');
+    Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
+    Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
     Route::post('/members/{member}/update', [MemberController::class, 'update']); // Optional: Keep for legacy forms
 });
 
@@ -122,7 +122,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Permission Management (Named for easy removal/addition)
     Route::get('/roles/pcreate', [RoleController::class, 'pcreate'])->name('roles.permissions.create');
     Route::post('/roles/pstore', [RoleController::class, 'pstore'])->name('roles.permissions.store');
-    Route::get('/roles/{name}/{pname}/remove', [RoleController::class, 'remove'])->name('roles.permissions.remove');
+// Use match to support the transition, or just change it to post
+    Route::match(['get', 'post'], '/roles/{name}/{pname}/remove', [RoleController::class, 'remove'])
+        ->name('roles.permissions.remove');
     Route::post('/roles/{name}/add', [RoleController::class, 'add'])->name('roles.permissions.add');
     Route::post('/roles/{name}/set', [RoleController::class, 'set'])->name('roles.permissions.set');
     Route::delete('/permissions/{permission}', [RoleController::class, 'pdestroy'])

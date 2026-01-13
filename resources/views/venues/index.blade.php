@@ -47,7 +47,7 @@
                             <div class="d-flex justify-content-end align-items-center gap-2">
 
                                 {{-- Edit Button: Apollo Standard Rounded --}}
-                                <a href="{{ url("/venues/{$venue->id}/edit") }}"
+                                <a href="{{ route('venues.edit', $venue->id) }}"
                                    class="btn btn-sm btn-warning shadow-sm fw-bold border-0 d-inline-flex align-items-center justify-content-center"
                                    style="height: 30px; min-width: 60px; border-radius: 8px;">
                                     Edit
