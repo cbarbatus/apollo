@@ -35,6 +35,7 @@ class MemberController extends Controller
      */
     public function index(Request $request): View|RedirectResponse
     {
+
         $user = auth()->user();
         /** @var \App\Models\User $user */
 
@@ -276,27 +277,33 @@ class MemberController extends Controller
      */
     public function restore(Request $request): RedirectResponse
     {
-        $member = Member::whereIn('category', ['Elder', 'Member'])
-            ->where('status', 'Resigned')
-            ->where('first_name', $request->first_name)
-            ->where('last_name', $request->last_name)
+        $member = Member::where('status', 'Resigned')
+            ->where('first_name', trim($request->first_name))
+            ->where('last_name', trim($request->last_name))
             ->first();
 
         if ($member) {
             $member->update(['status' => 'Current']);
 
-            // Use create() to satisfy PHPStorm and keep it clean
-            $user = User::create([
-                'name'     => "{$member->first_name} {$member->last_name}",
-                'email'    => $member->email,
-                'password' => '', // Or Hash::make(Str::random(32)) for better security
-            ]);
+            // Since only active members have user records [cite: 2025-12-31]
+            // We ensure a User exists now.
+            $user = User::updateOrCreate(
+                ['email' => $member->email],
+                [
+                    'name' => "{$member->first_name} {$member->last_name}",
+                    'password' => '',
+                ]
+            );
 
             $user->assignRole('member');
-
             $member->update(['user_id' => $user->id]);
+
+            return redirect()->route('members.index')
+                ->with('success', "{$member->first_name} has been restored.");
         }
 
-        return redirect()->route('members.index');
+        // FALLBACK: If we get here, $member was null. No crash!
+        return redirect()->route('members.index')
+            ->with('error', "Could not find a resigned member named {$request->first_name} {$request->last_name}.");
     }
 }

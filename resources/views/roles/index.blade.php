@@ -76,7 +76,7 @@
 
                                     {{-- 2. Standardized Role Delete --}}
                                     <x-delete-button
-                                        :action="url('/roles/' . $role->name . '/destroy')"
+                                        :action="url('/roles/' . $role->id)"
                                         resource="role"
                                     >
                                         Delete
@@ -111,9 +111,11 @@
                                 <div class="d-inline-flex align-items-center shadow-sm" style="height: 38px; border-radius: 8px; overflow: hidden;">
                                     {{-- Changed $pname to $permission to match your loop --}}
                                     <x-delete-button
-                                        :action="url('/roles/' . $permission->name . '/pdestroy')"
+                                        :action="route('permissions.pdestroy', $permission->id)"
                                         resource="permission"
-                                    />
+                                    >
+                                        Delete Permission
+                                    </x-delete-button>
                                 </div>
                             </td>
                         </tr>

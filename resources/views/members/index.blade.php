@@ -24,8 +24,9 @@
 
             <div class="card p-3 mb-4 shadow-sm">
                 <h5 class="card-title text-info">Restore Member</h5>
-                <form method="POST" action="/members/restore" id="restoreForm" class="row g-3 align-items-center">
+                <form method="POST" action="{{ route('members.restore') }}" id="restoreForm" class="row g-3 align-items-center">
                     @csrf
+                    @method('PUT')
                     <div class="col-auto">
                         <label for="first_name" class="form-label">First Name:</label>
                         <input type="text" name="first_name" id="first_name" class="form-control" required>
@@ -52,7 +53,10 @@
                         <th>User</th>
                     @endif
                     <th>Name</th>
+                    @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
+                    <th>Status</th>
                     <th>Category</th>
+                    @endif
                     <th>Email</th>
                     <th>ADF #</th>
                     @if(auth()->user()->canAny(['change all', 'change members', 'change_members']))
@@ -72,7 +76,14 @@
                         @endif
 
                         <td class="fw-bold">{{ $member->first_name }} {{ $member->last_name }}</td>
-                        <td><span class="badge bg-light text-dark border">{{ $member->category }}</span></td>
+                            <td>
+                            <span class="badge {{ $member->status === 'Current' ? 'bg-success' : 'bg-danger' }}">
+                                {{ $member->status }}
+                            </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info text-dark">{{ $member->category }}</span>
+                            </td>
 
                         {{-- REMOVED 'small' here --}}
                         <td>{{ $member->email }}</td>

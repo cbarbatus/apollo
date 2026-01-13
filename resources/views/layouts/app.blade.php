@@ -82,7 +82,7 @@
                                     {{ __('Logout') }}
                                 </a>
 
-                                @role(['SeniorDruid', 'admin'])
+                                @role(['senior_druid', 'admin'])
                                 $ SeniorDruid:
                                 <a  class="dropdown-item" href="/announcements"> $ Announcements </a>
                                 <a  class="dropdown-item" href="/schedule"> $ Schedule </a>

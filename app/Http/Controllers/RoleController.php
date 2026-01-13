@@ -11,25 +11,28 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    /**
+
+    public function __construct()
+    {
+        // This is your 'Bouncer'.
+        // It applies to every single method in this file.
+        $this->middleware(['auth', 'role:admin']);
+    }
+
+        /**
      * Display a listing of roles and permissions.
      */
-    public function roles(): View|RedirectResponse
+    /**
+     * Display a listing of the roles and permissions.
+     */
+    public function roles(): View
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            if ($user && $user->hasRole('admin')) {
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Role> $roles */
-                $roles = Role::all();
-                /** @var \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions */
-                $permissions = Permission::all();
+        // The middleware handles the 'admin' check now,
+        // so we can focus purely on the data.
+        $roles = Role::all();
+        $permissions = Permission::all();
 
-                return view('roles.index', compact('roles', 'permissions'));
-            }
-        }
-
-        return redirect('/');
+        return view('roles.index', compact('roles', 'permissions'));
     }
 
     /* MAINTAIN RULES  */
@@ -68,15 +71,14 @@ class RoleController extends Controller
     /**
      * Remove the role.
      */
-    public function destroy(string $name): RedirectResponse
+    public function destroy(Role $role) // Laravel matches {role} to this model
     {
-        $role = Role::query()->where('name', $name)->firstOrFail();
-        /** @var \Spatie\Permission\Models\Role $role */
+        $role->syncPermissions([]);
+        $role->users()->detach();
         $role->delete();
 
-        return redirect('/roles')->with('success', 'Role was deleted');
+        return redirect('/roles')->with('success', 'Role deleted.');
     }
-
     /* MAINTAIN PERMISSIONS  */
 
     /**
@@ -113,13 +115,16 @@ class RoleController extends Controller
     /**
      * Remove the permission.
      */
-    public function pdestroy(string $name): RedirectResponse
+    public function pdestroy(Permission $permission)
     {
-        $permission = Permission::query()->where('name', $name)->firstOrFail();
-        /** @var \Spatie\Permission\Models\Permission $permission */
-        $permission->delete();
+        // Safety check: is it in use by ANY role?
+        if ($permission->roles()->count() > 0) {
+            $names = $permission->roles()->pluck('name')->join(', ');
+            return back()->with('error', "Cannot delete! This is still assigned to: {$names}.");
+        }
 
-        return redirect('/roles')->with('success', 'Permission was deleted');
+        $permission->delete();
+        return back()->with('success', "Permission purged.");
     }
 
     /* ASSOCIATE PERMISSIONS WITH ROLES   */

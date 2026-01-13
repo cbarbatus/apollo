@@ -41,8 +41,11 @@ Route::middleware(['auth', 'role:joiner'])->group(function () {
 | 2. THE MEMBER SANCTUARY (Auth + Role: Member/SeniorDruid/Admin)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:member|SeniorDruid|admin'])->group(function () {
-    Route::get('/members', [MemberController::class, 'index'])->name('members.index');
+Route::middleware(['auth', 'role:member|senior_druid|admin'])->group(function () {
+    // Allow both roles to hit the index, but Blade will handle column visibility
+    Route::get('/members', [MemberController::class, 'index'])
+        ->name('members.index');
+
     Route::get('/liturgy/find', [LiturgyController::class, 'find'])->name('liturgy.find');
     Route::get('/liturgy/list', [LiturgyController::class, 'list'])->name('liturgy.list');
     Route::get('/liturgy/{id}/downloadSource', [LiturgyController::class, 'downloadSource'])->name('liturgy.downloadSource');
@@ -59,7 +62,7 @@ Route::middleware(['auth', 'role:member|SeniorDruid|admin'])->group(function () 
 | 3. THE MASTER KEY (Auth + Role: SeniorDruid/Admin)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
+Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
 
     // 1. Specific Ritual & Announcement Actions (The "Interceptors")
     Route::get('/rituals/editNames', [RitualController::class, 'editNames']);
@@ -85,7 +88,7 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::get('/members/newmembers', [MemberController::class, 'newmembers'])->name('members.newmembers');
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
     Route::put('/elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');
-
+    Route::put('membership/restore', [MemberController::class, 'restore'])->name('members.restore');
     Route::get('/sections/{id}/on', [SectionController::class, 'on'])->name('sections.on');
     Route::get('/sections/{id}/off', [SectionController::class, 'off'])->name('sections.off');
 
@@ -97,6 +100,8 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
     Route::resource('venues', VenueController::class);
     Route::resource('books', BookController::class)->except(['index', 'show']);
     Route::resource('elements', ElementController::class);
+    Route::resource('members', MemberController::class)->except(['index']);
+    Route::resource('roles', RoleController::class);
 });
 
 
@@ -107,11 +112,26 @@ Route::middleware(['auth', 'role:SeniorDruid|admin'])->group(function () {
 */
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
-    Route::get('/roles', [RoleController::class, 'roles']);
-    Route::get('/permissions', [RoleController::class, 'permissions']);
-    Route::get('/grove/setup', [GroveController::class, 'setup']);
-    Route::get('/grove/hack', [GroveController::class, 'hack']);
-    Route::get('/grove/upload', [GroveController::class, 'upload']);
+
+    // Role Management (Direct Actions - All Named)
+    Route::get('/roles', [RoleController::class, 'roles'])->name('roles.index');
+    Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/roles/store', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{name}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+
+    // Permission Management (Named for easy removal/addition)
+    Route::get('/roles/pcreate', [RoleController::class, 'pcreate'])->name('roles.permissions.create');
+    Route::post('/roles/pstore', [RoleController::class, 'pstore'])->name('roles.permissions.store');
+    Route::get('/roles/{name}/{pname}/remove', [RoleController::class, 'remove'])->name('roles.permissions.remove');
+    Route::post('/roles/{name}/add', [RoleController::class, 'add'])->name('roles.permissions.add');
+    Route::post('/roles/{name}/set', [RoleController::class, 'set'])->name('roles.permissions.set');
+    Route::delete('/permissions/{permission}', [RoleController::class, 'pdestroy'])
+        ->name('permissions.pdestroy');
+
+    // System Config (Named)
+    Route::get('/permissions', [RoleController::class, 'permissions'])->name('permissions.index');
+    Route::get('/grove/setup', [GroveController::class, 'setup'])->name('grove.setup');
+    Route::get('/grove/upload', [GroveController::class, 'upload'])->name('grove.upload');
 });
 
 

@@ -8,10 +8,17 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
             <h1 style="margin: 0; font-weight: 700;">Role: '{{ $role->name }}'</h1>
 
-            <a href="{{ url('/roles/' . $role->name . '/add') }}"
-               style="background-color: #008080 !important; color: #ffffff !important; padding: 10px 20px !important; border-radius: 6px !important; text-decoration: none !important; font-weight: 700;">
-                + Add Permission
-            </a>
+            <form action="{{ route('roles.permissions.add', $role->name) }}" method="POST" style="display:inline;">
+                @csrf
+                <x-apollo-button
+                    type="submit"
+                    color="teal"
+                    class="bg-teal-600 text-white hover:bg-teal-700 shadow-sm" {{-- Force the solid background --}}
+                    style="background-color: #008080 !important; color: #ffffff !important;" {{-- The "Old Reliable" fallback --}}
+                >
+                    + Add Permission
+                </x-apollo-button>
+            </form>
         </div>
 
         {{-- Permissions Table Card --}}

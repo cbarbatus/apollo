@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
 
         // Explicitly register the policy for Laravel 12
-        Gate::policy(\App\Models\Member::class, \App\Policies\MemberPolicy::class);
+        /* Gate::policy(\App\Models\Member::class, \App\Policies\MemberPolicy::class); */
 
         Gate::before(function (User $user, string $ability) {
             if ($user->hasRole('admin')) {
