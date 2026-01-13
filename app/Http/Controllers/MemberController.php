@@ -188,6 +188,7 @@ class MemberController extends Controller
     public function edit($id): View
     {
         $member = Member::findOrFail($id);
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // The logic we know works:
