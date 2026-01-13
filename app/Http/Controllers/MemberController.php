@@ -209,6 +209,7 @@ class MemberController extends Controller
     public function update(Request $request, $id)
     {
         $member = Member::findOrFail($id);
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // The logic that we've verified works for the Edit screen:
