@@ -25,7 +25,7 @@ class RoleController extends Controller
     /**
      * Display a listing of the roles and permissions.
      */
-    public function roles(): View
+    public function index(): View
     {
         // The middleware handles the 'admin' check now,
         // so we can focus purely on the data.

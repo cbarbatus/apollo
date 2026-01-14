@@ -83,7 +83,7 @@
                                 </a>
 
                                 @role(['senior_druid', 'admin'])
-                                $ SeniorDruid:
+                                $ senior_druid:
                                 <a  class="dropdown-item" href="/announcements"> $ Announcements </a>
                                 <a  class="dropdown-item" href="/schedule"> $ Schedule </a>
                                 <a  class="dropdown-item" href="/venues"> $ Venues </a>
@@ -92,12 +92,12 @@
                                 <a  class="dropdown-item" href="/rituals/editNames"> $ Ritual Names </a>
                                 <a  class="dropdown-item" href="/rituals/editCultures"> $ Ritual Cultures </a>
                                 <a  class="dropdown-item" href="/sections"> $ Sections </a>
+                                <a  class="dropdown-item" href="/users"> $ User Roles </a>
 
                                 @endrole
 
                                 @role('admin')
                                 * Admin:
-                                <a  class="dropdown-item" href="/users"> * User Roles </a>
                                 <a  class="dropdown-item" href="/roles"> * Roles </a>
                                 <a  class="dropdown-item" href="/grove/upload"> * Upload </a>
 

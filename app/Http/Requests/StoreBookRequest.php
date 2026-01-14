@@ -10,14 +10,14 @@ class StoreBookRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
-     * We'll only allow users with 'admin' or 'SeniorDruid' roles to create/update books.
+     * We'll only allow users with 'admin' or 'senior_druid' roles to create/update books.
      */
     public function authorize(): bool
     {
         $user = Auth::user();
 
         // Check if user is authenticated and has the required role
-        return $user && $user->hasRole(['admin', 'SeniorDruid']);
+        return $user && $user->hasRole(['admin', 'senior_druid']);
     }
 
     /**

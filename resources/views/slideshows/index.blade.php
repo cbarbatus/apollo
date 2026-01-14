@@ -41,8 +41,8 @@
         </form>
 
         {{-- 1. Standardized Management Card --}}
-        {{-- Only show the Management Card to Admin or SeniorDruid --}}
-        @if(isset($choiceId) && auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']))
+        {{-- Only show the Management Card to Admin or senior_druid --}}
+        @if(isset($choiceId) && auth()->user()?->hasAnyRole(['admin', 'senior_druid']))
             <div class="row">
                 <div class="col-md-6 col-lg-5">
                     <div class="card mb-4 bg-light shadow-sm border-0">

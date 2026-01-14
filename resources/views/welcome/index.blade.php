@@ -20,12 +20,15 @@
         <img alt="cover" src="/img/webpage_cover.webp" class="img-fluid d-block mx-auto border-4 border-dark mb-5">
         <p class="text-center fw-bold mb-4">Click or touch to show a section.</p>
 
-        {{-- 2. Dynamic Sections --}}
         @foreach($sections as $section)
             @if ($section->id != 99)
-                <div class="card mb-3 shadow-sm">
+                {{-- MOVE THE ID TO THE OUTERMOST DIV --}}
+                <div id="section-{{ $section->id }}" class="card mb-3 shadow-sm">
+
                     <div class="card-header bg-light">
-                        <a href="/sections/{{ $section->id }}/on" class="text-decoration-none text-dark d-block">
+                        {{-- If it's already on, maybe make the title just text, or keep it as a toggle? --}}
+                        <a href="/sections/{{ $section->id }}/{{ $section->showit ? 'off' : 'on' }}"
+                           class="text-decoration-none text-dark d-block">
                             <h5 class="mb-0">{{ $section->name }}</h5>
                         </a>
                     </div>
@@ -60,7 +63,6 @@
                 </div>
             @endif {{-- End id != 99 --}}
         @endforeach
-
 
 
         <hr class="my-5">

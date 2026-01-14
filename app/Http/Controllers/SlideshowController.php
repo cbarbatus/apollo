@@ -19,9 +19,9 @@ class SlideshowController extends Controller
             'index', 'list', 'one', 'year', 'view'
         ]);
 
-        // 2. Requirement: Only Admin OR SeniorDruid can create/edit/delete [cite: 2026-01-06]
+        // 2. Requirement: Only Admin OR senior_druid can create/edit/delete [cite: 2026-01-06]
         // Note: We except the same public methods so guests aren't blocked from the gallery.
-        $this->middleware('role:admin|SeniorDruid')->except([
+        $this->middleware('role:admin|senior_druid')->except([
             'index', 'list', 'one', 'year', 'view'
         ]);
     }
@@ -56,7 +56,7 @@ class SlideshowController extends Controller
 
             if ($slideshow) {
                 // 🚦 The Public Redirect Interceptor
-                $isStaff = auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']);
+                $isStaff = auth()->user()?->hasAnyRole(['admin', 'senior_druid']);
 
                 if (!$isStaff) {
                     // Redirect using the exact ID for precision
@@ -117,17 +117,9 @@ class SlideshowController extends Controller
      */
     public function create(): View|RedirectResponse
     {
-        if (Auth::check()) {
-            $user = Auth::user();
-            /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
-            // FIX 2: Added PHPDoc cast to recognize hasRole()
-            if ($user->hasRole('admin')) {
-                return view('slideshows.create');
-            }
-        }
-
-        return redirect('/')->with('warning', 'Login is needed.');
+        return view('slideshows.create');
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -187,14 +179,11 @@ class SlideshowController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(int $id): View
+    public function edit(Slideshow $slideshow): View
     {
-        $slideshow = Slideshow::findOrFail($id);
-        /** @var \App\Models\Slideshow $slideshow */
-
+        // No findOrFail needed; Laravel handles the 404 automatically
         return view('slideshows.edit', compact('slideshow'));
     }
-
     /**
      * View a slideshow.
      */

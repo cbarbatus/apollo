@@ -22,7 +22,7 @@ class RitualController extends Controller
         $this->middleware('auth')->except(['index', 'display', 'liturgy']);
 
         // Ensure leaders can still manage, but members/guests can view these three
-        $this->middleware('role:admin|SeniorDruid')->except(['index', 'display', 'liturgy']);
+        $this->middleware('role:admin|senior_druid')->except(['index', 'display', 'liturgy']);
     }
 
 
@@ -54,8 +54,8 @@ class RitualController extends Controller
         // 5. THE FLOW LOGIC
 // 5. THE FLOW LOGIC [cite: 2026-01-06]
         if ($ritual) {
-            // Check if the user has the 'Master Key' (Admin or SeniorDruid)
-            $isStaff = auth()->user()?->hasAnyRole(['admin', 'SeniorDruid']);
+            // Check if the user has the 'Master Key' (Admin or senior_druid)
+            $isStaff = auth()->user()?->hasAnyRole(['admin', 'senior_druid']);
 
             if (!$isStaff) {
                 // GUESTS & MEMBERS: Transport immediately to the clean public view

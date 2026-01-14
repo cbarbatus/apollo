@@ -24,7 +24,7 @@ class SectionController extends Controller
             // Cast $user to the expected type to resolve static analysis errors
             /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
 
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
+            if ($user && $user->hasRole(['admin', 'senior_druid'])) {
 
                 $sections = Section::query()->orderBy('sequence')->get();
 
@@ -40,7 +40,7 @@ class SectionController extends Controller
      */
     public function edit($id): View|RedirectResponse
     {
-        if (Auth::check() && Auth::user()->hasRole(['admin', 'SeniorDruid'])) {
+        if (Auth::check() && Auth::user()->hasRole(['admin', 'senior_druid'])) {
 
             // Manually fetch the section using the ID from the URL
             $section = Section::findOrFail($id);
@@ -66,7 +66,7 @@ class SectionController extends Controller
             // Cast $user to the expected type
             /** @var \App\Models\User&\Illuminate\Contracts\Auth\Access\Authorizable $user */
 
-            if ($user && $user->hasRole(['admin', 'SeniorDruid'])) {
+            if ($user && $user->hasRole(['admin', 'senior_druid'])) {
 
                 return view('sections.create');
             }
@@ -105,27 +105,24 @@ class SectionController extends Controller
      */
     public function on(Request $request, Section $section): RedirectResponse
     {
-        // No need for a loop or findOrFail($id).
-        // Just update the specific section provided by the route.
         $section->showit = 1;
         $section->save();
 
-        return redirect('/');
+        // Redirect to the home page, but snap to the specific section ID
+        return redirect('/#section-' . $section->id);
     }
-    /**
-     * Turn off the showit flag.
-     */
+
     public function off(Request $request, Section $section): RedirectResponse
     {
-
         $section->showit = 0;
         $section->save();
 
-        return redirect('/');
+        // When turning off, you might want to snap to the top or the previous spot
+        return redirect('/#section-' . $section->id);
     }
 
 
-    public function updatePost(Request $request, $id)
+    public function update(Request $request, $id)
     {
         // 1. Validate only what belongs to the Section
         $request->validate([

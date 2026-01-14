@@ -25,7 +25,6 @@ Route::get('/slideshows/{id}/view', [SlideshowController::class, 'view'])->name(
 
 // Books & Contacts (Public Views)
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
-Route::get('/books/{id}', [BookController::class, 'show'])->name('books.show');
 Route::get('/contact', [ContactController::class, 'contactus'])->name('contactus');
 Route::get('/contacts/thanks', [ContactController::class, 'thanks'])->name('contacts.thanks');
 Route::post('/contacts/submit', [ContactController::class, 'submit'])->name('contacts.submit');
@@ -39,7 +38,7 @@ Route::middleware(['auth', 'role:joiner'])->group(function () {
 
 /*
 |--------------------------------------------------------------------------
-| 2. THE MEMBER SANCTUARY (Auth + Role: Member/SeniorDruid/Admin)
+| 2. THE MEMBER SANCTUARY (Auth + Role: Member/senior_druid/Admin)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:member|senior_druid|admin'])->group(function () {
@@ -60,10 +59,15 @@ Route::middleware(['auth', 'role:member|senior_druid|admin'])->group(function ()
 
 /*
 |--------------------------------------------------------------------------
-| 3. THE MASTER KEY (Auth + Role: SeniorDruid/Admin)
+| 3. THE MASTER KEY (Auth + Role: senior_druid/Admin)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
+// User Management (Index and Role Assignment only)
+    Route::resource('users', UserController::class)->only(['index', 'edit', 'update']);
+
+    // View Roles (Allows them to see the list they are assigning from)
+    Route::get('/index', [RoleController::class, 'roles'])->name('roles.index');
 
     // 1. Specific Ritual & Announcement Actions (The "Interceptors")
     Route::get('/rituals/editNames', [RitualController::class, 'editNames']);
@@ -88,10 +92,10 @@ Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
     Route::put('/schedule/{id}', [ElementController::class, 'updateSchedule'])->name('schedule.update');
     Route::get('/members/newmembers', [MemberController::class, 'newmembers'])->name('members.newmembers');
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
-    Route::put('/elements/{id}/update', [ElementController::class, 'updatePost'])->name('elements.update');
+    Route::put('/elements/{element}/update', [ElementController::class, 'updatePost'])->name('elements.update');
     Route::put('membership/restore', [MemberController::class, 'restore'])->name('members.restore');
-    Route::get('/sections/{id}/on', [SectionController::class, 'on'])->name('sections.on');
-    Route::get('/sections/{id}/off', [SectionController::class, 'off'])->name('sections.off');
+    Route::get('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
+    Route::get('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
 
     // 4. Management Resources (The "Catch-Alls" at the bottom)
     Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);
@@ -102,7 +106,8 @@ Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
     Route::resource('books', BookController::class)->except(['index', 'show']);
     Route::resource('elements', ElementController::class);
     Route::resource('members', MemberController::class)->except(['index']);
-    Route::resource('roles', RoleController::class);
+    // Only allow the methods you actually have in the controller
+    Route::resource('roles', RoleController::class)->only(['index', 'create', 'store', 'edit', 'update']);
 });
 
 
@@ -115,7 +120,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('users', UserController::class);
 
     // Role Management (Direct Actions - All Named)
-    Route::get('/roles', [RoleController::class, 'roles'])->name('roles.index');
     Route::get('/roles/create', [RoleController::class, 'create'])->name('roles.create');
     Route::post('/roles/store', [RoleController::class, 'store'])->name('roles.store');
     Route::get('/roles/{name}/edit', [RoleController::class, 'edit'])->name('roles.edit');

@@ -7,8 +7,9 @@
 
         </div>
 
-        <form method="POST" action="{{ url('sections/' . $section->id . '/update') }}">
+        <form method="POST" action="{{ route('sections.update', $section) }}">
             @csrf
+            @method('PUT')
 
             <div class="row mb-3">
                 <div class="col-md-6">

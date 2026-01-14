@@ -26,7 +26,7 @@ class BookController extends Controller
         // Apply a high-level authorization check for methods requiring permission.
         // This stops unauthorized users before the function body executes.
 // TEMPORARILY COMMENT OUT THIS LINE FOR DIAGNOSTICS:
-        // $this->middleware('role:admin|SeniorDruid')->only(['create', 'store', 'edit', 'update', 'sure', 'destroy']);
+        // $this->middleware('role:admin|senior_druid')->only(['create', 'store', 'edit', 'update', 'sure', 'destroy']);
 
     }
 
@@ -41,7 +41,7 @@ class BookController extends Controller
             $user = Auth::user();
             /** @var \App\Models\User $user */
             // We still need the hasRole check here to pass the flag to the view.
-            $changeok = $user->hasRole(['admin', 'SeniorDruid']);
+            $changeok = $user->hasRole(['admin', 'senior_druid']);
         }
 
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Book> $books */

@@ -98,24 +98,26 @@ class ElementController extends Controller
      * Route Model Binding Fix: Changed parameter from int $id to Element $element.
      * Type Safety Fix: Used input() and explicit casting.
      */
-    public function updatePost(Request $request, $id)
+    public function updatePost(Request $request, Element $element)
     {
-        $element = Element::findOrFail($id);
+        if (auth()->user()->cannot('manage-rituals')) {
+            abort(403, 'Permission "manage-rituals" is required.');
+        }
 
         $validated = $request->validate([
             'name'       => 'required|string',
             'title'      => 'required|string',
             'sequence'   => 'required|integer',
             'item'       => 'nullable|string',
-            'section_id' => 'required|integer',
+            'section_id' => 'required|integer|exists:sections,id', // Apollo Tight: Verify the section exists
         ]);
 
         $element->update($validated);
 
-        return redirect('sections/' . $element->section_id . '/edit')
+        // Using the object property for the redirect
+        return redirect()->route('sections.edit', $element->section_id)
             ->with('status', "Element '{$element->name}' updated successfully!");
     }
-
     public function editSchedule(): View
     {
         // Simplified Authorization - assuming your middleware handles the heavy lifting
