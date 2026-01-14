@@ -37,11 +37,9 @@
                 </select>
             </div>
 
-            <br>
+            <x-apollo-button type="submit">Submit Changes</x-apollo-button>
+            <x-cancel-button href="{{ route('rituals.show', $ritual->id) }}"/>
         </form>
-
-        <x-apollo-button type="submit">Submit Changes</x-apollo-button>
-        <x-cancel-button href="{{ route('rituals.show', $ritual->id) }}"/>
 
     </div>
 @endsection

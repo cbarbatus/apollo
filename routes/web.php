@@ -16,9 +16,10 @@ Route::get('/dashboard', [WelcomeController::class, 'index'])->name('dashboard')
 
 // Rituals & Slideshows (Public Views)
 Route::get('/rituals', [RitualController::class, 'index'])->name('rituals.index');
-Route::get('/rituals/{id}/display', [RitualController::class, 'display'])->name('rituals.display');
-Route::get('/rituals/{id}/liturgy', [RitualController::class, 'liturgy'])->name('rituals.liturgy');
 
+// Swapping {id} for {ritual} to enable Model Binding
+Route::get('/rituals/{ritual}/display', [RitualController::class, 'display'])->name('rituals.display');
+Route::get('/rituals/{ritual}/liturgy', [RitualController::class, 'liturgy'])->name('rituals.liturgy');
 Route::get('/slideshows', [SlideshowController::class, 'index'])->name('slideshows.index');
 Route::get('/slideshows/{id}/view', [SlideshowController::class, 'view'])->name('slideshows.view');
 

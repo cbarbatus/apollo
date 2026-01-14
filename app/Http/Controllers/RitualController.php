@@ -168,24 +168,19 @@ class RitualController extends Controller
     /**
      * Display one ritual.
      */
-    public function display (int $id): View
+    public function display (Ritual $ritual): View
     {
-        $ritual = Ritual::query()->findOrFail($id);
         $data = $this->getRitualDisplayData($ritual);
         $viewData = array_merge($data, compact('ritual'));
-
         return view('rituals.display', $viewData);
-
     }
 
     /**
      * Modernized Liturgy Reader
      * Replaces legacy 'text' method and manual line-parsing loops.
      */
-    public function liturgy(int $id): View|RedirectResponse
+    public function liturgy(Ritual $ritual): View|RedirectResponse
     {
-        $ritual = Ritual::findOrFail($id);
-
         // 1. Use the Phoenix 'liturgy_base' column for the filename
         $fileName = "{$ritual->liturgy_base}.htm";
         $filePath = public_path("liturgy/{$fileName}");
@@ -257,9 +252,8 @@ class RitualController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($id)
+    public function edit(Ritual $ritual)
     {
-        $ritual = Ritual::findOrFail($id);
         $activeNames = $this->getSection99Names();
         $cultures = $this->getSection99Cultures(); // Dynamic fetch
 
@@ -268,10 +262,8 @@ class RitualController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, int $id)
+    public function update(Request $request, Ritual $ritual) // No more $id!
     {
-        $ritual = Ritual::findOrFail($id);
-
         $request->validate([
             'year' => 'required|integer',
             'name' => [
@@ -279,19 +271,18 @@ class RitualController extends Controller
                 'string',
                 \Illuminate\Validation\Rule::unique('rituals')
                     ->where(fn ($query) => $query->where('year', $request->year))
-                    ->ignore($ritual->id), // The "Jealous Rule" fix
+                    ->ignore($ritual->id), // Still using the "Jealous Rule" fix
             ],
         ], [
             'name.unique' => 'This ritual name and year combination is already in use.'
         ]);
 
-        // Mass assignment using your specific $fillable fields
+        // Mass assignment - Eloquent handles the dirty check
         $ritual->update($request->all());
 
-        return redirect()->route('rituals.index', [
-            'year' => $ritual->year,
-            'name' => $ritual->name
-        ])->with('success', 'Ritual updated successfully.');
+// Redirect back to the specific ritual management page instead of the list
+        return redirect()->route('rituals.show', $ritual->id)
+            ->with('success', "{$ritual->name} updated successfully.");
     }
 
 
@@ -324,7 +315,7 @@ class RitualController extends Controller
         $ritual->save();
 
         // 3. Clear, descriptive Phoenix success message
-        return redirect()->route('rituals.index', ['year' => $ritual->year])
+        return redirect()->route('rituals.show', $ritual->id)
             ->with('success', "Liturgy base '{$baseName}' updated. Public .htm is live, and private .docx remains secure in storage.");
     }
 
