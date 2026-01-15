@@ -75,7 +75,7 @@
                     @foreach($members as $member)
                         @php
                             // 1. Define the manager check for THIS specific loop iteration
-                            $isManager = auth()->user()->canAny(['change all', 'change members', 'change_members']);
+                            $isManager = auth()->user()->canAny(['change all', 'change members']);
 
                             // 2. Define ownership: Only active members have user records [cite: 2025-12-31]
                             // Compare the record's user_id to the logged-in user
@@ -99,8 +99,8 @@
 
                                 <span class="badge rounded-pill {{ $statusColor }} shadow-sm"
                                       style="font-size: 0.8rem; padding: 0.4em 0.8em; min-width: 80px;">
-    {{ ucfirst($member->status) }}
-</span>
+                                    {{ ucfirst($member->status) }}
+                                </span>
                             </td>
                             <td class="py-1">{{ $member->category }}</td>
                             <td class="py-1 text-small">{{ $member->email }}</td>

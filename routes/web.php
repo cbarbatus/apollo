@@ -107,7 +107,7 @@ Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
     Route::resource('elements', ElementController::class);
     Route::resource('members', MemberController::class)->except(['index']);
     // Only allow the methods you actually have in the controller
-    Route::resource('roles', RoleController::class)->only(['index', 'create', 'store', 'edit', 'update']);
+    Route::resource('roles', RoleController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 });
 
 

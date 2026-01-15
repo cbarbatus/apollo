@@ -192,7 +192,7 @@ class MemberController extends Controller
         $user = Auth::user();
 
         // The logic we know works:
-        $isManager = $user->canAny(['change all', 'change members', 'change_members']);
+        $isManager = $user->canAny(['change all', 'change members']);
         $isOwner = ($user->can('change own') && (int)$member->user_id === (int)$user->id);
 
         if (!$isManager && !$isOwner) {
@@ -213,7 +213,7 @@ class MemberController extends Controller
         $user = Auth::user();
 
         // The logic that we've verified works for the Edit screen:
-        $isManager = $user->canAny(['change all', 'change members', 'change_members']);
+        $isManager = $user->canAny(['change all', 'change members']);
         $isOwner = ($user->can('change own') && (int)$member->user_id === (int)$user->id);
 
         if (!$isManager && !$isOwner) {

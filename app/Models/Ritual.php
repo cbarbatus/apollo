@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property string $year
- * @property string $name
+ * @property string $RitualName
  * @property string $liturgy_base
- * @property string $culture
+ * @property string $RitualCulture
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues
@@ -29,9 +29,9 @@ class Ritual extends Model
      */
     protected $fillable = [
         'year',
-        'name',
+        'RitualName',      // Updated from 'name'
         'liturgy_base',
-        'culture',
+        'RitualCulture',   // Updated from 'culture'
     ];
 
     public function venues(): HasMany
@@ -42,5 +42,19 @@ class Ritual extends Model
     public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);
+    }
+
+    protected function ritualName(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => in_array($value, ['0', ' ']) ? 'Legacy Ritual' : $value,
+        );
+    }
+
+    protected function ritualCulture(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: fn ($value) => in_array($value, ['0', ' ']) ? 'Historical' : $value,
+        );
     }
 }

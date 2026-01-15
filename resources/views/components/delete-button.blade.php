@@ -5,8 +5,12 @@
 ])
 
 @php
-    // Create a unique ID for this specific button/modal pair
-    $modalId = 'deleteModal' . md5($action);
+    // We cast to string immediately.
+    // If it's a Spatie object, we grab the ID manually to prevent the JSON string.
+    $actionUrl = is_object($action) ? url('/roles/' . $action->id) : (string)$action;
+
+    // Use the cleaned string for the MD5
+    $modalId = 'deleteModal' . md5($actionUrl);
 @endphp
 
 <x-apollo-button
@@ -21,7 +25,7 @@
 
 <x-confirmation-modal
     :id="$modalId"
-    :action="$action"
+    :action="$actionUrl"
     :method="$method"
     :resource="$resource"
     title="Confirm Action"
