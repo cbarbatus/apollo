@@ -25,4 +25,5 @@ Homestead.json
 Homestead.yaml
 # Compiled Assets (Vite/Mix output)
 /public_html/build
+/public_html/img/
 /public/build

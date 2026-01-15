@@ -1,0 +1,5 @@
+{{-- The "Safe" Swap --}}
+<x-cancel-button href="{{ $original_link_destination }}" />
+
+Search Pattern: (?<!x-)cancel (With Alt+X/Regex enabled)
+
