@@ -23,11 +23,13 @@ Route::get('/rituals/{ritual}/liturgy', [RitualController::class, 'liturgy'])->n
 Route::get('/slideshows', [SlideshowController::class, 'index'])->name('slideshows.index');
 Route::get('/slideshows/{id}/view', [SlideshowController::class, 'view'])->name('slideshows.view');
 
-// Books & Contacts (Public Views)
+// Books, Home page sections & Contacts (Public Views)
 Route::get('/books', [BookController::class, 'index'])->name('books.index');
 Route::get('/contact', [ContactController::class, 'contactus'])->name('contactus');
 Route::get('/contacts/thanks', [ContactController::class, 'thanks'])->name('contacts.thanks');
 Route::post('/contacts/submit', [ContactController::class, 'submit'])->name('contacts.submit');
+Route::get('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
+Route::get('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
 
 // Onboarding
 Route::get('/members/join', [MemberController::class, 'join'])->name('members.join');
@@ -94,8 +96,7 @@ Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
     Route::post('/members/{id}/accept', [MemberController::class, 'accept'])->name('members.accept');
     Route::put('/elements/{element}/update', [ElementController::class, 'updatePost'])->name('elements.update');
     Route::put('membership/restore', [MemberController::class, 'restore'])->name('members.restore');
-    Route::get('/sections/{section}/on', [SectionController::class, 'on'])->name('sections.on');
-    Route::get('/sections/{section}/off', [SectionController::class, 'off'])->name('sections.off');
+
 
     // 4. Management Resources (The "Catch-Alls" at the bottom)
     Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);

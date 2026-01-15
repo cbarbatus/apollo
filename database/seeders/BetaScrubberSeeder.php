@@ -42,15 +42,33 @@ class BetaScrubberSeeder extends Seeder
         $druid->givePermissionTo(Permission::all());
         $member->givePermissionTo('change own');
 
-        // 6. Assign Roles to you and the Senior Druid
-        // Remember: Only active members have user records! [cite: 2025-12-31]
-        $powerUsers = User::whereIn('email', [
-            'michael.talvola@gmail.com',
-            'lisa.saylorgentry@gmail.com'
-        ])->get();
+// 6. Assign Roles to you and the Senior Druid
+        $powerEmails = ['michael.talvola@gmail.com',
+            'lisa.saylorgentry@gmail.com'];
 
-        foreach ($powerUsers as $user) {
-            $user->assignRole(['admin', 'senior_druid']);
+        foreach ($powerEmails as $email) {
+            $user = User::where('email', $email)->first();
+            if ($user) {
+                $user->syncRoles(['admin', 'senior_druid']);
+            }
+        }
+
+// 7. Assign "member" to all 28 active records
+// Since only active members have records, we can be 100% inclusive here.
+// 1. Give EVERYONE the member role first
+        $allUsers = User::all();
+        foreach ($allUsers as $user) {
+            $user->assignRole('member');
+        }
+
+// 2. Then "Upgrade" the power users to Admin/Senior Druid
+        $powerEmails = ['michael.talvola@gmail.com',
+            'lisa.saylorgentry@gmail.com'];
+        foreach ($powerEmails as $email) {
+            $user = User::where('email', $email)->first();
+            if ($user) {
+                $user->assignRole(['admin', 'senior_druid']);
+            }
         }
     }
 }
