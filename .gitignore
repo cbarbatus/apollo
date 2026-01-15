@@ -18,6 +18,7 @@ yarn-error.log
 /public/hot # Development helper
 /storage/*.key
 /vendor
+/public_html/liturgy/
 .env
 .phpunit.result.cache
 Homestead.json
