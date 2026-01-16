@@ -13,7 +13,7 @@
         <header class="text-center mb-5">
             <h1 class="fs-3 text-dark fw-bold">Serving the L.A. Pagan community since 1999!</h1>
             <p class="fs-5 text-dark">
-                Raven's Cry Grove is an inclusive, anti-racist community...
+                Raven's Cry Grove is an inclusive, anti-racist community, welcoming and respecting all abilities, ethnicities, national origins, sexual orientations & gender identities.
             </p>
         </header>
 
