@@ -20,22 +20,20 @@ class LiturgyController extends Controller
         if (Auth::check()) {
             $rawelements = Element::all();
 
-            // --- MATCH THE INTERNAL NAMES EXACTLY ---
-
-            // 1. Check for "Cultures" (Verify if this is also capitalized in the DB)
+            // 1. Pull the "Allowed List" using the verified keys
             $cultures = [];
-            $cultureElement = $rawelements->where('name', 'RitualCultures')->first(); // Updated to match likely camelCase
+            $cultureElement = $rawelements->where('name', 'cultures')->first();
             if ($cultureElement && is_string($cultureElement->item)) {
                 $cultures = array_map('trim', explode(',', $cultureElement->item));
             }
 
-            // 2. Match "RitualNames" from your screenshot
             $rituals = [];
-            $nameElement = $rawelements->where('name', 'RitualNames')->first(); // FIXED to match image_1e30e3.png
+            $nameElement = $rawelements->where('name', 'names')->first();
             if ($nameElement && is_string($nameElement->item)) {
                 $rituals = array_map('trim', explode(',', $nameElement->item));
             }
 
+            // 2. Return the view with the dropdown options
             return view('liturgy.find', compact('rituals', 'cultures'));
         }
         return redirect('/');
