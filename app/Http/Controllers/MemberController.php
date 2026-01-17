@@ -150,9 +150,9 @@ class MemberController extends Controller
                 'city', 'state', 'zip', 'country', 'dob', 'emergency_contact' // Common culprits
             ];
             foreach ($optional as $field) {
-                // Check if column exists on the model to avoid a different error
                 if (Schema::hasColumn('members', $field)) {
-                    $member->$field = $request->input($field) ?? '';
+                    // Use null for empty fields instead of an empty string
+                    $member->$field = $request->filled($field) ? $request->input($field) : null;
                 }
             }
 
