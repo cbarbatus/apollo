@@ -18,7 +18,8 @@
 
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title> Local Raven's Cry Grove, ADF</title>
+    <title>{{ config('app.name') }}</title>
+
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>

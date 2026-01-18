@@ -4,7 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Carbon;
 /**
  * App\Models\Member
  *
@@ -79,4 +80,58 @@ class Member extends Model
         return $this->belongsTo(User::class);
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($member) {
+            // If it's an empty string, dump and die to see the culprit
+            if ($member->adf_join === '') {
+                dd([
+                    'message' => 'Caught the Bad Guy!',
+                    'value' => $member->adf_join,
+                    'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10)
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Handle adf_join date conversion
+     */
+    protected function adfJoin(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $this->parseAdfDate($value),
+        );
+    }
+
+    /**
+     * Handle adf_renew date conversion
+     */
+    protected function adfRenew(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => $this->parseAdfDate($value),
+        );
+    }
+
+    /**
+     * Internal helper to catch empty strings and format human dates for MySQL
+     */
+    private function parseAdfDate($value)
+    {
+        if (empty($value)) {
+            return null;
+        }
+
+        try {
+            // Carbon is smart enough to handle "20 December, 2026"
+            // and "12/25/2025" automatically.
+            return Carbon::parse($value)->format('Y-m-d');
+        } catch (\Exception $e) {
+            // If it's truly unparseable garbage, return null to avoid a crash
+            return null;
+        }
+    }
 }
