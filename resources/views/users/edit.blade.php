@@ -40,14 +40,14 @@
 
                     {{-- Navigation Actions --}}
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                        <a href="{{ url('/users') }}" class="btn btn-outline-secondary shadow-sm fw-bold px-4"
-                           style="height: 38px; border-radius: 8px;">
-                            Cancel
-                        </a>
 
-                        <x-apollo-button type="submit" color="primary" class="px-5 shadow-sm fw-bold">
-                            Save Role Changes
-                        </x-apollo-button>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <x-apollo-button type="submit">Submit</x-apollo-button>
+                                <x-cancel-button></x-cancel-button>
+                            </div>
+                        </div>
+
                     </div>
                 </form>
             </div>

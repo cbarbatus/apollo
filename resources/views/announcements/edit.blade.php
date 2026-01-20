@@ -71,10 +71,12 @@
 
                     {{-- Footer Actions --}}
                     <div class="d-flex justify-content-between align-items-center pt-3 border-top">
-                        <x-cancel-button></x-cancel-button>
-                        <x-apollo-button type="submit" color="success" class="px-5 shadow-sm fw-bold">
-                            Submit
-                        </x-apollo-button>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <x-apollo-button type="submit">Submit</x-apollo-button>
+                                <x-cancel-button></x-cancel-button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

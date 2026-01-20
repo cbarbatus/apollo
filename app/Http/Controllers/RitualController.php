@@ -38,11 +38,20 @@ class RitualController extends Controller
 
         // 3. PRECISION NAME LIST: Only names that exist for the currently selected sticky year
         // This fixes the 'blinking' by ensuring the dropdown matches the reality of that year.
-        $activeNames = Ritual::where('year', $selectedYear)
+// 1. Get the "God List" (The Master Sequence)
+        $masterList = Element::where('name', 'names')->value('item');
+        $ritualSequence = array_map('trim', explode(',', $masterList));
+
+// 2. The Precision Filter: Get ONLY names that exist for this year
+        $existingNames = Ritual::where('year', $selectedYear)
             ->distinct()
-            ->orderBy('name')
             ->pluck('name');
 
+// 3. The Sort: Reorder the existing names based on the Master List
+        $activeNames = $existingNames->sortBy(function ($name) use ($ritualSequence) {
+            $pos = array_search($name, $ritualSequence);
+            return ($pos === false) ? 999 : $pos;
+        })->values();
         // 4. FIND THE SPECIFIC RITUAL (If selected)
         $ritual = null;
         if ($selectedYear && $selectedName) {
@@ -88,7 +97,7 @@ class RitualController extends Controller
 
         // 2. Fetch the Master List using the Element model
         $nameElement = Element::where('section_id', 99)
-            ->where('name', 'RitualNames')
+            ->where('name', 'names')
             ->first();
 
         // 3. Explode the comma-delimited string
@@ -341,7 +350,7 @@ class RitualController extends Controller
      */
     public function editNames(): View
     {
-        $element = Element::query()->where('name', '=', 'RitualNames')->first();
+        $element = Element::query()->where('name', '=', 'names')->first();
         /** @var \App\Models\Element|null $element */
 
         return view('rituals.parameters', compact('element'));
@@ -353,7 +362,7 @@ class RitualController extends Controller
      */
     public function editCultures(): View
     {
-        $element = Element::query()->where('name', '=', 'RitualCultures')->first();
+        $element = Element::query()->where('name', '=', 'cultures')->first();
         /** @var \App\Models\Element|null $element */
 
         return view('rituals.parameters', compact('element'));
@@ -383,26 +392,24 @@ class RitualController extends Controller
 
     private function getSection99Names()
     {
-        // Fetch the Master List from Section 99 via the Element model
+        // Fix: Change 'RitualNames' to 'names' to match your database
         $nameElement = \App\Models\Element::where('section_id', 99)
-            ->where('name', 'RitualNames')
+            ->where('name', 'names') // Match the record you showed in the image
             ->first();
 
-        // Explode and clean the comma-delimited string
         return $nameElement
             ? array_map('trim', explode(',', $nameElement->item))
-            : ['Samhain', 'Yule', 'Imbolc', 'Beltaine']; // High Day fallback
+            : ['SYSTEM ERROR: Ritual Names Not Found'];
     }
 
     private function getSection99Cultures()
     {
         $cultureElement = \App\Models\Element::where('section_id', 99)
-            ->where('name', 'RitualCultures')
+            ->where('name', 'cultures')
             ->first();
 
         return $cultureElement
             ? array_map('trim', explode(',', $cultureElement->item))
-            : ['Welsh', 'Irish', 'Greek', 'Norse']; // Fallback
+            : ['SYSTEM ERROR: Ritual Cultures Not Found'];
     }
-
 }

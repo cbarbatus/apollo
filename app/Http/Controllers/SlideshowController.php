@@ -115,9 +115,11 @@ class SlideshowController extends Controller
      *
      * @return View|RedirectResponse  // FIX 1: Corrected PHPDoc return type
      */
-    public function create(): View|RedirectResponse
+    public function create()
     {
-        return view('slideshows.create');
+        // Fetch the master list using your newly corrected helper
+        $names = $this->getSection99Names();
+        return view('slideshows.create', compact('names'));
     }
 
 
@@ -252,13 +254,13 @@ class SlideshowController extends Controller
     {
         // Fetch the Master List from Section 99 via the Element model
         $nameElement = \App\Models\Element::where('section_id', 99)
-            ->where('name', 'RitualNames')
+            ->where('name', 'names')
             ->first();
 
         // Explode and clean the comma-delimited string
         return $nameElement
             ? array_map('trim', explode(',', $nameElement->item))
-            : ['Samhain', 'Yule', 'Imbolc', 'Beltaine']; // High Day fallback
+            : ['SYSTEM ERROR: Ritual Names Not Found']; // High Day fallback
     }
 
 

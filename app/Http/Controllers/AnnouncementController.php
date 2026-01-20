@@ -38,7 +38,7 @@ class AnnouncementController extends Controller
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
         $locations = Venue::all();
 
-        $elements = Element::where('name', '=', 'RitualNames')->first();
+        $elements = Element::where('name', '=', 'names')->first();
         /** @var \App\Models\Element|null $elements */
 
         // Handle possible null element and property access
@@ -88,7 +88,7 @@ class AnnouncementController extends Controller
         /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $locations */
         $locations = Venue::all();
 
-        $element = Element::where('name', 'RitualNames')->first();
+        $element = Element::where('name', 'names')->first();
 
         // Handle possible null element and property access
         $rituals = ($element && !empty($element->item))

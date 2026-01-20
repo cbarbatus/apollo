@@ -13,9 +13,23 @@
                  <input type="text" name="year" id="year" size="4">
                 </div>
 
-                <div class="col-md-1 mb-3">
-                    <label for="name">Name:</label>
-                    <input type="text" name="name" id="name" size="10">
+                <div class="col-md-4 mb-3">
+                    <label for="name" class="fw-bold">Slideshow Name:</label>
+                    <input
+                        list="ritual-names"
+                    autocomplete="off"
+                        name="name"
+                        id="name"
+                        class="form-control"
+                        placeholder="Select Ritual or type Event name..."
+                        required
+                    >
+                    <datalist id="ritual-names">
+                        @foreach ($names as $nameOption)
+                            <option value="{{ $nameOption }}">
+                        @endforeach
+                    </datalist>
+                    <small class="text-secondary">Suggestions are pulled from the High Day master list.</small>
                 </div>
             </div>
 

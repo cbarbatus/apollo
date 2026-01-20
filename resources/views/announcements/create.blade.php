@@ -72,7 +72,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <x-apollo-button type="submit">Submit</x-apollo-button>
-                </div>
+                    <x-cancel-button></x-cancel-button>
             </div>
 
         </form>
