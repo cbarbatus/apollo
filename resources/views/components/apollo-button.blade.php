@@ -10,18 +10,20 @@
 
     $colorClass = ($color === 'info') ? 'btn-info' : "btn-$color";
 
-    // Add href to the attributes bag programmatically to avoid quote nesting
     if ($href) {
         $attributes = $attributes->merge(['href' => $href]);
     }
+
+    $classes = "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded";
+    $style = ($textColor === 'text-white') ? 'color: white !important;' : '';
 @endphp
 
 @if($href)
-    <a {{ $attributes->merge(['class' => "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded"]) }}
-       @if($textColor === 'text-white') style="color: white !important;" @endif>
-        @else
-            <button {{ $attributes->merge(['class' => "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded"]) }}
-                    @if($textColor === 'text-white') style="color: white !important;" @endif>
-                @endif
-                {{ $slot }}
-            </{{ $href ? 'a' : 'button' }}>
+    <a {{ $attributes->merge(['class' => $classes]) }} style="{{ $style }}">
+        {{ $slot }}
+    </a>
+@else
+    <button {{ $attributes->merge(['class' => $classes]) }} style="{{ $style }}">
+        {{ $slot }}
+    </button>
+@endif
