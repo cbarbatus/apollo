@@ -1,6 +1,7 @@
 @props(['color' => 'primary', 'size' => 'md', 'href' => null])
 
 @php
+    /** @var \Illuminate\View\ComponentAttributeBag $attributes */
     $sizeClass = ($size === 'sm') ? 'btn-sm' : (($size === 'lg') ? 'btn-lg' : '');
 
     $textColor = in_array($color, ['primary', 'secondary'])
@@ -15,9 +16,12 @@
     }
 @endphp
 
-<{{ $href ? 'a' : 'button' }}
-    {{ $attributes->merge(['class' => "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded"]) }}
-    @if($textColor === 'text-white') style="color: white !important;" @endif
->
-{{ $slot }}
-</{{ $href ? 'a' : 'button' }}>
+@if($href)
+    <a {{ $attributes->merge(['class' => "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded"]) }}
+       @if($textColor === 'text-white') style="color: white !important;" @endif>
+        @else
+            <button {{ $attributes->merge(['class' => "btn $colorClass $sizeClass $textColor fw-bold shadow-sm rounded"]) }}
+                    @if($textColor === 'text-white') style="color: white !important;" @endif>
+                @endif
+                {{ $slot }}
+            </{{ $href ? 'a' : 'button' }}>
