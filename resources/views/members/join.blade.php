@@ -67,8 +67,8 @@
 
         </form>
 
-        <div class="d-flex justify-content-end">
-            <x-apollo-button type="submit" form='create' color="warning">Submit Application </x-apollo-button>
+        <div class="d-flex justify-content-start gap-2 pt-2">
+            <x-apollo-button type="submit" form='create' color="primary">Submit</x-apollo-button>
         </div>
 
     </div>

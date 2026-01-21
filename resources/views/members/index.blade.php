@@ -69,8 +69,10 @@
                         @endif
 
                         <th class="py-2 text-uppercase fw-extrabold text-dark">ADF #</th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Join</th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Renew</th>
+                        @if($isManager)
+                            <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Join</th>
+                            <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Renew</th>
+                        @endif
                         <th class="pe-3 py-2 text-end text-uppercase fw-extrabold text-dark">Action</th>
                     </tr>
                     </thead>
@@ -107,6 +109,8 @@
                             @endif
 
                             <td>{{ $member->adf }}</td>
+
+                            @if($isManager)
                             {{-- ADF Join Column --}}
                             <td class="py-1">
                                 {{ ($member->adf_join && strtotime($member->adf_join) > 0)
@@ -120,12 +124,12 @@
                                     ? \Carbon\Carbon::parse($member->adf_renew)->format('Y-m-d')
                                     : '---' }}
                             </td>
+                            @endif
 
                             <td class="text-end">
                                 @if($isManager || $isMyRecord)
-                                    <a href="{{ route('members.edit', $member->id) }}" class="btn btn-sm btn-primary">
-                                        Edit
-                                    </a>
+                                    <a href="{{ route('members.edit', $member->id) }}?filter={{ $full ? 'all' : '' }}"
+                                       class="btn btn-sm btn-primary">Edit</a>
                                 @endif
                             </td>
 

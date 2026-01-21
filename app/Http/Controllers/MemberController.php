@@ -220,18 +220,38 @@ class MemberController extends Controller
             abort(403, 'You do not have permission to update this member.');
         }
 
-        // Now proceed with your validation and update logic
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name'  => 'required|string|max:255',
-            'email'      => 'required|email',
-            'status'     => 'required|string',
-            'category'   => 'required|string',
-            // ... add the rest of your fields here ...
-        ]);
+// Define the groups based on your list
+        $selfFields = [
+            'first_name', 'last_name', 'mid_name', 'rel_name',
+            'address', 'pri_phone', 'alt_phone', 'email', 'adf'
+        ];
 
-        // 2. Perform the Member update
-        $validated = $request->all(); // Or $request->validate([...]);
+        $managementFields = [
+            'status', 'category', 'joined', 'adf_join', 'adf_renew'
+        ];
+
+// Start with the self-change rules
+        $rules = [];
+        foreach ($selfFields as $field) {
+            $rules[$field] = ($field === 'email') ? 'required|email' : 'nullable|string|max:255';
+        }
+
+// If the user is an admin, ADD the management-only fields to the rules [cite: 2026-01-14]
+        if (auth()->user()->hasAnyRole(['admin', 'senior_druid'])) {
+            foreach ($managementFields as $field) {
+                // Status and Category stay required; dates become nullable [cite: 2026-01-21]
+                if (in_array($field, ['status', 'category'])) {
+                    $rules[$field] = 'required|string';
+                } else {
+                    // This covers 'joined', 'adf_join', and 'adf_renew'
+                    $rules[$field] = 'nullable|date';
+                }
+            }
+        }
+
+        $validated = $request->validate($rules);
+
+// Update using ONLY what passed validation (protects against spoofing)
         $member->update($validated);
 
 
@@ -258,7 +278,11 @@ class MemberController extends Controller
                 ]);
             }
         }
-        return redirect()->route('members.index')->with('success', 'Member updated successfully.');
+// We grab 'filter' from the POST data (the hidden input)
+        // and put it into the GET redirect.
+        return redirect()->route('members.index', [
+            'filter' => $request->input('filter')
+        ])->with('success', 'Member updated successfully.');
     }
 
 
