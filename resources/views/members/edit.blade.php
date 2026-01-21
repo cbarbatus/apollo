@@ -6,7 +6,9 @@
         $isManager = auth()->user()->hasAnyRole(['admin', 'senior_druid']);
 
         // Check if this is a historical member (User ID ---) or active [cite: 2025-12-31]
+        /** @var \App\Models\Member $member */
         $isMyRecord = ($member->user_id && auth()->id() === $member->user_id);
+    dd($member);
     @endphp
 
     <div class="container py-4">
