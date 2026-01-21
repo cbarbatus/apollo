@@ -45,14 +45,18 @@
                 <trix-editor input="directions" class="trix-content shadow-sm bg-white" style="min-height: 200px;"></trix-editor>
             </div>
 
-            {{-- Apollo Standard Buttons - INSIDE the form --}}
-            <div class="mt-4 pt-4 border-top d-flex gap-3">
+
+            {{-- Apollo Standard Button Group --}}
+            <div class="d-flex justify-content-start gap-2 pt-2">
                 <x-apollo-button type="submit">
-                    <i class="bi bi-save me-2"></i>Update Venue
+                    Submit
                 </x-apollo-button>
 
-                <x-cancel-button href="{{ route('venues.index') }}" />
+                <x-cancel-button href="{{ route('home') }}">
+                    Cancel
+                </x-cancel-button>
             </div>
+
         </form>
     </div>
 @endsection

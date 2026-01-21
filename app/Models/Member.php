@@ -72,11 +72,8 @@ class Member extends Model
      */
     public function user()
     {
-        // If the ID is 0, we know there is no user, so don't even look.
-        if ($this->user_id === 0) {
-            return null;
-        }
-
+        // Remove the if statement.
+        // Laravel will naturally return null for the data if user_id is 0 or null.
         return $this->belongsTo(User::class);
     }
 

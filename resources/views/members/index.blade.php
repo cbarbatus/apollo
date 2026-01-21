@@ -3,6 +3,12 @@
 @section('content')
     <div class="container py-4">
 
+        @php
+            // 1. Define the manager check at the TOP of the file
+            // Using $isManager to match your @if on line 66
+            $isManager = auth()->user()->hasAnyRole(['admin', 'senior_druid'])
+                         || auth()->user()->canAny(['change all', 'change members']);
+        @endphp
 
             <h1 class="display-6 fw-bold mb-4">Grove Membership</h1>
 
@@ -49,75 +55,82 @@
                 <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
                     <thead class="bg-light border-bottom border-2">
                     <tr>
-                        {{-- Added fw-extrabold and tracked-wider style --}}
-                        <th class="ps-3 py-2 text-uppercase fw-extrabold text-dark"
-                            style="font-size: 0.85rem; letter-spacing: 0.05em; border-bottom: 2px solid #dee2e6;">
-                            Name
-                        </th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark" style="font-size: 0.85rem; letter-spacing: 0.05em;">
-                            Status
-                        </th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark" style="font-size: 0.85rem; letter-spacing: 0.05em;">
-                            Role
-                        </th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark" style="font-size: 0.85rem; letter-spacing: 0.05em;">
-                            Email
-                        </th>
-                        <th class="py-2 text-uppercase fw-extrabold text-dark" style="font-size: 0.85rem; letter-spacing: 0.05em;">
-                            ADF #
-                        </th>
-                        <th class="pe-3 py-2 text-end text-uppercase fw-extrabold text-dark" style="font-size: 0.85rem; letter-spacing: 0.05em;">
-                            Action
-                        </th>
+                        <th class="ps-3 py-2 text-uppercase fw-extrabold text-dark">ID</th>
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">Name</th>
+
+                        {{-- Category Column (The 'Joiner/Member' text in your screenshot) --}}
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">Category</th>
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">Status</th>
+
+                        @if($isManager)
+                            <th class="py-2 text-uppercase fw-extrabold text-dark">User</th>
+                            <th class="py-2 text-uppercase fw-extrabold text-dark">Joined</th>
+                            <th class="py-2 text-uppercase fw-extrabold text-dark">Email</th>
+                        @endif
+
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">ADF #</th>
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Join</th>
+                        <th class="py-2 text-uppercase fw-extrabold text-dark">ADF Renew</th>
+                        <th class="pe-3 py-2 text-end text-uppercase fw-extrabold text-dark">Action</th>
                     </tr>
                     </thead>
+
                     <tbody style="line-height: 1.2;"> {{-- Tighter line height for the rows --}}
                     @foreach($members as $member)
                         @php
-                            // 1. Define the manager check for THIS specific loop iteration
-                            $isManager = auth()->user()->canAny(['change all', 'change members']);
-
-                            // 2. Define ownership: Only active members have user records [cite: 2025-12-31]
-                            // Compare the record's user_id to the logged-in user
+                            // Ownership check stays inside the loop
                             $isMyRecord = (auth()->user()->can('change own') && $member->user_id === auth()->id());
+                            // 2. Status Color check for THIS member (This was missing!)
+                            $statusColor = match(strtolower($member->status)) {
+                                'current'  => 'bg-success',
+                                'friend'   => 'bg-info text-dark',
+                                'inactive' => 'bg-secondary',
+                                default    => 'bg-danger'
+                            };
                         @endphp
-                        <tr>
-                            <td class="ps-3 py-1 fw-bold text-dark" style="font-size: 1rem;">
-                                {{ $member->first_name }} {{ $member->last_name }}
-                            </td>
-                            <td class="py-1">
-                                @php
-                                    // Map your statuses to Bootstrap colors
-                                    $statusColor = match(strtolower($member->status)) {
-                                        'current' => 'bg-success',
-                                        'friend'  => 'bg-info text-dark',
-                                        'inactive' => 'bg-secondary',
-                                        // Resigned, Expired, etc., all get the 'danger' or a neutral red
-                                        default    => 'bg-danger',
-                                    };
-                                @endphp
 
-                                <span class="badge rounded-pill {{ $statusColor }} shadow-sm"
-                                      style="font-size: 0.8rem; padding: 0.4em 0.8em; min-width: 80px;">
-                                    {{ ucfirst($member->status) }}
-                                </span>
+                        <tr>
+                            <td>{{ $member->id }}</td>
+                            <td>{{ $member->first_name }} {{ $member->last_name }}</td>
+                            <td>{{ $member->category }}</td>
+                            <td><span class="badge {{ $statusColor }}">{{ $member->status }}</span></td>
+
+                            @if($isManager)
+                                {{-- [cite: 2025-12-31] Only active members have user records --}}
+                                <td>{{ $member->user_id > 0 ? $member->user_id : '---' }}</td>
+                                <td class="py-1">
+                                    {{ ($member->joined && strtotime($member->joined) > 0)
+                                        ? \Carbon\Carbon::parse($member->joined)->format('Y-m-d')
+                                        : '---' }}
+                                </td>
+                                <td>{{ $member->user?->email ?? $member->email }}</td>
+                            @endif
+
+                            <td>{{ $member->adf }}</td>
+                            {{-- ADF Join Column --}}
+                            <td class="py-1">
+                                {{ ($member->adf_join && strtotime($member->adf_join) > 0)
+                                    ? \Carbon\Carbon::parse($member->adf_join)->format('Y-m-d')
+                                    : '---' }}
                             </td>
-                            <td class="py-1">{{ $member->category }}</td>
-                            <td class="py-1 text-small">{{ $member->email }}</td>
-                            <td class="py-1">{{ $member->adf }}</td>
-                            <td class="pe-3 py-1 text-end">
-                                {{-- Optimized logic using the variables you defined above --}}
+
+                            {{-- ADF Renew Column --}}
+                            <td class="py-1">
+                                {{ ($member->adf_renew && strtotime($member->adf_renew) > 0)
+                                    ? \Carbon\Carbon::parse($member->adf_renew)->format('Y-m-d')
+                                    : '---' }}
+                            </td>
+
+                            <td class="text-end">
                                 @if($isManager || $isMyRecord)
-                                    <a href="{{ url("/members/{$member->id}/edit") }}"
-                                       class="btn btn-primary btn-sm px-3 fw-bold shadow-sm"
-                                       style="border-radius: 6px; font-size: 0.7rem; padding-top: 1px; padding-bottom: 1px;">
+                                    <a href="{{ route('members.edit', $member->id) }}" class="btn btn-sm btn-primary">
                                         Edit
                                     </a>
                                 @endif
                             </td>
+
                         </tr>
-                    @endforeach
-                    </tbody>
+                    @endforeach        </tbody>
                 </table>
             </div>
         </div>

@@ -16,12 +16,10 @@ class AnnouncementController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(function ($request, $next) {
-            // This covers every single method in this controller
-            $this->authorize('manage', Announcement::class);
-            return $next($request);
-        });
+        // Standard 7 routes (index, create, store, show, edit, update, destroy)
+        $this->authorizeResource(\App\Models\Announcement::class, 'announcement');
     }
+
     /**
      * Display a listing of the resource.
      */
@@ -128,6 +126,8 @@ class AnnouncementController extends Controller
      */
     public function activate(Announcement $announcement): RedirectResponse
     {
+        $this->authorize('update', $announcement);
+
         $venue = Venue::where('name', $announcement->venue_name)->first();
         if (!$venue) {
             return redirect()->back()->with('error', "Venue not found.");
@@ -160,6 +160,9 @@ class AnnouncementController extends Controller
      */
     public function uploadpic(Announcement $announcement): View
     {
+        // Custom route: manually link to the 'update' logic in the Policy
+        $this->authorize('update', $announcement);
+
         $picname = $announcement->year . '_' . str_replace(' ', '_', $announcement->name) . '.jpg';
         return view('announcements.uploadpic', compact('announcement', 'picname'));
     }
@@ -169,6 +172,8 @@ class AnnouncementController extends Controller
      */
     public function storepic(Announcement $announcement, Request $request): RedirectResponse
     {
+        $this->authorize('update', $announcement);
+
         $request->validate([
             'file' => 'required|image|mimes:jpeg,jpg|max:2048',
             'id' => 'required|exists:announcements,id'

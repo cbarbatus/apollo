@@ -56,6 +56,7 @@ Route::middleware(['auth', 'role:member|senior_druid|admin'])->group(function ()
     Route::get('/members/{id}/edit', [MemberController::class, 'edit'])->name('members.edit');
     Route::put('/members/{id}', [MemberController::class, 'update'])->name('members.update');
     Route::post('/members/{member}/update', [MemberController::class, 'update']); // Optional: Keep for legacy forms
+    Route::resource('announcements', AnnouncementController::class);
 });
 
 
@@ -102,7 +103,7 @@ Route::middleware(['auth', 'role:senior_druid|admin'])->group(function () {
     Route::resource('rituals', RitualController::class)->except(['index', 'display', 'liturgy']);
     Route::resource('slideshows', SlideshowController::class)->except(['index', 'view']);
     Route::resource('sections', SectionController::class);
-    Route::resource('announcements', AnnouncementController::class);
+
     Route::resource('venues', VenueController::class);
     Route::resource('books', BookController::class)->except(['index', 'show']);
     Route::resource('elements', ElementController::class);

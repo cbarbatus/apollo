@@ -65,7 +65,9 @@
                         />
                     </td>
                     <td>
-                    <img src="/img/{{ $announcement->picture_file}}" alt="None" style="max-height:50px">
+                        <img src="/img/{{ $announcement->picture_file }}?t={{ $announcement->updated_at->timestamp }}"
+                             alt="None"
+                             style="max-height:50px">
                     </td>
                     <td>
                         <x-apollo-button

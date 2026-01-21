@@ -1,120 +1,122 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class='container py-4'>
+    @php
+        // Establish the same manager logic as the index page [cite: 2026-01-18]
+        $isManager = auth()->user()->hasAnyRole(['admin', 'senior_druid']);
 
+        // Check if this is a historical member (User ID ---) or active [cite: 2025-12-31]
+        $isMyRecord = ($member->user_id && auth()->id() === $member->user_id);
+    @endphp
+
+    <div class="container py-4">
         <h1 class="mb-4">Edit Member: {{ $member->first_name }} {{ $member->last_name }}</h1>
 
-        <form method="post" action="/members/{{ $member->id }}" id="edit">
+        <form action="{{ route('members.update', $member->id) }}" method="POST">
             @csrf
-            @method('put')
+            @method('PUT')
 
-            {{-- 1. Basic Identity Section --}}
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="first_name" class="form-label">First Name</label>
-                    <input type="text" name="first_name" id="first_name" class="form-control" value="{{ old('first_name', $member->first_name) }}" required>
+            <div class="row">
+                {{-- Personal Profile Section --}}
+                <div class="col-md-12 mb-4">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><strong>First Name:</strong></label>
+                            <input type="text" name="first_name" value="{{ old('first_name', $member->first_name) }}" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><strong>Middle Name:</strong></label>
+                            <input type="text" name="mid_name" value="{{ old('mid_name', $member->mid_name) }}" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label"><strong>Last Name:</strong></label>
+                            <input type="text" name="last_name" value="{{ old('last_name', $member->last_name) }}" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Religious Name(s):</strong></label>
+                            <input type="text" name="rel_name" value="{{ old('rel_name', $member->rel_name) }}" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Contact Email:</strong></label>
+                            <input type="email" name="email" value="{{ old('email', $member->email) }}" class="form-control">
+                            <small class="text-muted">Changing this will also update your login email if you are an active member.</small>
+                        </div>
+                    </div>
+
+                    {{-- Full Address: Reduced height to match other inputs --}}
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Full Address:</strong></label>
+                        <input type="text" name="address" value="{{ old('address', $member->address) }}" class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Primary Phone:</strong></label>
+                            <input type="text" name="pri_phone" value="{{ old('pri_phone', $member->pri_phone) }}" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Alt Phone:</strong></label>
+                            <input type="text" name="alt_phone" value="{{ old('alt_phone', $member->alt_phone) }}" class="form-control">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label for="last_name" class="form-label">Last Name</label>
-                    <input type="text" name="last_name" id="last_name" class="form-control" value="{{ old('last_name', $member->last_name) }}" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="mid_name" class="form-label">Middle Name</label>
-                    <input type="text" name="mid_name" id="mid_name" class="form-control" value="{{ old('mid_name', $member->mid_name) }}">
-                </div>
+
+                {{-- Manager Only Section [cite: 2026-01-18] --}}
+                @if($isManager)
+                    <div class="col-md-12 mt-4 p-4 bg-light border rounded shadow-sm">
+                        <h3 class="mb-3 text-secondary">Grove Management</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>Status:</strong></label>
+                                <select name="status" class="form-select">
+                                    @foreach(['current', 'friend', 'inactive', 'expired', 'resigned'] as $s)
+                                        <option value="{{ $s }}" {{ $member->status == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>Category:</strong></label>
+                                <input type="text" name="category" value="{{ old('category', $member->category) }}" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>ADF # (ID Number):</strong></label>
+                                <input type="text" name="adf" value="{{ old('adf', $member->adf) }}" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>Joined Date:</strong></label>
+                                <input type="date" name="joined" value="{{ ($member->joined && strtotime($member->joined) > 0) ? \Carbon\Carbon::parse($member->joined)->format('Y-m-d') : '' }}" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>ADF Join Date:</strong></label>
+                                <input type="date" name="adf_join" value="{{ ($member->adf_join && strtotime($member->adf_join) > 0) ? \Carbon\Carbon::parse($member->adf_join)->format('Y-m-d') : '' }}" class="form-control">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label"><strong>ADF Renew Date:</strong></label>
+                                <input type="date" name="adf_renew" value="{{ ($member->adf_renew && strtotime($member->adf_renew) > 0) ? \Carbon\Carbon::parse($member->adf_renew)->format('Y-m-d') : '' }}" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
 
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label for="rel_name" class="form-label">Religious Name</label>
-                    <input type="text" name="rel_name" id="rel_name" class="form-control" value="{{ old('rel_name', $member->rel_name) }}">
-                </div>
-                <div class="col-md-6">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $member->email) }}">
-                </div>
-            </div>
-
-            <hr>
-
-            {{-- 2. Admin / Status Section --}}
-            <h2 class="h5 mt-4 mb-3">Membership Details</h2>
-            @if ($change_members)
-                <div class="row mb-3">
-                    <div class="col-md-3">
-                        <label for="status" class="form-label">Status</label>
-                        <input type="text" name="status" id="status" class="form-control" value="{{ old('status', $member->status) }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="category" class="form-label">Category</label>
-                        <input type="text" name="category" id="category" class="form-control" value="{{ old('category', $member->category) }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="joined" class="form-label">Joined</label>
-                        <input type="text" name="joined" id="joined" class="form-control" value="{{ old('joined', $member->joined) }}">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="adf_id" class="form-label">ADF ID Number</label>
-                        <input type="text" name="adf" id="adf_id" class="form-control" value="{{ old('adf', $member->adf) }}">
-                    </div>
-                </div>
-
-                {{-- ADF Dates --}}
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <label for="adf_join" class="form-label">ADF Join Date</label>
-                        {{-- Corrected ID from 'adf join' to 'adf_join' --}}
-                        <input type="text" name="adf_join" id="adf_join" class="form-control" value="{{ old('adf_join', $member->adf_join) }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="adf_renew" class="form-label">ADF Renew Date</label>
-                        {{-- Corrected ID from 'adf renew' to 'adf_renew' --}}
-                        <input type="text" name="adf_renew" id="adf_renew" class="form-control" value="{{ old('adf_renew', $member->adf_renew) }}">
-                    </div>
-                </div>
-
-            @else
-                <input type="hidden" name="status" value="{{ $member->status }}">
-                <input type="hidden" name="category" value="{{ $member->category }}">
-                <input type="hidden" name="joined" value="{{ $member->joined }}">
-                <input type="hidden" name="adf" value="{{ $member->adf }}">
-                <input type="hidden" name="adf_join" value="{{ $member->adf_join }}">
-                <input type="hidden" name="adf_renew" value="{{ $member->adf_renew }}">
-            @endif
-
-            <hr>
-
-            {{-- 3. Contact Section --}}
-            <h2 class="h5 mt-4 mb-3">Contact Information</h2>
-            <div class="row mb-3">
-                <div class="col-12">
-                    <label for="address" class="form-label">Address</label>
-                    <input type="text" name="address" id="address" class="form-control" value="{{ old('address', $member->address) }}">
-                </div>
-            </div>
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label for="pri_phone" class="form-label">Primary Phone</label>
-                    <input type="text" name="pri_phone" id="pri_phone" class="form-control" value="{{ old('pri_phone', $member->pri_phone) }}">
-                </div>
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <label for="alt_phone" class="form-label">Alternate Phone</label>
-                        <input type="text" name="alt_phone" id="alt_phone" class="form-control" value="{{ old('alt_phone', $member->alt_phone) }}">
-                    </div>
-                </div>
-
-                {{-- MOVE THE BUTTON INSIDE THE FORM HERE --}}
-                <div class="mt-4">
+            <div class="mt-5 border-top pt-4">
+                <div class="d-flex justify-content-start gap-3">
                     <x-apollo-button type="submit">
-                        Save Changes
+                        Submit
                     </x-apollo-button>
-                    <x-cancel-button></x-cancel-button>
+
+                    <x-cancel-button href="{{ route('members.index') }}">
+                        Cancel
+                    </x-cancel-button>
                 </div>
             </div>
-        </form> {{-- The form now correctly closes AFTER the button --}}
-
+        </form>
+        </form>
     </div>
-    <br>
 @endsection
