@@ -9,16 +9,21 @@
         </div>
     @endif
 
-    <div class="container py-4">
-        <header class="text-center mb-5">
-            <h1 class="fs-3 text-dark fw-bold">Serving the L.A. Pagan community since 1999!</h1>
-            <p class="fs-5 text-dark">
-                Raven's Cry Grove is an inclusive, anti-racist community, welcoming and respecting all abilities, ethnicities, national origins, sexual orientations & gender identities.
-            </p>
+    <div class="container py-2">
+
+        <header>
+            <div class="mx-auto mb-5 text-center" style="max-width: 1250px;">
+                <h1 style="text-shadow: 2px 2px #888888;"
+                    class="fs-3 text-dark fw-bold">Serving the L.A. Pagan community since 1999!</h1>
+                <p  class="fs-4 text-dark" style="text-shadow: 1px 1px #888888; ">
+                    Raven's Cry Grove is an inclusive, anti-racist community, welcoming and respecting all abilities, ethnicities, national origins, sexual orientations & gender identities.
+                </p>
+            </div>
+
         </header>
 
         <img alt="cover" src="/img/webpage_cover.webp" class="img-fluid d-block mx-auto border-4 border-dark mb-5">
-        <p class="text-center fw-bold mb-4">Click or touch to show a section.</p>
+        <p class="fw-bold mb-4">Click or touch name to show a section.</p>
 
         @foreach($sections as $section)
             @if ($section->id != 99)
