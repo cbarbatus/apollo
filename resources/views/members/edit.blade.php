@@ -65,24 +65,70 @@
                     <div class="row mb-3">
                         <div class="col-md-4">
                             <label class="form-label"><strong>Status:</strong></label>
+                            @php
+                                // Define your "Gold Standard" for future entries
+                                $statusStandards = ['Current', 'Pending', 'Resigned', 'Deceased', 'Expired'];
+
+                                // Normalize current value for comparison
+                                $currentStatus = old('status', $member->status);
+
+                                // Build the collection: start with standards
+                                $statusOptions = collect($statusStandards);
+
+                                // Check if the current DB value is a "Ghost" (not in our standard list)
+                                // We use strtolower to ensure 'current' doesn't get flagged as historical if 'Current' is standard
+                                $isHistorical = $currentStatus && !$statusOptions->contains(function($value) use ($currentStatus) {
+                                    return strtolower($value) == strtolower($currentStatus);
+                                });
+
+                                if ($isHistorical) {
+                                    $statusOptions->prepend($currentStatus);
+                                }
+                            @endphp
+
                             <select name="status" class="form-control">
-                                <option value="" {{ is_null(old('status', $member->status)) ? 'selected' : '' }}>-- Select Status --</option>
-                                {{-- Status: Values are lowercase to match legacy DB --}}
-                                @foreach(['current', 'active', 'inactive', 'pending', 'lapsed', 'resigned', 'deceased', 'expired'] as $status)
-                                    <option value="{{ $status }}"
-                                        {{ old('status', $member->status) == $status ? 'selected' : '' }}>
-                                        {{ $status }} {{-- This keeps the UI looking polished --}}
+                                <option value="" {{ is_null($currentStatus) ? 'selected' : '' }}>-- Select Status --</option>
+
+                                @foreach($statusOptions as $opt)
+                                    @php
+                                        $isOptHistorical = !in_array($opt, $statusStandards);
+                                    @endphp
+                                    <option value="{{ $opt }}"
+                                        {{ strtolower($currentStatus) == strtolower($opt) ? 'selected' : '' }}>
+                                        {{ $opt }}{{ $isOptHistorical ? ' (Historical)' : '' }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label"><strong>Category:</strong></label>
+                            @php
+                                // Your specific pruned standards
+                                $categoryStandards = ['Member', 'Friend', 'Elder', 'Local', 'Joiner'];
+
+                                $currentCategory = old('category', $member->category);
+                                $categoryOptions = collect($categoryStandards);
+
+                                // Detect if this member is currently assigned to a legacy category
+                                $isHistoricalCat = $currentCategory && !$categoryOptions->contains(function($value) use ($currentCategory) {
+                                    return strtolower($value) == strtolower($currentCategory);
+                                });
+
+                                if ($isHistoricalCat) {
+                                    $categoryOptions->prepend($currentCategory);
+                                }
+                            @endphp
+
                             <select name="category" class="form-control">
-                                <option value="" {{ is_null(old('category', $member->category)) ? 'selected' : '' }}>-- Select Category --</option>
-                                @foreach(['Member', 'Friend', 'Associate', 'Initiate', 'Dedicant', 'Clergy'] as $category)
-                                    <option value="{{ $category }}" {{ (old('category', $member->category) == $category) ? 'selected' : '' }}>
-                                        {{ $category }}
+                                <option value="" {{ is_null($currentCategory) ? 'selected' : '' }}>-- Select Category --</option>
+
+                                @foreach($categoryOptions as $opt)
+                                    @php
+                                        $isOptHistorical = !in_array($opt, $categoryStandards);
+                                    @endphp
+                                    <option value="{{ $opt }}"
+                                        {{ strtolower($currentCategory) == strtolower($opt) ? 'selected' : '' }}>
+                                        {{ $opt }}{{ $isOptHistorical ? ' (Historical)' : '' }}
                                     </option>
                                 @endforeach
                             </select>
