@@ -308,8 +308,8 @@ class RitualController extends Controller
     public function storelit(Request $request): RedirectResponse
     {
         $request->validate([
-            // Strictly .htm and .docx only
-            'file' => 'required|mimes:htm,docx|max:5120',
+            // 'html' covers the mime type for both .htm and .html files
+            'file' => 'required|mimes:htm,html,docx|max:5120',
             'id' => 'required|exists:rituals,id'
         ]);
         $ritual = Ritual::findOrFail($request->id);
