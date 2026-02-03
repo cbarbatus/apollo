@@ -1,8 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-    {{-- @var \App\Models\Ritual $ritual --}}
-    {{-- @var string $litName --}}
+    @php
+        /** @var string $litName */
+        /** @var \App\Models\Ritual $ritual */
+    @endphp
 
     <div class="container">
 
