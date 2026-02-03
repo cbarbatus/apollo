@@ -1,9 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- @var \App\Models\Ritual $ritual --}}
+    {{-- @var string $litName --}}
+
     <div class="container">
-        {{-- @var \App\Models\Ritual $ritual --}}
-        {{-- @var string $litName --}}
 
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-primary text-white py-3">
