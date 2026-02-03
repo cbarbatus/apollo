@@ -2,8 +2,8 @@
 
 @section('content')
     <div class="container">
-        {{-- This tag replaces BOTH red boxes in your screenshot with one clean one --}}
-        <x-alert-danger />
+        {{-- @var \App\Models\Ritual $ritual --}}
+        {{-- @var string $litName --}}
 
         <div class="card border-0 shadow-sm rounded-3">
             <div class="card-header bg-primary text-white py-3">
@@ -15,16 +15,26 @@
 
                 <div class="mb-4">
                     <div class="alert alert-info border-0 shadow-sm">
-                        <i class="bi bi-code-slash me-2"></i>
+                        <i class="bi bi-info-circle me-2"></i>
                         Liturgy for: <strong>{{ $ritual->name }} ({{ $ritual->year }})</strong><br>
-                        Files must be <strong>.htm</strong> for public readability.
+                        Upload <strong>.htm</strong> for the public site, or <strong>.docx</strong> for the private archive.
                     </div>
-                    <p class="mt-2 text-muted">The file will be automatically renamed to:
-                        <code class="text-danger fw-bold">
-                            {{ Str::limit($litName, 47, '')}}
-                        </code>
-                        @if(strlen($litName) > 50)
-                            <br><small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Original name was shortened to fit 50-character limit.</small>
+                    @php
+                        // Strip the extension so we only limit the actual name
+                        $baseNameOnly = pathinfo($litName, PATHINFO_FILENAME);
+                        $limitedBase = str()->limit($baseNameOnly, 45, '');
+                    @endphp
+
+                    <p class="mt-2 text-muted">The file will be automatically renamed to:<br>
+                        <code class="text-danger fw-bold">{{ pathinfo($litName, PATHINFO_FILENAME) }}</code><span class="fw-bold">.htm</span>
+                        <span class="text-muted mx-1">or</span>
+                        <code class="text-danger fw-bold">{{ pathinfo($litName, PATHINFO_FILENAME) }}</code><span class="fw-bold">.docx</span>
+
+                        @if(strlen($baseNameOnly) > 45)
+                            <br><small class="text-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                Name was shortened to fit the 50-character limit with extension.
+                            </small>
                         @endif
                     </p>
                 </div>
@@ -35,7 +45,7 @@
                     <input type="hidden" name="litName" value="{{ $litName }}">
 
                     <div class="mb-4">
-                        <label for="file" class="form-label fw-bold">Select .htm File:</label>
+                        <label for="file" class="form-label fw-bold">Select File (.htm or .docx):</label>
                         {{-- w-50 or col-md-6 keeps the input from stretching across the whole screen --}}
                         <div style="max-width: 500px;">
                             <input type="file" name="file" class="form-control form-control-lg border-0 bg-light shadow-sm" required>

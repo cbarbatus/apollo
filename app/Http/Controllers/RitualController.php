@@ -308,24 +308,33 @@ class RitualController extends Controller
     public function storelit(Request $request): RedirectResponse
     {
         $request->validate([
-            'file' => 'required|mimes:htm,html|max:5120',
+            // Strictly .htm and .docx only
+            'file' => 'required|mimes:htm,docx|max:5120',
             'id' => 'required|exists:rituals,id'
         ]);
-
         $ritual = Ritual::findOrFail($request->id);
-        $fullFilename = $request->litName; // e.g., 2026_Imbolc.htm
+        $extension = $request->file('file')->getClientOriginalExtension();
 
-        // 1. Move the public file to public_html/liturgy
-        $request->file('file')->move(public_path('liturgy'), $fullFilename);
+        // Ensure we use the correct extension for the final filename
+        $baseName = pathinfo($request->litName, PATHINFO_FILENAME);
+        $fullFilename = $baseName . '.' . $extension;
 
-        // 2. Extract and save the base name (2026_Imbolc) to liturgy_base
-        $baseName = pathinfo($fullFilename, PATHINFO_FILENAME);
-        $ritual->liturgy_base = $baseName;
-        $ritual->save();
+        if (in_array($extension, ['doc', 'docx'])) {
+            // Explicitly move to the legacy grove folder
+            $request->file('file')->move(storage_path('app/grove'), $fullFilename);
+            $message = "Private source file ({$extension}) uploaded successfully to the grove archive.";
+        } else {
+            // PUBLIC: Move to public/liturgy
+            $request->file('file')->move(public_path('liturgy'), $fullFilename);
 
-        // 3. Clear, descriptive Phoenix success message
+            // Update the database only for public files to track the "active" ritual
+            $ritual->liturgy_base = $baseName;
+            $ritual->save();
+            $message = "Public liturgy (.htm) is now live.";
+        }
+
         return redirect()->route('rituals.show', $ritual->id)
-            ->with('success', "Liturgy base '{$baseName}' updated. Public .htm is live, and private .docx remains secure in storage.");
+            ->with('success', $message);
     }
 
     /**
