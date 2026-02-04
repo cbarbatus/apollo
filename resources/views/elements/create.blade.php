@@ -4,7 +4,7 @@
     <div class="container">
         <h1>Add New Element to Section {{ $section_id }}</h1>
 
-        <form method="POST" action="{{ url('elements/store') }}">
+        <form method="POST" action="{{ route('elements.store') }}">
             @csrf
             <input type="hidden" name="section_id" value="{{ $section_id }}">
 
