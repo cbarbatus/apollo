@@ -184,7 +184,7 @@ class AnnouncementController extends Controller
 
         // Use base_path or public_path depending on your local vs server setup
         // Since you use public_html/Img, we target that directly:
-        $request->file('file')->move(public_path('Img'), $filename);
+        $request->file('file')->move(public_path('img'), $filename);
 
         $announcement->picture_file = $filename;
         $announcement->save();
