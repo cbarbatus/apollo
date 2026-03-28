@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property string $year
- * @property string $RitualName
+ * @property string $name
  * @property string $liturgy_base
- * @property string $RitualCulture
+ * @property string $culture
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Venue> $venues
@@ -29,9 +29,9 @@ class Ritual extends Model
      */
     protected $fillable = [
         'year',
-        'RitualName',      // Updated from 'name'
+        'name',      // Updated from 'name'
         'liturgy_base',
-        'RitualCulture',   // Updated from 'culture'
+        'culture',   // Updated from 'culture'
     ];
 
     public function venues(): HasMany

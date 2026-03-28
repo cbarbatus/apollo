@@ -307,35 +307,33 @@ class RitualController extends Controller
 
     public function storelit(Request $request): RedirectResponse
     {
-        $request->validate([
-            // 'html' covers the mime type for both .htm and .html files
-            'file' => 'required|mimes:htm,html,docx|max:5120',
-            'id' => 'required|exists:rituals,id'
-        ]);
+        // ... validation ...
         $ritual = Ritual::findOrFail($request->id);
-        $extension = $request->file('file')->getClientOriginalExtension();
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
 
-        // Ensure we use the correct extension for the final filename
-        $baseName = pathinfo($request->litName, PATHINFO_FILENAME);
+        // --- FIX STARTS HERE ---
+        // Ignore $request->litName entirely.
+        // Build the name from the record we just verified exists.
+        $baseName = $ritual->year . "_" . $ritual->name;
         $fullFilename = $baseName . '.' . $extension;
+        // --- FIX ENDS HERE ---
 
         if (in_array($extension, ['doc', 'docx'])) {
-            // Explicitly move to the legacy grove folder
-            $request->file('file')->move(storage_path('app/grove'), $fullFilename);
-            $message = "Private source file ({$extension}) uploaded successfully to the grove archive.";
+            $file->move(storage_path('app/grove'), $fullFilename);
+            $message = "Private source file ({$extension}) uploaded successfully.";
         } else {
-            // PUBLIC: Move to public/liturgy
-            $request->file('file')->move(public_path('liturgy'), $fullFilename);
+            $file->move(public_path('liturgy'), $fullFilename);
 
-            // Update the database only for public files to track the "active" ritual
+            // Update the database with the CORRECT base name (2026_Beltaine)
             $ritual->liturgy_base = $baseName;
             $ritual->save();
-            $message = "Public liturgy (.htm) is now live.";
+            $message = "Public liturgy ({$fullFilename}) is now live.";
         }
 
-        return redirect()->route('rituals.show', $ritual->id)
-            ->with('success', $message);
+        return redirect()->route('rituals.show', $ritual->id)->with('success', $message);
     }
+
 
     /**
      * Remove the specified resource from storage.
